@@ -1,0 +1,116 @@
+{
+  "IN": {
+    "name": "India",
+    "adjacentCountries": [
+      "Pakistan",
+      "China",
+      "Bangladesh",
+      "Nepal"
+    ]
+  },
+  "US": {
+    "name": "United States",
+    "adjacentCountries": [
+      "Canada",
+      "Mexico"
+    ]
+  },
+  "AUS": {
+    "name": "Australia",
+    "adjacentCountries": []
+  },
+  "PK": {
+    "name": "Pakistan",
+    "adjacentCountries": [
+      "India",
+      "Afghanistan"
+    ]
+  },
+  "CN": {
+    "name": "China",
+    "adjacentCountries": [
+      "India",
+      "Russia",
+      "North Korea"
+    ]
+  },
+  "BD": {
+    "name": "Bangladesh",
+    "adjacentCountries": [
+      "India",
+      "Myanmar"
+    ]
+  },
+  "NP": {
+    "name": "Nepal",
+    "adjacentCountries": [
+      "India",
+      "China"
+    ]
+  },
+  "MX": {
+    "name": "Mexico",
+    "adjacentCountries": [
+      "United States"
+    ]
+  },
+  "CA": {
+    "name": "Canada",
+    "adjacentCountries": [
+      "United States"
+    ]
+  },
+  "RU": {
+    "name": "Russia",
+    "adjacentCountries": [
+      "China",
+      "Finland"
+    ]
+  },
+  "AF": {
+    "name": "Afghanistan",
+    "adjacentCountries": [
+      "Pakistan",
+      "Iran"
+    ]
+  },
+  "KP": {
+    "name": "North Korea",
+    "adjacentCountries": [
+      "China",
+      "South Korea"
+    ]
+  },
+  "KR": {
+    "name": "South Korea",
+    "adjacentCountries": [
+      "North Korea"
+    ]
+  },
+  "FI": {
+    "name": "Finland",
+    "adjacentCountries": [
+      "Russia",
+      "Sweden"
+    ]
+  },
+  "SE": {
+    "name": "Sweden",
+    "adjacentCountries": [
+      "Finland",
+      "Norway"
+    ]
+  },
+  "NO": {
+    "name": "Norway",
+    "adjacentCountries": [
+      "Sweden"
+    ]
+  },
+  "NZ": {
+    "name": "New Zealand",
+    "adjacentCountries": [
+      "Australia"
+    ]
+  }
+}

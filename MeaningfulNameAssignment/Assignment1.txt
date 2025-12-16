@@ -1,0 +1,19 @@
+Assignment 1: The below program is to Roll the Dice
+import random
+def getDiceValue(numberOfSides):
+    diceValue=random.randint(1, numberOfSides)
+    return diceValue
+
+
+def main():
+    numberOfSides=6
+    userPlaying=True
+    while userPlaying:
+        userInput=input("Ready to roll? Enter Q to Quit")
+        if userInput.lower() !="q":
+            diceValue=getDiceValue(numberOfSides)
+            print("You have rolled a",diceValue)
+        else:
+            userPlaying=False
+
+
