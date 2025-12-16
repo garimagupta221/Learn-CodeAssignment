@@ -1,0 +1,29 @@
+Assignment - 3
+The below program is to check whether the number is Armstrong number or not
+
+
+def calculateArmstrongSum(number):
+    armstrongSum = 0
+    totalDigits = 0
+    tempNumber = number
+    while tempNumber > 0:
+        totalDigits = totalDigits + 1
+        tempNumber = tempNumber // 10
+
+    tempNumber = number
+    for index in range(1, tempNumber + 1):
+        remainder = tempNumber % 10
+        armstrongSum = armstrongSum + (remainder ** totalDigits)
+        tempNumber //= 10
+    return armstrongSum
+
+
+# End of Function
+
+# User Input
+number = int(input("\nPlease Enter the Number to Check for Armstrong: "))
+
+if (number == calculateArmstrongSum(number)):
+    print("\n %d is Armstrong Number.\n" % number)
+else:
+    print("\n %d is Not a Armstrong Number.\n" % number)
