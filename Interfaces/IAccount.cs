@@ -1,0 +1,19 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace BankingSystem.Interfaces
+{
+    internal interface IAccount
+    {
+        int CustomerId { get; }
+
+        int AccountNumber { get; }
+        string Username { get; }
+        double Balance { get; }
+        bool Deposit(double amount);
+        bool Withdraw(double amount);
+    }
+}
