@@ -9,31 +9,37 @@ namespace BankingSystem.Models
     internal class Loan : ILoan
     {
         public int LoanId { get; private set; }
-        public double Principal { get; private set; }
-
-        private double interestRate;
-        private int tenureYears;
-
-        public Loan(int loanId, double principal, double interestRate, int tenureYears)
+        public decimal Principal { get; private set; }
+        public int LinkedAccountNumber { get; }
+        
+        public Loan(int loanId, LoanInfo info)
         {
             LoanId = loanId;
-            Principal = principal;
-            this.interestRate = interestRate;
-            this.tenureYears = tenureYears;
+            Principal = info.Principal;
+            tenureYears = info.TenureYears;
+            LinkedAccountNumber = info.LinkedAccountNumber;
+            interestRate = DEFAULT_INTEREST_RATE;
         }
 
-        public double CalculateInterest()
+        public decimal CalculateInterest()
         {
             return (Principal * interestRate * tenureYears) / 100;
         }
 
-        public double CalculateEMI()
+        public decimal CalculateEMI()
         {
-            double monthlyRate = interestRate / (12 * 100);
-            int months = tenureYears * 12;
+            decimal monthlyRate = interestRate / (MONTHS * 100);
+            int months = tenureYears * MONTHS;
+            decimal numerator = Principal * monthlyRate * (decimal)Math.Pow((double)(1 + monthlyRate), months);
+            decimal denominator = (decimal)Math.Pow((double)(1 + monthlyRate), months) - 1;
 
-            return (Principal * monthlyRate * Math.Pow(1 + monthlyRate, months)) /
-                   (Math.Pow(1 + monthlyRate, months) - 1);
+            return numerator / denominator;
         }
+
+        private const decimal DEFAULT_INTEREST_RATE = 10.5m;
+        private const int MONTHS = 12;
+
+        private decimal interestRate;
+        private int tenureYears;
     }
 }

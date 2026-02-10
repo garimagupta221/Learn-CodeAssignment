@@ -9,9 +9,10 @@ namespace BankingSystem.Interfaces
     internal interface ILoan
     {
         int LoanId { get; }
-        double Principal { get; }
+        decimal Principal { get; }
+        int LinkedAccountNumber { get; }
 
-        double CalculateInterest();
-        double CalculateEMI();
+        decimal CalculateInterest();
+        decimal CalculateEMI();
     }
 }

@@ -9,11 +9,11 @@ namespace BankingSystem.Interfaces
     internal interface IAccount
     {
         int CustomerId { get; }
-
         int AccountNumber { get; }
         string Username { get; }
-        double Balance { get; }
-        bool Deposit(double amount);
-        bool Withdraw(double amount);
+        decimal Balance { get; }
+
+        bool Deposit(decimal amount);
+        bool Withdraw(decimal amount);
     }
 }

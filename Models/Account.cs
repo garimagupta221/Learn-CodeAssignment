@@ -11,30 +11,30 @@ namespace BankingSystem.Models
     {
         public string Username { get; private set; }
         public int CustomerId { get; private set; }
-
         public int AccountNumber { get; private set; }
-        public double Balance { get; private set; }
+        public decimal Balance { get; private set; }
 
-        public Account(string username, int accountNumber, int customerId, double intialBalance)
+        public Account(int accountNumber, AccountInfo info)
         {
-            Username = username;
             AccountNumber = accountNumber;
-            Balance = intialBalance;
-            CustomerId = customerId;
+            CustomerId = info.CustomerId;
+            Username = info.Username;
+            Balance = info.InitialBalance;
         }
 
-        public bool Deposit(double amount)
+        public bool Deposit(decimal amount)
         {
             if (amount <= 0)
             {
                 Console.WriteLine("Amount is invalid");
                 return false;
             }
+
             Balance += amount;
             return true;
         }
 
-        public bool Withdraw(double amount)
+        public bool Withdraw(decimal amount)
         {
             if (amount <= 0)
             {
@@ -47,11 +47,9 @@ namespace BankingSystem.Models
                 Console.WriteLine("Account balance is insufficient");
                 return false;
             }
-                
 
             Balance -= amount;
             return true;
         }
-
     }
 }

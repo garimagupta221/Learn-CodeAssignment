@@ -8,6 +8,6 @@ namespace BankingSystem.Interfaces
 {
     internal interface ITransferService
     {
-        bool Transfer(IAccount sender, IAccount receiver, double amount);
+        bool Transfer(IAccount sender, IAccount receiver, decimal amount);
     }
 }

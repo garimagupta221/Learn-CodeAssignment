@@ -1,114 +1,64 @@
 ﻿using BankingSystem.Interfaces;
+using BankingSystem.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace BankingSystem.Models
 {
-    internal class Bank : ICustomerService, IAccountService
+    internal class Bank
     {
-        private List<IAccount> accounts;
-        private List<Customer> customers;
+        private readonly ICustomerService _customerService;
+        private readonly IAccountService _accountService;
+        private readonly ITransferService _transferService;
 
         public Bank()
         {
-            accounts = new List<IAccount>();
-            customers = new List<Customer>();
+            _customerService = new CustomerService();
+            _accountService = new AccountService();
+            _transferService = new TransferService();
         }
 
         public Customer CreateCustomer(int id, string name)
         {
-            Customer customer = new Customer(id, name);
-            customers.Add(customer);
-            return customer;
+            return _customerService.CreateCustomer(id, name);
         }
 
-        public bool CreateAccountForCustomer(Customer customer)
+        public bool CreateAccount(Customer customer)
+        {
+            return _accountService.CreateAccountForCustomer(customer);
+        }
+
+        public bool DeleteAccount(Customer customer, int accountNumber)
         {
             if (customer == null)
-                return false;
-
-            int accountNumber = 1000 + accounts.Count;
-            IAccount account = new Account(customer.Name, accountNumber, customer.CustomerId, 0.0);
-
-            accounts.Add(account);
-            customer.AddAccount(account);
-
-            return true;
-        }
-
-        public bool DeleteAccount(int accountNumber)
-        {
-            int deleteIndex = -1;
-            IAccount account = null;
-
-            for (int index = 0; index < accounts.Count; index++)
             {
-                if (accounts[index].AccountNumber == accountNumber)
-                {
-                    deleteIndex = index;
-                    account = accounts[index];
-                    break;
-                }
+                return false;
             }
 
-            if (deleteIndex == -1)
-                return false;
-
-            accounts.RemoveAt(deleteIndex);
-            Customer owner = GetCustomerById(account.CustomerId);
-            if (owner != null)
+            if (!_accountService.DeleteAccount(accountNumber))
             {
-                owner.RemoveAccount(accountNumber);
+                return false;
             }
-            return true;
+
+            return customer.RemoveAccount(accountNumber);
         }
 
         public Customer GetCustomerById(int customerId)
         {
-            for (int index = 0; index < customers.Count; index++)
-            {
-                if (customers[index].CustomerId == customerId)
-                    return customers[index];
-            }
-            return null;
+            return _customerService.GetCustomerById(customerId);
         }
 
-        public IAccount FindAccountByNumber(int accountNumber)
+        public IAccount FindAccount(int accountNumber)
         {
-            for (int index = 0; index < accounts.Count; index++)
-            {
-                if (accounts[index].AccountNumber == accountNumber)
-                    return accounts[index];
-            }
-            return null;
+            return _accountService.FindAccountByNumber(accountNumber);
         }
 
-        public IAccount GetAccountByUsername(string username)
+        public bool Transfer(IAccount sender, IAccount receiver, decimal amount)
         {
-            for (int index = 0; index < accounts.Count; index++)
-            {
-                if (accounts[index].Username == username)
-                    return accounts[index];
-            }
-            return null;
+            return _transferService.Transfer(sender, receiver, amount);
         }
-
-        public int AccountCount
-        {
-            get { return accounts.Count; }
-        }
-
-        public IAccount GetAccount(int index)
-        {
-            if (index < 0 || index >= accounts.Count)
-                return null;
-
-            return accounts[index];
-        }
-
     }
 }

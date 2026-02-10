@@ -7,33 +7,39 @@ using System.Threading.Tasks;
 
 namespace BankingSystem.Models
 {
-    internal class Customer
+    internal class Customer: ICustomer
     {
         public int CustomerId { get; }
-        public string Name { get; }
-
-        private List<IAccount> accounts;
-        private List<ILoan> loans;
-
+        public string UserName { get; }
         public int AccountCount => accounts.Count;
-        public Customer(int id, string name)
+        public IReadOnlyList<IAccount> Accounts => accounts;
+        public IReadOnlyList<ILoan> Loans => loans;
+
+        public Customer(int id, string userName)
         {
             CustomerId = id;
-            Name = name;
+            UserName = userName;
             accounts = new List<IAccount>();
             loans = new List<ILoan>();
         }
-
-        public List<IAccount> Accounts => accounts;
-
-
+        
         public void AddAccount(IAccount account)
         {
+            if (account == null)
+            {
+                return;
+            }
+
             accounts.Add(account);
         }
 
         public void AddLoan(ILoan loan)
         {
+            if(loan == null)
+            {
+                return;
+            }
+
             loans.Add(loan);
         }
 
@@ -47,8 +53,24 @@ namespace BankingSystem.Models
                     return true;
                 }
             }
+
             return false;
         }
 
+        public IAccount GetAccountByNumber(int accountNumber)
+        {
+            foreach (var account in accounts)
+            {
+                if (account.AccountNumber == accountNumber)
+                {
+                    return account;
+                }
+            }
+
+            return null;
+        }
+
+        private List<IAccount> accounts;
+        private List<ILoan> loans;
     }
 }

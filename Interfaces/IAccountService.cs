@@ -9,13 +9,9 @@ namespace BankingSystem.Interfaces
 {
     internal interface IAccountService
     {
-        bool CreateAccountForCustomer(Customer customer);
+        bool CreateAccountForCustomer(ICustomer customer);
         bool DeleteAccount(int accountNumber);
-
+        
         IAccount FindAccountByNumber(int accountNumber);
-        IAccount GetAccountByUsername(string username);
-
-        int AccountCount { get; }
-        IAccount GetAccount(int index);
     }
 }

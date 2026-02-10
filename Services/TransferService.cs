@@ -10,7 +10,7 @@ namespace BankingSystem.Services
 {
     internal class TransferService : ITransferService
     {
-        public bool Transfer(IAccount sender, IAccount receiver, double amount)
+        public bool Transfer(IAccount sender, IAccount receiver, decimal amount)
         {
             if (amount <= 0)
             {
@@ -27,6 +27,12 @@ namespace BankingSystem.Services
             if (receiver == null)
             {
                 Console.WriteLine("Recipient account not found");
+                return false;
+            }
+
+            if (sender.AccountNumber == receiver.AccountNumber)
+            {
+                Console.WriteLine("Cannot transfer in same account");
                 return false;
             }
 
