@@ -7,6 +7,7 @@ namespace BankingSystem.Enums
         LoanManagement,
         Exit
     }
+
     internal enum AccountMenuChoice
     {
         CreateAccount = 1,
@@ -14,6 +15,7 @@ namespace BankingSystem.Enums
         ViewAccountDetails,
         Back
     }
+
     internal enum TransactionMenuChoice
     {
         Deposit = 1,
@@ -21,6 +23,7 @@ namespace BankingSystem.Enums
         Transfer,
         Back
     }
+    
     internal enum LoanMenuChoice
     {
         ApplyLoan = 1,

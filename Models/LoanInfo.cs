@@ -11,6 +11,5 @@ namespace BankingSystem.Models
         public decimal Principal { get; set; }
         public int TenureYears { get; set; }
         public int LinkedAccountNumber { get; set; }
-
     }
 }

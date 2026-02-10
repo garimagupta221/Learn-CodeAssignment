@@ -12,6 +12,5 @@ namespace BankingSystem.Interfaces
         string UserName { get; }
         
         void AddAccount(IAccount account);
-
     }
 }

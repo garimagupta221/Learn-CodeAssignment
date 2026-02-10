@@ -23,12 +23,7 @@ namespace BankingSystem
         {
             while (true)
             {
-                Console.Write("Enter integral Customer Id: ");
-                if (!int.TryParse(Console.ReadLine(), out int id))
-                {
-                    Console.WriteLine("Invalid customer id");
-                    continue;
-                }
+                int id = InputValidator.GetValidPositiveInt("Enter Customer Id: ");
 
                 Customer customer = _bank.GetCustomerById(id);
                 if (customer != null)
@@ -36,8 +31,7 @@ namespace BankingSystem
                     return customer;
                 }
 
-                Console.Write("Enter Customer UserName: ");
-                string name = Console.ReadLine();
+                string name = InputValidator.GetValidUsername();
 
                 customer = _bank.CreateCustomer(id, name);
                 _bank.CreateAccount(customer);
@@ -51,7 +45,7 @@ namespace BankingSystem
             {
                 ShowMainMenu();
 
-                int input = GetValidChoice(1, 4);
+                int input = InputValidator.GetValidChoiceInRange(1, 4);
                 MainMenuChoice choice = (MainMenuChoice)input;
                 switch (choice)
                 {
@@ -93,7 +87,7 @@ namespace BankingSystem
             {
                 showAccountMenu();
 
-                int input = GetValidChoice(1, 4);
+                int input = InputValidator.GetValidChoiceInRange(1, 4);
                 AccountMenuChoice choice = (AccountMenuChoice)input;
 
                 if (choice == AccountMenuChoice.Back)
@@ -143,7 +137,7 @@ namespace BankingSystem
             while (true)
             {
                 showTransactionMenu();
-                int input = GetValidChoice(1, 4);
+                int input = InputValidator.GetValidChoiceInRange(1, 4);
                 TransactionMenuChoice choice = (TransactionMenuChoice)input;
 
                 if (choice == TransactionMenuChoice.Back)
@@ -185,7 +179,7 @@ namespace BankingSystem
             while (true)
             {
                 showLoanMenu();
-                int input = GetValidChoice(1, 4);
+                int input = InputValidator.GetValidChoiceInRange(1, 4);
                 LoanMenuChoice choice = (LoanMenuChoice)input;
 
                 if (choice == LoanMenuChoice.Back)
@@ -222,20 +216,6 @@ namespace BankingSystem
             Console.WriteLine("4. Back");
         }
 
-        private int GetValidChoice(int lowerBound, int upperBound)
-        {
-            while (true)
-            {
-                Console.Write($"Enter choice ({lowerBound}-{upperBound}): ");
-                if (int.TryParse(Console.ReadLine(), out int choice) && choice >= lowerBound && choice <= upperBound)
-                {
-                    return choice;
-                }
-
-                Console.WriteLine($"Invalid choice. Please enter {lowerBound}-{upperBound}");
-            }
-        }
-
         private void HandleDeleteAccount()
         {
             ShowCustomerAccounts();
@@ -258,32 +238,26 @@ namespace BankingSystem
         private void HandleDeposit()
         {
             ShowCustomerAccounts();
-
             var account = SelectAccount();
-
             if (account == null)
             {
                 return;
             }
 
-            Console.Write("Amount: ");
-            decimal amount = decimal.Parse(Console.ReadLine());
+            decimal amount = InputValidator.GetValidDecimal("Amount: ");
             Console.WriteLine(account.Deposit(amount) ? "Deposit completed" : "Cannot deposit");
         }
 
         private void HandleWithdraw()
         {
             ShowCustomerAccounts();
-
             var account = SelectAccount();
-
             if (account == null)
             {
                 return;
             }
 
-            Console.Write("Amount: ");
-            decimal amount = decimal.Parse(Console.ReadLine());
+            decimal amount = InputValidator.GetValidDecimal("Amount: ");
             Console.WriteLine(account.Withdraw(amount) ? "Withdrawal successful" : "Cannot withdraw");
         }
 
@@ -291,20 +265,14 @@ namespace BankingSystem
         {
             ShowCustomerAccounts();
 
-            Console.Write("Enter Sender account details: ");
+            Console.WriteLine("Enter Sender account details: ");
             var sender = SelectAccount();
-
             if (sender == null)
             {
                 return;
             }
 
-            Console.Write("Enter Receiver account number: ");
-            if (!int.TryParse(Console.ReadLine(), out int receiverAccountNo))
-            {
-                Console.WriteLine("Invalid receiver account number");
-                return;
-            }
+            int receiverAccountNo = InputValidator.GetValidPositiveInt("Enter Receiver account number: ");
 
             var receiver = _bank.FindAccount(receiverAccountNo);
             if (receiver == null)
@@ -313,8 +281,7 @@ namespace BankingSystem
                 return;
             }
 
-            Console.Write("Amount: ");
-            decimal amount = decimal.Parse(Console.ReadLine());
+            decimal amount = InputValidator.GetValidDecimal("Amount: ");
             Console.WriteLine(_bank.Transfer(sender, receiver, amount) ? "Transfer successful" : "Transfer failed");
         }
 
@@ -327,25 +294,19 @@ namespace BankingSystem
             }
 
             Console.WriteLine("Select account for EMI deduction:");
-
             foreach (var acc in _customer.Accounts)
             {
                 Console.WriteLine($"Account No: {acc.AccountNumber}");
             }
 
-            Console.Write("Account number: ");
             var account = SelectAccount();
-
             if (account == null)
             {
                 return;
             }
 
-            Console.Write("Loan amount: ");
-            decimal principal = decimal.Parse(Console.ReadLine());
-
-            Console.Write("Tenure (years): ");
-            int years = int.Parse(Console.ReadLine());
+            decimal principal = InputValidator.GetValidDecimal("Loan amount: ");
+            int years = InputValidator.GetValidPositiveInt("Tenure (years): ");
             int loanId = _loanSequence++;
             var info = new LoanInfo
             {
@@ -356,9 +317,11 @@ namespace BankingSystem
 
             Loan loan = new Loan(loanId, info);
             _customer.AddLoan(loan);
+            account.Deposit(principal);
 
             Console.WriteLine("Loan approved successfully");
             Console.WriteLine($"Loan ID: {loan.LoanId}");
+            Console.WriteLine($"Credited Amount: {principal}");
             Console.WriteLine($"EMI: {loan.CalculateEMI()}");
         }
 
@@ -384,9 +347,8 @@ namespace BankingSystem
                 return;
             }
 
-            Console.Write("Enter Loan ID: ");
-            int loanId = int.Parse(Console.ReadLine());
-            var loan = _customer.Loans.FirstOrDefault(l => l.LoanId == loanId);
+            int loanId = InputValidator.GetValidPositiveInt("Enter Loan ID: ");
+            var loan = _customer.Loans.FirstOrDefault(currentLoan => currentLoan.LoanId == loanId);
 
             if (loan == null)
             {
@@ -417,13 +379,7 @@ namespace BankingSystem
 
         private IAccount SelectAccount()
         {
-            Console.Write("Enter account number: ");
-            if (!int.TryParse(Console.ReadLine(), out int accountNo))
-            {
-                Console.WriteLine("Invalid input");
-                return null;
-            }
-
+            int accountNo = InputValidator.GetValidPositiveInt("Enter account number: ");
             var account = _customer.GetAccountByNumber(accountNo);
             if (account == null)
             {
