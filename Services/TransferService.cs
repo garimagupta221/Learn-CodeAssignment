@@ -36,12 +36,6 @@ namespace BankingSystem.Services
                 return false;
             }
 
-            if (sender.Balance < amount)
-            {
-                Console.WriteLine("Insufficient balance");
-                return false;
-            }
-
             if (!sender.Withdraw(amount))
             {
                 Console.WriteLine("Withdrawal failed");

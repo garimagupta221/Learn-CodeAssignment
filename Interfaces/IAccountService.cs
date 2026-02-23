@@ -9,7 +9,7 @@ namespace BankingSystem.Interfaces
 {
     internal interface IAccountService
     {
-        bool CreateAccountForCustomer(ICustomer customer);
+        bool CreateAccountForCustomer(ICustomer customer, string type);
         bool DeleteAccount(int accountNumber);
         
         IAccount FindAccountByNumber(int accountNumber);

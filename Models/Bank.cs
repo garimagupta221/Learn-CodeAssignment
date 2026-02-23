@@ -26,9 +26,9 @@ namespace BankingSystem.Models
             return _customerService.CreateCustomer(id, name);
         }
 
-        public bool CreateAccount(Customer customer)
+        public bool CreateAccount(Customer customer, string type)
         {
-            return _accountService.CreateAccountForCustomer(customer);
+            return _accountService.CreateAccountForCustomer(customer, type);
         }
 
         public bool DeleteAccount(Customer customer, int accountNumber)
@@ -38,12 +38,12 @@ namespace BankingSystem.Models
                 return false;
             }
 
-            if (!_accountService.DeleteAccount(accountNumber))
+            if (!customer.RemoveAccount(accountNumber))
             {
                 return false;
             }
 
-            return customer.RemoveAccount(accountNumber);
+            return _accountService.DeleteAccount(accountNumber);
         }
 
         public Customer GetCustomerById(int customerId)

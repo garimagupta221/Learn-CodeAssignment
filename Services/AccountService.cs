@@ -17,7 +17,7 @@ namespace BankingSystem.Services
             accounts = new List<IAccount>();
         }
 
-        public bool CreateAccountForCustomer(ICustomer customer)
+        public bool CreateAccountForCustomer(ICustomer customer, string type)
         {
             if (customer == null)
             {
@@ -32,7 +32,17 @@ namespace BankingSystem.Services
             };
 
             int accountNumber = _accountSequence++;
-            IAccount account = new Account(accountNumber, info);
+            IAccount account;
+
+            if (type == "Savings")
+            {
+                account = new SavingsAccount(accountNumber, info);
+
+            }
+            else
+            {
+                account = new CurrentAccount(accountNumber, info);
+            }
             accounts.Add(account);
             customer.AddAccount(account);
 

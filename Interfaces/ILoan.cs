@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BankingSystem.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,7 @@ namespace BankingSystem.Interfaces
         int LoanId { get; }
         decimal Principal { get; }
         int LinkedAccountNumber { get; }
+        LoanType LoanType { get; }
 
         decimal CalculateInterest();
         decimal CalculateEMI();

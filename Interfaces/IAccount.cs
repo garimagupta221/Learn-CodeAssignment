@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BankingSystem.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ namespace BankingSystem.Interfaces
         int AccountNumber { get; }
         string Username { get; }
         decimal Balance { get; }
+        AccountType AccountType { get; } 
 
         bool Deposit(decimal amount);
         bool Withdraw(decimal amount);

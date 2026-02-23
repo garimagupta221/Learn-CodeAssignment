@@ -1,4 +1,5 @@
-﻿using BankingSystem.Interfaces;
+﻿using BankingSystem.Enums;
+using BankingSystem.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace BankingSystem.Models
         public int CustomerId { get; private set; }
         public int AccountNumber { get; private set; }
         public decimal Balance { get; private set; }
+        public abstract AccountType AccountType { get; }
 
         public Account(int accountNumber, AccountInfo info)
         {
@@ -22,11 +24,9 @@ namespace BankingSystem.Models
             Balance = info.InitialBalance;
         }
 
-        public bool Deposit(decimal amount)
+        public virtual bool Deposit(decimal amount)
         {
-            if (amount <= 0)
-            {
-                Console.WriteLine("Amount is invalid");
+            if (amount <= 0){
                 return false;
             }
 
@@ -34,22 +34,6 @@ namespace BankingSystem.Models
             return true;
         }
 
-        public bool Withdraw(decimal amount)
-        {
-            if (amount <= 0)
-            {
-                Console.WriteLine("Amount is invalid");
-                return false;
-            }
-
-            if (Balance < amount)
-            {
-                Console.WriteLine("Account balance is insufficient");
-                return false;
-            }
-
-            Balance -= amount;
-            return true;
-        }
+        public abstract bool Withdraw(decimal amount);
     }
 }
