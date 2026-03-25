@@ -1,4 +1,5 @@
-﻿using BankingSystem.Enums;
+using BankingSystem.Enums;
+using BankingSystem.Exceptions;
 using BankingSystem.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,22 @@ namespace BankingSystem.Models
 
         public Loan(int loanId, LoanInfo info)
         {
+            if (info == null) {
+                throw new ArgumentNullException("info", "Info not found");
+            }
+            if (loanId <= 0) {
+                throw new ArgumentOutOfRangeException("loanId", "Loan id must be positive");
+            }
+            if (info.Principal <= 0) {
+                throw new InvalidLoanException("Loan principal must be positive.");
+            }
+            if (info.TenureYears <= 0) {
+                throw new InvalidLoanException("Loan tenure must be positive.");
+            }
+            if (info.LinkedAccountNumber <= 0) {
+                throw new InvalidLoanException("Linked account number must be positive.");
+            }
+
             LoanId = loanId;
             Principal = info.Principal;
             TenureYears = info.TenureYears;

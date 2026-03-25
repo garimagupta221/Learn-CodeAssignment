@@ -1,5 +1,6 @@
 using BankingSystem.Interfaces;
 using BankingSystem.Models;
+using BankingSystem.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,9 +20,11 @@ namespace BankingSystem.Services
 
         public bool CreateAccountForCustomer(ICustomer customer, string type)
         {
-            if (customer == null)
-            {
-                return false;
+            if (customer == null) {
+                throw new ArgumentNullException("Customer not found");
+            }
+            if (string.IsNullOrWhiteSpace(type)) {
+                throw new InvalidAccountTypeException(type);
             }
 
             var info = new AccountInfo
@@ -39,9 +42,13 @@ namespace BankingSystem.Services
                 account = new SavingsAccount(accountNumber, info);
 
             }
-            else
+            else if (type == "Current")
             {
                 account = new CurrentAccount(accountNumber, info);
+            }
+            else
+            {
+                throw new InvalidAccountTypeException(type);
             }
             accounts.Add(account);
             customer.AddAccount(account);
@@ -51,6 +58,10 @@ namespace BankingSystem.Services
 
         public bool DeleteAccount(int accountNumber)
         {
+            if (accountNumber <= 0) {
+                throw new ArgumentOutOfRangeException("accountNumber", "Account number must be positive");
+            }
+
             int deleteIndex = -1;
             for (int index = 0; index < accounts.Count; index++)
             {
@@ -63,7 +74,7 @@ namespace BankingSystem.Services
 
             if (deleteIndex == -1)
             {
-                return false;
+                throw new AccountNotFoundException(accountNumber);
             }
 
             accounts.RemoveAt(deleteIndex);
@@ -72,6 +83,10 @@ namespace BankingSystem.Services
 
         public IAccount FindAccountByNumber(int accountNumber)
         {
+            if (accountNumber <= 0) {
+                throw new ArgumentOutOfRangeException("accountNumber", "Account number must be positive");
+            }
+
             for (int index = 0; index < accounts.Count; index++)
             {
                 if (accounts[index].AccountNumber == accountNumber)
@@ -80,20 +95,7 @@ namespace BankingSystem.Services
                 }
             }
 
-            return null;
-        }
-
-        public IAccount GetAccountByUsername(string username)
-        {
-            for (int index = 0; index < accounts.Count; index++)
-            {
-                if (accounts[index].Username == username)
-                {
-                    return accounts[index];
-                }
-            }
-
-            return null;
+            throw new AccountNotFoundException(accountNumber);
         }
 
         private List<IAccount> accounts;

@@ -1,5 +1,6 @@
-﻿using BankingSystem.Interfaces;
+using BankingSystem.Interfaces;
 using BankingSystem.Models;
+using BankingSystem.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,36 +13,22 @@ namespace BankingSystem.Services
     {
         public bool Transfer(IAccount sender, IAccount receiver, decimal amount)
         {
-            if (amount <= 0)
-            {
-                Console.WriteLine("Invalid transfer amount");
-                return false;
+            if (amount <= 0) {
+                throw new InvalidAmountException(amount, "transfer");
             }
-
-            if (sender == null)
-            {
-                Console.WriteLine("Sender account not found");
-                return false;
+            if (sender == null) {
+                throw new AccountReferenceException("Sender account not found");
             }
-
-            if (receiver == null)
-            {
-                Console.WriteLine("Recipient account not found");
-                return false;
+            if (receiver == null) {
+                throw new AccountReferenceException("Receiver account not found");
             }
 
             if (sender.AccountNumber == receiver.AccountNumber)
             {
-                Console.WriteLine("Cannot transfer in same account");
-                return false;
+                throw new SameAccountTransferException(sender.AccountNumber);
             }
 
-            if (!sender.Withdraw(amount))
-            {
-                Console.WriteLine("Withdrawal failed");
-                return false;
-            }
-
+            sender.Withdraw(amount);
             receiver.Deposit(amount);
             return true;
         }

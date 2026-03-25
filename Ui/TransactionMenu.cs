@@ -1,7 +1,8 @@
-﻿using BankingSystem.Enums;
+using BankingSystem.Enums;
 using BankingSystem.Interfaces;
 using BankingSystem.Models;
 using BankingSystem.Services;
+using BankingSystem.Exceptions;
 using System;
 
 namespace BankingSystem.Ui
@@ -68,7 +69,15 @@ namespace BankingSystem.Ui
             }
 
             decimal amount = InputValidator.GetValidDecimal("Amount: ");
-            Console.WriteLine(account.Deposit(amount) ? "Deposit completed" : "Cannot deposit");
+            try
+            {
+                account.Deposit(amount);
+                Console.WriteLine("Deposit completed");
+            }
+            catch (BankingException exception)
+            {
+                Console.WriteLine(exception.Message);
+            }
         }
 
         private void HandleWithdraw()
@@ -83,7 +92,15 @@ namespace BankingSystem.Ui
             }
 
             decimal amount = InputValidator.GetValidDecimal("Amount: ");
-            Console.WriteLine(account.Withdraw(amount) ? "Withdrawal successful" : "Cannot withdraw");
+            try
+            {
+                account.Withdraw(amount);
+                Console.WriteLine("Withdrawal successful");
+            }
+            catch (BankingException exception)
+            {
+                Console.WriteLine(exception.Message);
+            }
         }
 
         private void HandleTransfer()
@@ -99,16 +116,27 @@ namespace BankingSystem.Ui
             }
 
             int receiverAccountNo = InputValidator.GetValidPositiveInt("Enter Receiver account number: ");
-
-            var receiver = _bank.FindAccount(receiverAccountNo);
-            if (receiver == null)
+            IAccount receiver;
+            try
             {
-                Console.WriteLine("Receiver account not found");
+                receiver = _bank.FindAccount(receiverAccountNo);
+            }
+            catch (AccountNotFoundException exception)
+            {
+                Console.WriteLine(exception.Message);
                 return;
             }
 
             decimal amount = InputValidator.GetValidDecimal("Amount: ");
-            Console.WriteLine(_bank.Transfer(sender, receiver, amount) ? "Transfer successful" : "Transfer failed");
+            try
+            {
+                _bank.Transfer(sender, receiver, amount);
+                Console.WriteLine("Transfer successful");
+            }
+            catch (BankingException exception)
+            {
+                Console.WriteLine(exception.Message);
+            }
         }
 
         private void ShowCustomerAccounts()
@@ -131,14 +159,15 @@ namespace BankingSystem.Ui
         private IAccount SelectAccount()
         {
             int accountNo = InputValidator.GetValidPositiveInt("Enter account number: ");
-            var account = _customer.GetAccountByNumber(accountNo);
-            if (account == null)
+            try
             {
-                Console.WriteLine("Account doesn't exists");
+                return _customer.GetAccountByNumber(accountNo);
+            }
+            catch (AccountNotFoundException exception)
+            {
+                Console.WriteLine(exception.Message);
                 return null;
             }
-
-            return account;
         }
     }
 }

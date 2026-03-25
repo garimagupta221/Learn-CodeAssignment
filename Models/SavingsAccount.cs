@@ -1,4 +1,5 @@
-﻿using BankingSystem.Enums;
+using BankingSystem.Enums;
+using BankingSystem.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,14 +17,11 @@ namespace BankingSystem.Models
 
         public override bool Withdraw(decimal amount)
         {
-            if (amount <= 0)
-            {
-                return false;
+            if (amount <= 0) {
+                throw new InvalidAmountException(amount, "withdrawal");
             }
-
-            if (Balance < amount)
-            {
-                return false;
+            if (Balance < amount) {
+                throw new InsufficientFundsException(AccountNumber, amount, Balance);
             }
 
             Balance -= amount;

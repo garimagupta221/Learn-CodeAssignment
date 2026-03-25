@@ -1,6 +1,7 @@
-﻿using BankingSystem.Models;
+using BankingSystem.Models;
 using BankingSystem.Services;
 using BankingSystem.Enums;
+using BankingSystem.Exceptions;
 using System;
 
 namespace BankingSystem.Ui
@@ -18,20 +19,32 @@ namespace BankingSystem.Ui
             {
                 int id = InputValidator.GetValidPositiveInt("Enter Customer Id: ");
 
-                Customer customer = _bank.GetCustomerById(id);
-                if (customer != null)
+                Customer customer;
+                try
                 {
+                    customer = _bank.GetCustomerById(id);
                     return customer;
+                }
+                catch (CustomerNotFoundException)
+                {
+                        Console.WriteLine("Customer not found. Creating new customer");
                 }
 
                 string name = InputValidator.GetValidUsername();
 
-                customer = _bank.CreateCustomer(id, name);
-                Console.WriteLine("New customer created");
-                var accountMenu = new AccountMenu(_bank, customer);
-                accountMenu.HandleInitialAccountCreation();
+                try
+                {
+                    customer = _bank.CreateCustomer(id, name);
+                    Console.WriteLine("New customer created");
+                    var accountMenu = new AccountMenu(_bank, customer);
+                    accountMenu.HandleInitialAccountCreation();
 
-                return customer;
+                    return customer;
+                }
+                catch (DuplicateCustomerException exception)
+                {
+                    Console.WriteLine(exception.Message);
+                }
             }
         }
 

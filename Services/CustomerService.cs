@@ -1,5 +1,6 @@
 using BankingSystem.Interfaces;
 using BankingSystem.Models;
+using BankingSystem.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,11 +18,18 @@ namespace BankingSystem.Services
 
         public Customer CreateCustomer(int id, string name)
         {
+            if (id <= 0) {
+                throw new ArgumentOutOfRangeException("id", "Customer id must be positive.");
+            }
+            if (string.IsNullOrWhiteSpace(name)) {
+                throw new ArgumentOutOfRangeException("name", "Customer name cannot be empty.");
+            }
+
             for (int index = 0; index < customers.Count; index++)
             {
                 if (customers[index].CustomerId == id)
                 {
-                    return null;
+                    throw new DuplicateCustomerException(id);
                 }
             }
 
@@ -32,6 +40,10 @@ namespace BankingSystem.Services
 
         public Customer GetCustomerById(int customerId)
         {
+            if (customerId <= 0) {
+                throw new ArgumentOutOfRangeException("customerId", "Customer id must be positive.");
+            }
+
             for (int index = 0; index < customers.Count; index++)
             {
                 if (customers[index].CustomerId == customerId)
@@ -40,7 +52,7 @@ namespace BankingSystem.Services
                 }
             }
 
-            return null;
+            throw new CustomerNotFoundException(customerId);
         }
 
         private List<Customer> customers;

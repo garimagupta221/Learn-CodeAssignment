@@ -1,7 +1,8 @@
-﻿using BankingSystem.Enums;
+using BankingSystem.Enums;
 using BankingSystem.Interfaces;
 using BankingSystem.Models;
 using BankingSystem.Services;
+using BankingSystem.Exceptions;
 using System;
 
 namespace BankingSystem.Ui
@@ -23,13 +24,16 @@ namespace BankingSystem.Ui
                 AccountType typeChoice = (AccountType)input;
                 string type = typeChoice.ToString();
 
-                if (_bank.CreateAccount(_customer, type))
+                try
                 {
+                    _bank.CreateAccount(_customer, type);
                     Console.WriteLine($"{type} account created successfully");
                     return;
                 }
-
-                Console.WriteLine("Account creation failed. Try again");
+                catch (BankingException exception)
+                {
+                    Console.WriteLine(exception.Message);
+                }
             }
         }
 
@@ -93,15 +97,20 @@ namespace BankingSystem.Ui
                 }
 
                 string type = typeChoice.ToString();
-                bool created = _bank.CreateAccount(_customer, type);
-
-                if (created)
+                try
                 {
+                    _bank.CreateAccount(_customer, type);
                     Console.WriteLine($"{type} Account created successfully");
                     return;
                 }
-
-                Console.WriteLine("Account creation failed. Try again.");
+                catch (BankingException exception)
+                {
+                    Console.WriteLine(exception.Message);
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine(exception.Message);
+                }
             }
         }
 
@@ -115,7 +124,15 @@ namespace BankingSystem.Ui
                 return;
             }
 
-            Console.WriteLine(_bank.DeleteAccount(_customer, account.AccountNumber) ? "Account deleted" : "Account not found");
+            try
+            {
+                _bank.DeleteAccount(_customer, account.AccountNumber);
+                Console.WriteLine("Account deleted");
+            }
+            catch (AccountNotFoundException exception)
+            {
+                Console.WriteLine(exception.Message);
+            }
         }
 
         private void ShowCustomerAccounts()
@@ -135,14 +152,15 @@ namespace BankingSystem.Ui
         private IAccount SelectAccount()
         {
             int accountNo = InputValidator.GetValidPositiveInt("Enter account number: ");
-            var account = _customer.GetAccountByNumber(accountNo);
-            if (account == null)
+            try
             {
-                Console.WriteLine("Account doesn't exists");
+                return _customer.GetAccountByNumber(accountNo);
+            }
+            catch (AccountNotFoundException exception)
+            {
+                Console.WriteLine(exception.Message);
                 return null;
             }
-
-            return account;
         }
     }
 }

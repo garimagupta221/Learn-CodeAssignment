@@ -1,4 +1,4 @@
-﻿using BankingSystem.Interfaces;
+using BankingSystem.Interfaces;
 using BankingSystem.Services;
 using System;
 using System.Collections.Generic;
@@ -33,16 +33,11 @@ namespace BankingSystem.Models
 
         public bool DeleteAccount(Customer customer, int accountNumber)
         {
-            if (customer == null)
-            {
-                return false;
+            if (customer == null) {
+                throw new ArgumentNullException("Customer not found");
             }
 
-            if (!customer.RemoveAccount(accountNumber))
-            {
-                return false;
-            }
-
+            customer.RemoveAccount(accountNumber);
             return _accountService.DeleteAccount(accountNumber);
         }
 

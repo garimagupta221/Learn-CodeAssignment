@@ -1,6 +1,7 @@
-﻿using BankingSystem.Enums;
+using BankingSystem.Enums;
 using BankingSystem.Interfaces;
 using BankingSystem.Models;
+using BankingSystem.Exceptions;
 using System;
 using System.Linq;
 
@@ -92,35 +93,43 @@ namespace BankingSystem.Ui
             }
 
             ILoan loan;
-            if (loanType == LoanType.Home)
+            try
             {
-                loan = new HomeLoan(loanId, info);
+                if (loanType == LoanType.Home)
+                {
+                    loan = new HomeLoan(loanId, info);
+                }
+                else
+                {
+                    loan = new PersonalLoan(loanId, info);
+                }
+
+                _customer.AddLoan(loan);
+                account.Deposit(principal);
+
+                Console.WriteLine("Loan approved successfully");
+                Console.WriteLine($"Loan ID: {loan.LoanId}");
+                Console.WriteLine($"Credited Amount: {principal}");
+                Console.WriteLine($"EMI: {loan.CalculateEMI()}");
             }
-            else
+            catch (BankingException exception)
             {
-                loan = new PersonalLoan(loanId, info);
+                Console.WriteLine(exception.Message);
             }
-
-            _customer.AddLoan(loan);
-            account.Deposit(principal);
-
-            Console.WriteLine("Loan approved successfully");
-            Console.WriteLine($"Loan ID: {loan.LoanId}");
-            Console.WriteLine($"Credited Amount: {principal}");
-            Console.WriteLine($"EMI: {loan.CalculateEMI()}");
         }
 
         private IAccount SelectAccount()
         {
             int accountNo = InputValidator.GetValidPositiveInt("Enter account number: ");
-            var account = _customer.GetAccountByNumber(accountNo);
-            if (account == null)
+            try
             {
-                Console.WriteLine("Account doesn't exists");
+                return _customer.GetAccountByNumber(accountNo);
+            }
+            catch (AccountNotFoundException exception)
+            {
+                Console.WriteLine(exception.Message);
                 return null;
             }
-
-            return account;
         }
 
         private void ShowLoanTypeMenu()
