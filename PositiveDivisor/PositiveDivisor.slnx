@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../PositiveDivisor.Tests/PositiveDivisor.Tests.csproj" Id="1c13f14d-a572-46e0-8d2b-b8eb31793a3b" />
+  <Project Path="PositiveDivisor.csproj" Id="c5389089-a1c9-4f1b-a2e4-2dbfe1b34b83" />
+</Solution>
