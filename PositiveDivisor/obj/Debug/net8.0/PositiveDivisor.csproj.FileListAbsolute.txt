@@ -1,0 +1,4 @@
+C:\Users\garima.gupta\source\repos\PositiveDivisor\obj\Debug\net8.0\PositiveDivisor.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\garima.gupta\source\repos\PositiveDivisor\obj\Debug\net8.0\PositiveDivisor.AssemblyInfoInputs.cache
+C:\Users\garima.gupta\source\repos\PositiveDivisor\obj\Debug\net8.0\PositiveDivisor.AssemblyInfo.cs
+C:\Users\garima.gupta\source\repos\PositiveDivisor\obj\Debug\net8.0\PositiveDivisor.csproj.CoreCompileInputs.cache
