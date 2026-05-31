@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Project Resource Management Tool - Use Case Diagram</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg, #f6f8fa);
+  font-family: system-ui, sans-serif;
+  padding: 24px 16px 48px;
+}
+@media (prefers-color-scheme: dark) {
+  body { --bg: #0d1117; }
+}
+h1 {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #57606a;
+  margin-bottom: 4px;
+}
+@media (prefers-color-scheme: dark) { h1 { color: #484f58; } }
+.subtitle {
+  text-align: center;
+  font-size: 11px;
+  color: #8c959f;
+  margin-bottom: 20px;
+  letter-spacing: .04em;
+}
+.legend {
+  display: flex; flex-wrap: wrap; gap: 20px;
+  justify-content: center; margin-bottom: 24px;
+}
+.li {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: #57606a;
+}
+@media (prefers-color-scheme: dark) { .li { color: #8b949e; } }
+.ld { width: 10px; height: 10px; border-radius: 50%; }
+.ll { width: 28px; height: 0; }
+.wrap { overflow-x: auto; }
+svg text { font-family: system-ui, -apple-system, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Project Resource Management Tool - Use Case Diagram</h1>
+
+<div class="wrap">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1700 2920" width="1700" style="display:block">
+<defs>
+  <marker id="mi" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+    <path d="M1 1L9 5L1 9" fill="none" stroke="#1F6FEB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+  <marker id="me" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+    <path d="M1 1L9 5L1 9" fill="none" stroke="#CF7C35" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<rect x="115" y="18" width="1540" height="2870" rx="6"
+  fill="none" stroke="#d0d7de" stroke-width="1"/>
+<text x="385" y="14" font-size="11" fill="#8c959f" text-anchor="middle" letter-spacing=".06em">SYSTEM BOUNDARY</text>
+
+<rect x="120" y="28" width="530" height="904" rx="4"
+  fill="#ddf4ff20" stroke="#1F6FEB" stroke-width="0.7" stroke-dasharray="6 3"/>
+<text x="385" y="48" font-size="11" fill="#1F6FEB" text-anchor="middle" letter-spacing=".05em" font-weight="500">Admin use cases</text>
+
+<ellipse cx="385" cy="75" rx="155" ry="19" fill="#ddf4ff" stroke="#1F6FEB" stroke-width="0.8"/>
+<text x="385" y="79" font-size="12" fill="#0550ae" text-anchor="middle">Create user account</text>
+
+<ellipse cx="385" cy="120" rx="155" ry="19" fill="#ddf4ff" stroke="#1F6FEB" stroke-width="0.8"/>
+<text x="385" y="124" font-size="12" fill="#0550ae" text-anchor="middle">Deactivate user account</text>
+
+<ellipse cx="385" cy="165" rx="155" ry="19" fill="#ddf4ff" stroke="#1F6FEB" stroke-width="0.8"/>
+<text x="385" y="169" font-size="12" fill="#0550ae" text-anchor="middle">Reactivate user account</text>
+
+<ellipse cx="385" cy="210" rx="155" ry="19" fill="#ddf4ff" stroke="#1F6FEB" stroke-width="0.8"/>
+<text x="385" y="214" font-size="12" fill="#0550ae" text-anchor="middle">Reset user password</text>
+
+<ellipse cx="385" cy="255" rx="155" ry="19" fill="#ddf4ff" stroke="#1F6FEB" stroke-width="0.8"/>
+<text x="385" y="259" font-size="12" fill="#0550ae" text-anchor="middle">Add new employee profile</text>
+
+<ellipse cx="385" cy="300" rx="155" ry="19" fill="#ddf4ff" stroke="#1F6FEB" stroke-width="0.8"/>
+<text x="385" y="304" font-size="12" fill="#0550ae" text-anchor="middle">Update employee details</text>
+
+<ellipse cx="385" cy="345" rx="155" ry="19" fill="#ddf4ff" stroke="#1F6FEB" stroke-width="0.8"/>
+<text x="385" y="349" font-size="12" fill="#0550ae" text-anchor="middle">Deactivate employee profile</text>
+
+<ellipse cx="385" cy="390" rx="155" ry="19" fill="#ddf4ff" stroke="#1F6FEB" stroke-width="0.8"/>
+<text x="385" y="394" font-size="12" fill="#0550ae" text-anchor="middle">Assign skill to employee</text>
+
+<ellipse cx="385" cy="435" rx="155" ry="19" fill="#ddf4ff" stroke="#1F6FEB" stroke-width="0.8"/>
+<text x="385" y="439" font-size="12" fill="#0550ae" text-anchor="middle">Update employee skill</text>
+
+<ellipse cx="385" cy="480" rx="155" ry="19" fill="#ddf4ff" stroke="#1F6FEB" stroke-width="0.8"/>
+<text x="385" y="484" font-size="12" fill="#0550ae" text-anchor="middle">Remove employee skill</text>
+
+<ellipse cx="385" cy="525" rx="155" ry="19" fill="#ddf4ff" stroke="#1F6FEB" stroke-width="0.8"/>
+<text x="385" y="529" font-size="12" fill="#0550ae" text-anchor="middle">Create project</text>
+
+<ellipse cx="385" cy="570" rx="155" ry="19" fill="#ddf4ff" stroke="#1F6FEB" stroke-width="0.8"/>
+<text x="385" y="574" font-size="12" fill="#0550ae" text-anchor="middle">Assign manager to project</text>
+
+<ellipse cx="385" cy="615" rx="155" ry="19" fill="#ddf4ff" stroke="#1F6FEB" stroke-width="0.8"/>
+<text x="385" y="619" font-size="12" fill="#0550ae" text-anchor="middle">View full allocation matrix</text>
+
+<ellipse cx="385" cy="660" rx="155" ry="19" fill="#ddf4ff" stroke="#1F6FEB" stroke-width="0.8"/>
+<text x="385" y="664" font-size="12" fill="#0550ae" text-anchor="middle">Configure LLM provider &amp; key</text>
+
+<ellipse cx="385" cy="705" rx="155" ry="19" fill="#ddf4ff" stroke="#1F6FEB" stroke-width="0.8"/>
+<text x="385" y="709" font-size="12" fill="#0550ae" text-anchor="middle">Configure max weekly hours</text>
+
+<ellipse cx="385" cy="750" rx="155" ry="19" fill="#ddf4ff" stroke="#1F6FEB" stroke-width="0.8"/>
+<text x="385" y="754" font-size="12" fill="#0550ae" text-anchor="middle">Configure scheduler interval</text>
+
+<circle cx="62" cy="390" r="18" fill="none" stroke="#1F6FEB" stroke-width="1.5"/>
+<line x1="62" y1="408" x2="62" y2="455" stroke="#1F6FEB" stroke-width="1.5"/>
+<line x1="38" y1="425" x2="86" y2="425" stroke="#1F6FEB" stroke-width="1.5"/>
+<line x1="62" y1="455" x2="40" y2="480" stroke="#1F6FEB" stroke-width="1.5"/>
+<line x1="62" y1="455" x2="84" y2="480" stroke="#1F6FEB" stroke-width="1.5"/>
+<text x="62" y="498" font-size="12" fill="#1F6FEB" text-anchor="middle" font-weight="500">Admin</text>
+
+<line x1="80" y1="412" x2="230" y2="75"  stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="412" x2="230" y2="120" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="412" x2="230" y2="165" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="412" x2="230" y2="210" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="412" x2="230" y2="255" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="412" x2="230" y2="300" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="412" x2="230" y2="345" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="412" x2="230" y2="390" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="412" x2="230" y2="435" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="412" x2="230" y2="480" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="412" x2="230" y2="525" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="412" x2="230" y2="570" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="412" x2="230" y2="615" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="412" x2="230" y2="660" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="412" x2="230" y2="705" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="412" x2="230" y2="750" stroke="#d0d7de" stroke-width="0.7"/>
+
+<rect x="120" y="950" width="1380" height="700" rx="4"
+  fill="#d2f4ea20" stroke="#2DA44E" stroke-width="0.7" stroke-dasharray="6 3"/>
+<text x="810" y="970" font-size="11" fill="#2DA44E" text-anchor="middle" letter-spacing=".05em" font-weight="500">Manager use cases</text>
+
+<ellipse cx="385" cy="1005" rx="155" ry="19" fill="#d2f4ea" stroke="#2DA44E" stroke-width="0.8"/>
+<text x="385" y="1002" font-size="11" fill="#116329" text-anchor="middle">View company-wide</text>
+<text x="385" y="1015" font-size="11" fill="#116329" text-anchor="middle">employee availability</text>
+
+<ellipse cx="385" cy="1060" rx="155" ry="19" fill="#d2f4ea" stroke="#2DA44E" stroke-width="0.8"/>
+<text x="385" y="1057" font-size="11" fill="#116329" text-anchor="middle">Drill down into</text>
+<text x="385" y="1070" font-size="11" fill="#116329" text-anchor="middle">employee profile</text>
+
+<ellipse cx="385" cy="1115" rx="155" ry="19" fill="#d2f4ea" stroke="#2DA44E" stroke-width="0.8"/>
+<text x="385" y="1112" font-size="11" fill="#116329" text-anchor="middle">Search available employees</text>
+<text x="385" y="1125" font-size="11" fill="#116329" text-anchor="middle">via natural language</text>
+
+<ellipse cx="385" cy="1170" rx="155" ry="19" fill="#d2f4ea" stroke="#2DA44E" stroke-width="0.8"/>
+<text x="385" y="1167" font-size="11" fill="#116329" text-anchor="middle">Allocate employee</text>
+<text x="385" y="1180" font-size="11" fill="#116329" text-anchor="middle">to project</text>
+
+<ellipse cx="385" cy="1225" rx="155" ry="19" fill="#d2f4ea" stroke="#2DA44E" stroke-width="0.8"/>
+<text x="385" y="1222" font-size="11" fill="#116329" text-anchor="middle">End active project</text>
+<text x="385" y="1235" font-size="11" fill="#116329" text-anchor="middle">allocation</text>
+
+<ellipse cx="385" cy="1280" rx="155" ry="19" fill="#d2f4ea" stroke="#2DA44E" stroke-width="0.8"/>
+<text x="385" y="1277" font-size="11" fill="#116329" text-anchor="middle">View assigned projects</text>
+<text x="385" y="1290" font-size="11" fill="#116329" text-anchor="middle">with health indicators</text>
+
+<ellipse cx="385" cy="1335" rx="155" ry="19" fill="#d2f4ea" stroke="#2DA44E" stroke-width="0.8"/>
+<text x="385" y="1332" font-size="11" fill="#116329" text-anchor="middle">Drill down into</text>
+<text x="385" y="1345" font-size="11" fill="#116329" text-anchor="middle">project details</text>
+
+<ellipse cx="385" cy="1390" rx="155" ry="19" fill="#d2f4ea" stroke="#2DA44E" stroke-width="0.8"/>
+<text x="385" y="1387" font-size="11" fill="#116329" text-anchor="middle">Request AI-generated</text>
+<text x="385" y="1400" font-size="11" fill="#116329" text-anchor="middle">project risk summary</text>
+
+<ellipse cx="385" cy="1445" rx="170" ry="19" fill="#d2f4ea" stroke="#2DA44E" stroke-width="0.8"/>
+<text x="385" y="1449" font-size="12" fill="#116329" text-anchor="middle">View submitted timesheets</text>
+
+<ellipse cx="385" cy="1500" rx="170" ry="19" fill="#d2f4ea" stroke="#2DA44E" stroke-width="0.8"/>
+<text x="385" y="1497" font-size="11" fill="#116329" text-anchor="middle">Identify employees not</text>
+<text x="385" y="1510" font-size="11" fill="#116329" text-anchor="middle">submitted (current week)</text>
+
+<ellipse cx="385" cy="1555" rx="170" ry="19" fill="#d2f4ea" stroke="#2DA44E" stroke-width="0.8"/>
+<text x="385" y="1559" font-size="12" fill="#116329" text-anchor="middle">Approve submitted timesheet</text>
+
+<ellipse cx="385" cy="1610" rx="170" ry="19" fill="#d2f4ea" stroke="#2DA44E" stroke-width="0.8"/>
+<text x="385" y="1614" font-size="12" fill="#116329" text-anchor="middle">Reject submitted timesheet</text>
+
+<circle cx="62" cy="1230" r="18" fill="none" stroke="#2DA44E" stroke-width="1.5"/>
+<line x1="62" y1="1248" x2="62" y2="1295" stroke="#2DA44E" stroke-width="1.5"/>
+<line x1="38" y1="1265" x2="86" y2="1265" stroke="#2DA44E" stroke-width="1.5"/>
+<line x1="62" y1="1295" x2="40" y2="1320" stroke="#2DA44E" stroke-width="1.5"/>
+<line x1="62" y1="1295" x2="84" y2="1320" stroke="#2DA44E" stroke-width="1.5"/>
+<text x="62" y="1338" font-size="12" fill="#2DA44E" text-anchor="middle" font-weight="500">Manager</text>
+
+<line x1="80" y1="1252" x2="230" y2="1005" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="1252" x2="230" y2="1060" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="1252" x2="230" y2="1115" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="1252" x2="230" y2="1170" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="1252" x2="230" y2="1225" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="1252" x2="230" y2="1280" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="1252" x2="230" y2="1335" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="1252" x2="230" y2="1390" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="1252" x2="230" y2="1445" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="1252" x2="230" y2="1500" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="1252" x2="230" y2="1555" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="1252" x2="230" y2="1610" stroke="#d0d7de" stroke-width="0.7"/>
+
+<ellipse cx="800" cy="1610" rx="155" ry="19" fill="#fff8f0" stroke="#CF7C35" stroke-width="0.8" stroke-dasharray="5 2"/>
+<text x="800" y="1607" font-size="11" fill="#7d4e17" text-anchor="middle">Enter rejection reason</text>
+<text x="800" y="1620" font-size="11" fill="#a8622a" text-anchor="middle">[on rejection]</text>
+
+<ellipse cx="800" cy="1060" rx="165" ry="19" fill="#f1f3f9" stroke="#6E7781" stroke-width="0.8"/>
+<text x="800" y="1057" font-size="11" fill="#424a53" text-anchor="middle">Query DB for available</text>
+<text x="800" y="1070" font-size="11" fill="#424a53" text-anchor="middle">employees</text>
+
+<ellipse cx="1150" cy="1080" rx="155" ry="19" fill="#fbefff" stroke="#8250DF" stroke-width="0.8"/>
+<text x="1150" y="1077" font-size="11" fill="#5a2d91" text-anchor="middle">Call LLM API to rank</text>
+<text x="1150" y="1090" font-size="11" fill="#5a2d91" text-anchor="middle">suggestions</text>
+
+<ellipse cx="800" cy="1390" rx="165" ry="19" fill="#f1f3f9" stroke="#6E7781" stroke-width="0.8"/>
+<text x="800" y="1387" font-size="11" fill="#424a53" text-anchor="middle">Query milestone &amp;</text>
+<text x="800" y="1400" font-size="11" fill="#424a53" text-anchor="middle">timesheet data</text>
+
+<ellipse cx="1150" cy="1440" rx="155" ry="19" fill="#fbefff" stroke="#8250DF" stroke-width="0.8"/>
+<text x="1150" y="1437" font-size="11" fill="#5a2d91" text-anchor="middle">Call LLM API for</text>
+<text x="1150" y="1450" font-size="11" fill="#5a2d91" text-anchor="middle">risk summary</text>
+
+<circle cx="1440" cy="1225" r="18" fill="none" stroke="#8250DF" stroke-width="1.5"/>
+<line x1="1440" y1="1243" x2="1440" y2="1290" stroke="#8250DF" stroke-width="1.5"/>
+<line x1="1416" y1="1260" x2="1464" y2="1260" stroke="#8250DF" stroke-width="1.5"/>
+<line x1="1440" y1="1290" x2="1418" y2="1315" stroke="#8250DF" stroke-width="1.5"/>
+<line x1="1440" y1="1290" x2="1462" y2="1315" stroke="#8250DF" stroke-width="1.5"/>
+<text x="1440" y="1333" font-size="12" fill="#8250DF" text-anchor="middle" font-weight="500">LLM API</text>
+<text x="1440" y="1347" font-size="10" fill="#8c959f" text-anchor="middle">(External)</text>
+
+<line x1="1305" y1="1080" x2="1422" y2="1225" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="1305" y1="1440" x2="1422" y2="1240" stroke="#d0d7de" stroke-width="0.7"/>
+
+<path d="M540 1115 L635 1070" fill="none" stroke="#1F6FEB" stroke-width="1" stroke-dasharray="6 3" marker-end="url(#mi)"/>
+<text x="585" y="1082" font-size="10" fill="#1F6FEB" text-anchor="middle">«include»</text>
+
+<path d="M540 1112 L995 1080" fill="none" stroke="#1F6FEB" stroke-width="1" stroke-dasharray="6 3" marker-end="url(#mi)"/>
+<text x="760" y="1095" font-size="10" fill="#1F6FEB" text-anchor="middle">«include»</text>
+
+<path d="M540 1390 L635 1390" fill="none" stroke="#1F6FEB" stroke-width="1" stroke-dasharray="6 3" marker-end="url(#mi)"/>
+<text x="585" y="1382" font-size="10" fill="#1F6FEB" text-anchor="middle">«include»</text>
+
+<path d="M540 1390 L995 1440" fill="none" stroke="#1F6FEB" stroke-width="1" stroke-dasharray="6 3" marker-end="url(#mi)"/>
+<text x="820" y="1428" font-size="10" fill="#1F6FEB" text-anchor="middle">«include»</text>
+
+<path d="M385 1134 L385 1151" fill="none" stroke="#CF7C35" stroke-width="1" stroke-dasharray="5 3" marker-end="url(#me)"/>
+<text x="310" y="1148" font-size="10" fill="#CF7C35" text-anchor="middle">«extend»</text>
+
+<path d="M385 1371 L385 1299" fill="none" stroke="#CF7C35" stroke-width="1" stroke-dasharray="5 3" marker-end="url(#me)"/>
+<text x="315" y="1340" font-size="10" fill="#CF7C35" text-anchor="middle">«extend»</text>
+
+<path d="M555 1610 L635 1610" fill="none" stroke="#CF7C35" stroke-width="1" stroke-dasharray="5 3" marker-end="url(#me)"/>
+<text x="595" y="1602" font-size="10" fill="#CF7C35" text-anchor="middle">«extend»</text>
+
+<rect x="120" y="1670" width="730" height="430" rx="4"
+  fill="#fff8e020" stroke="#E16F24" stroke-width="0.7" stroke-dasharray="6 3"/>
+<text x="485" y="1690" font-size="11" fill="#E16F24" text-anchor="middle" letter-spacing=".05em" font-weight="500">Employee use cases</text>
+
+<ellipse cx="360" cy="1725" rx="155" ry="19" fill="#fff3cc" stroke="#E16F24" stroke-width="0.8"/>
+<text x="360" y="1722" font-size="11" fill="#7d4e17" text-anchor="middle">Submit weekly timesheets</text>
+<text x="360" y="1735" font-size="11" fill="#7d4e17" text-anchor="middle">(hours + activity tags)</text>
+
+<ellipse cx="360" cy="1780" rx="155" ry="19" fill="#fff3cc" stroke="#E16F24" stroke-width="0.8"/>
+<text x="360" y="1784" font-size="12" fill="#7d4e17" text-anchor="middle">Log hours per project</text>
+
+<ellipse cx="360" cy="1825" rx="155" ry="19" fill="#fff3cc" stroke="#E16F24" stroke-width="0.8"/>
+<text x="360" y="1822" font-size="11" fill="#7d4e17" text-anchor="middle">Tag work with activity</text>
+<text x="360" y="1835" font-size="11" fill="#7d4e17" text-anchor="middle">tags</text>
+
+<ellipse cx="360" cy="1890" rx="165" ry="19" fill="#fff3cc" stroke="#E16F24" stroke-width="0.8"/>
+<text x="360" y="1887" font-size="11" fill="#7d4e17" text-anchor="middle">View own current &amp;</text>
+<text x="360" y="1900" font-size="11" fill="#7d4e17" text-anchor="middle">past allocations</text>
+
+<ellipse cx="360" cy="1945" rx="165" ry="19" fill="#fff3cc" stroke="#E16F24" stroke-width="0.8"/>
+<text x="360" y="1942" font-size="11" fill="#7d4e17" text-anchor="middle">View timesheet history</text>
+<text x="360" y="1955" font-size="11" fill="#7d4e17" text-anchor="middle">&amp; status</text>
+
+<ellipse cx="360" cy="2000" rx="165" ry="19" fill="#fff3cc" stroke="#E16F24" stroke-width="0.8"/>
+<text x="360" y="1997" font-size="11" fill="#7d4e17" text-anchor="middle">View timesheet</text>
+<text x="360" y="2010" font-size="11" fill="#7d4e17" text-anchor="middle">rejection reason</text>
+
+<ellipse cx="690" cy="1725" rx="155" ry="19" fill="#fff0e4" stroke="#CF7C35" stroke-width="0.8" stroke-dasharray="5 2"/>
+<text x="690" y="1722" font-size="11" fill="#7d4e17" text-anchor="middle">Correct &amp; resubmit</text>
+<text x="690" y="1735" font-size="11" fill="#a8622a" text-anchor="middle">[if rejected]</text>
+
+<path d="M515 1725 L535 1725" fill="none" stroke="#CF7C35" stroke-width="1" stroke-dasharray="5 3" marker-end="url(#me)"/>
+<text x="525" y="1715" font-size="10" fill="#CF7C35" text-anchor="middle">«extend»</text>
+
+<circle cx="62" cy="1860" r="18" fill="none" stroke="#E16F24" stroke-width="1.5"/>
+<line x1="62" y1="1878" x2="62" y2="1925" stroke="#E16F24" stroke-width="1.5"/>
+<line x1="38" y1="1895" x2="86" y2="1895" stroke="#E16F24" stroke-width="1.5"/>
+<line x1="62" y1="1925" x2="40" y2="1950" stroke="#E16F24" stroke-width="1.5"/>
+<line x1="62" y1="1925" x2="84" y2="1950" stroke="#E16F24" stroke-width="1.5"/>
+<text x="62" y="1968" font-size="12" fill="#E16F24" text-anchor="middle" font-weight="500">Employee</text>
+
+<line x1="80" y1="1885" x2="205" y2="1725" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="1885" x2="205" y2="1780" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="1885" x2="205" y2="1825" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="1885" x2="195" y2="1890" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="1885" x2="195" y2="1945" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="1885" x2="195" y2="2000" stroke="#d0d7de" stroke-width="0.7"/>
+
+<rect x="120" y="2120" width="730" height="310" rx="4"
+  fill="#f8f0ff20" stroke="#8250DF" stroke-width="0.7" stroke-dasharray="6 3"/>
+<text x="485" y="2140" font-size="11" fill="#8250DF" text-anchor="middle" letter-spacing=".05em" font-weight="500">Background scheduler use cases</text>
+
+<ellipse cx="450" cy="2175" rx="200" ry="19" fill="#f8f0ff" stroke="#8250DF" stroke-width="0.8"/>
+<text x="450" y="2179" font-size="12" fill="#4c2889" text-anchor="middle">Recompute employee utilization</text>
+
+<ellipse cx="450" cy="2225" rx="200" ry="19" fill="#f8f0ff" stroke="#8250DF" stroke-width="0.8"/>
+<text x="450" y="2222" font-size="11" fill="#4c2889" text-anchor="middle">Update employee status</text>
+<text x="450" y="2235" font-size="11" fill="#4c2889" text-anchor="middle">(Bench or Allocated)</text>
+
+<ellipse cx="450" cy="2280" rx="200" ry="19" fill="#f8f0ff" stroke="#8250DF" stroke-width="0.8"/>
+<text x="450" y="2277" font-size="11" fill="#4c2889" text-anchor="middle">Evaluate active project health flags</text>
+<text x="450" y="2290" font-size="11" fill="#4c2889" text-anchor="middle">(Green / Amber / Red)</text>
+
+<ellipse cx="450" cy="2335" rx="200" ry="19" fill="#f8f0ff" stroke="#8250DF" stroke-width="0.8"/>
+<text x="450" y="2339" font-size="12" fill="#4c2889" text-anchor="middle">Mark unsubmitted timesheets as missed</text>
+
+<circle cx="62" cy="2250" r="18" fill="none" stroke="#8250DF" stroke-width="1.5"/>
+<line x1="62" y1="2268" x2="62" y2="2315" stroke="#8250DF" stroke-width="1.5"/>
+<line x1="38" y1="2285" x2="86" y2="2285" stroke="#8250DF" stroke-width="1.5"/>
+<line x1="62" y1="2315" x2="40" y2="2340" stroke="#8250DF" stroke-width="1.5"/>
+<line x1="62" y1="2315" x2="84" y2="2340" stroke="#8250DF" stroke-width="1.5"/>
+<text x="62" y="2358" font-size="11" fill="#8250DF" text-anchor="middle" font-weight="500">Scheduler</text>
+
+<line x1="80" y1="2268" x2="250" y2="2175" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="2268" x2="250" y2="2225" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="2268" x2="250" y2="2280" stroke="#d0d7de" stroke-width="0.7"/>
+<line x1="80" y1="2268" x2="250" y2="2335" stroke="#d0d7de" stroke-width="0.7"/>
+
+<rect x="120" y="2450" width="730" height="400" rx="4"
+  fill="#f6f8fa20" stroke="#6E7781" stroke-width="0.7" stroke-dasharray="6 3"/>
+<text x="485" y="2470" font-size="11" fill="#6E7781" text-anchor="middle" letter-spacing=".05em" font-weight="500">Shared use cases</text>
+
+<ellipse cx="485" cy="2515" rx="130" ry="19" fill="#f6f8fa" stroke="#6E7781" stroke-width="0.8"/>
+<text x="485" y="2519" font-size="12" fill="#424a53" text-anchor="middle">Login to system</text>
+
+<path d="M485 2561 L485 2541" fill="none" stroke="#CF7C35" stroke-width="1" stroke-dasharray="5 3" marker-end="url(#me)"/>
+<text x="525" y="2555" font-size="10" fill="#CF7C35" text-anchor="middle">«extend»</text>
+
+<ellipse cx="485" cy="2580" rx="155" ry="19" fill="#fff0e4" stroke="#CF7C35" stroke-width="0.8" stroke-dasharray="5 2"/>
+<text x="485" y="2577" font-size="11" fill="#7d4e17" text-anchor="middle">Prompt mandatory</text>
+<text x="485" y="2590" font-size="11" fill="#a8622a" text-anchor="middle">password change</text>
+<text x="485" y="2607" font-size="9" fill="#8c959f" text-anchor="middle">[first login, admin-created]</text>
+
+<ellipse cx="485" cy="2645" rx="130" ry="19" fill="#f6f8fa" stroke="#6E7781" stroke-width="0.8"/>
+<text x="485" y="2649" font-size="12" fill="#424a53" text-anchor="middle">Logout of system</text>
+
+<ellipse cx="485" cy="2710" rx="165" ry="19" fill="#f6f8fa" stroke="#6E7781" stroke-width="0.8"/>
+<text x="485" y="2707" font-size="11" fill="#424a53" text-anchor="middle">View in-app notifications</text>
+<text x="485" y="2720" font-size="11" fill="#424a53" text-anchor="middle">at menu load</text>
+
+<ellipse cx="485" cy="2775" rx="160" ry="19" fill="#f6f8fa" stroke="#6E7781" stroke-width="0.8"/>
+<text x="485" y="2779" font-size="12" fill="#424a53" text-anchor="middle">Self-register employee account</text>
+
+<ellipse cx="485" cy="2840" rx="160" ry="19" fill="#f6f8fa" stroke="#6E7781" stroke-width="0.8"/>
+<text x="485" y="2844" font-size="12" fill="#424a53" text-anchor="middle">Self-register manager account</text>
+
+</svg>
+</div>
+</body>
+</html>
