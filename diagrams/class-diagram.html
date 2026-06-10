@@ -49,6 +49,22 @@
 
 <h1>Project Resource Management Tool - Class Diagram</h1>
 
+<div class="changes">
+  <h2>V4 Changes</h2>
+  <ul>
+    <li><strong>Employee</strong>: New <code>ManagerUserId</code> (nullable int) and <code>ManagerUserEmail</code> for display</li>
+    <li><strong>Project</strong>: New <code>TotalStoryPoints</code>; status corrected to PLANNED|ACTIVE|ON_HOLD|COMPLETED; <code>ProjectSummaryDto</code> includes <code>CompletedStoryPoints</code></li>
+    <li><strong>Milestone</strong>: New <code>StoryPoints</code>; status updated to NOT_STARTED|IN_PROGRESS|DONE</li>
+    <li><strong>IEmployeeService</strong>: New <code>GetByManagerUserId</code> and <code>AssignManager</code> methods</li>
+    <li><strong>IProjectService</strong>: <code>Update</code> now accepts full dto including <code>TotalStoryPoints</code>; milestones carry <code>StoryPoints</code></li>
+    <li><strong>EmployeeController</strong>: New <code>Get_ByManager</code> and <code>Put_AssignManager</code> endpoints</li>
+    <li><strong>ProjectController</strong>: New <code>Get_ById</code> endpoint; <code>Post_Create</code> and <code>Put_Update</code> include story points</li>
+    <li><strong>AiController</strong>: New; exposes <code>Post_SkillMatch</code> (team-scoped) and <code>Get_RiskSummary</code></li>
+    <li><strong>AuthController</strong>: <code>Post_SignUp</code> now requires Admin role (no public self-registration)</li>
+    <li><strong>TimesheetController</strong>: <code>Put_Approve</code> and <code>Put_Reject</code> retained server-side; no longer called from console client</li>
+  </ul>
+</div>
+
 <div id="cd"></div>
 
 <script type="module">
@@ -81,6 +97,7 @@ const diagram = `classDiagram
   class Employee {
     +int Id
     +int UserId
+    +int? ManagerUserId
     +string FullName
     +string Email
     +string Department
@@ -97,12 +114,14 @@ const diagram = `classDiagram
     +ProjectStatus Status
     +HealthFlag Health
     +int ManagerId
+    +int TotalStoryPoints
   }
   class Milestone {
     +int Id
     +int ProjectId
     +string Title
     +DateTime DueDate
+    +int StoryPoints
     +MilestoneStatus Status
     +DateTime CompletedAt
   }
@@ -167,6 +186,7 @@ const diagram = `classDiagram
     +GetAll() List~Employee~
     +GetById(id) Employee
     +GetByUserId(userId) Employee
+    +GetByManagerUserId(mgrUserId) List~Employee~
     +Create(employee) Employee
     +Update(employee) Employee
   }
@@ -216,11 +236,13 @@ const diagram = `classDiagram
     +GetAll() List~Employee~
     +GetById(id) Employee
     +GetAvailable(utilizationThreshold) List~Employee~
+    +GetByManagerUserId(mgrUserId) List~Employee~
     +GetUtilization(employeeId) float
     +Create(dto) Employee
     +Update(id, dto) Employee
     +Deactivate(id) void
     +Reactivate(id) void
+    +AssignManager(dto) void
     +AssignSkill(employeeId, skillDto) void
     +UpdateSkill(employeeId, skillId, proficiency) void
     +RemoveSkill(employeeId, skillId) void
@@ -236,7 +258,7 @@ const diagram = `classDiagram
     +AddMilestone(projectId, dto) Milestone
     +UpdateMilestone(milestoneId, dto) Milestone
     +GetMilestones(projectId) List~Milestone~
-    +CompleteMilestone(milestoneId) void
+    +GetCompletedStoryPoints(projectId) int
   }
   class IAllocationService {
     <<interface>>
@@ -304,18 +326,24 @@ const diagram = `classDiagram
     +Get_All() IActionResult
     +Get_ById(id) IActionResult
     +Get_Available() IActionResult
+    +Get_ByManager(managerUserId) IActionResult
     +Post_Create(dto) IActionResult
     +Put_Update(id, dto) IActionResult
+    +Put_AssignManager(dto) IActionResult
     +Delete_Deactivate(id) IActionResult
     +Post_AssignSkill(employeeId, dto) IActionResult
+    +Put_UpdateSkill(id, skillId, dto) IActionResult
+    +Delete_RemoveSkill(id, skillId) IActionResult
   }
   class ProjectController {
     +Get_All() IActionResult
+    +Get_ById(id) IActionResult
     +Get_ByManager(id) IActionResult
     +Post_Create(dto) IActionResult
     +Put_Update(id, dto) IActionResult
     +Get_Health(id) IActionResult
     +Post_AddMilestone(projectId, dto) IActionResult
+    +Get_MilestonesByProject(projectId) IActionResult
     +Put_UpdateMilestone(milestoneId, dto) IActionResult
   }
   class AllocationController {
@@ -335,6 +363,10 @@ const diagram = `classDiagram
     +Get_All() IActionResult
     +Put_Set(key, value) IActionResult
   }
+  class AiController {
+    +Post_SkillMatch(dto) IActionResult
+    +Get_RiskSummary(projectId) IActionResult
+  }
 
   ILLMService <|.. GeminiAdapter : implements
   ILLMService <|.. GroqAdapter : implements
@@ -344,9 +376,12 @@ const diagram = `classDiagram
   IAllocationService <.. AllocationController : uses
   ITimesheetService <.. TimesheetController : uses
   ISystemConfigService <.. SystemConfigController : uses
+  ILLMService <.. AiController : uses
+  IEmployeeService <.. AiController : uses
   INotificationService <.. TimesheetController : uses
   INotificationService <.. AllocationController : uses
   User "1" --> "0..1" Employee : has profile
+  User "1" --> "0..*" Employee : manages team
   Employee "1" --> "0..*" EmployeeSkill : has
   Skill "1" --> "0..*" EmployeeSkill : used in
   Employee "1" --> "0..*" Allocation : allocated via

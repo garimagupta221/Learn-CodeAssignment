@@ -48,7 +48,16 @@
 <body>
 
 <h1>Project Resource Management Tool - ER Diagram</h1>
- 
+
+<div class="changes">
+  <h2>V4 Changes</h2>
+  <ul>
+    <li><strong>Employees</strong>: New <code>manager_user_id INT NULL</code> (FK → Users.Id) — migration <code>AddManagerUserIdToEmployee</code></li>
+    <li><strong>Projects</strong>: New <code>total_story_points INT DEFAULT 0</code>; status values corrected to PLANNED | ACTIVE | ON_HOLD | COMPLETED</li>
+    <li><strong>Milestones</strong>: New <code>story_points INT DEFAULT 0</code>; status values updated to NOT_STARTED | IN_PROGRESS | DONE — migration <code>AddStoryPoints</code></li>
+    <li>New relationship: Users → Employees via ManagerUserId (one Manager user supervises many Employees)</li>
+  </ul>
+</div>
 
 <div id="erd"></div>
 
@@ -89,6 +98,7 @@ const diagram = `erDiagram
     string email "unique, not null"
     string department
     string designation
+    int manager_user_id FK "nullable; FK to Users.Id — V4"
     string status "BENCH|ALLOCATED"
     bool is_active "false on deactivation"
     datetime created_at
@@ -116,9 +126,10 @@ const diagram = `erDiagram
     string description
     date start_date "not null"
     date end_date "not null"
-    string status "PLANNING|ACTIVE|ON_HOLD|CLOSED"
+    string status "PLANNED|ACTIVE|ON_HOLD|COMPLETED"
     string health "GREEN|AMBER|RED"
     int manager_id FK "FK to Employees"
+    int total_story_points "default 0 — V4"
     datetime created_at
     datetime updated_at
   }
@@ -128,8 +139,9 @@ const diagram = `erDiagram
     int project_id FK
     string title "not null"
     date due_date "not null"
-    string status "PENDING|COMPLETED|OVERDUE"
-    datetime completed_at "null until completed"
+    int story_points "default 0 — V4"
+    string status "NOT_STARTED|IN_PROGRESS|DONE"
+    datetime completed_at "null until DONE"
     datetime updated_at
   }
 
@@ -187,6 +199,7 @@ const diagram = `erDiagram
   Users ||--o{ Notifications : "receives"
   Users ||--o{ Allocations : "created allocation"
   Users ||--o{ Timesheets : "approved timesheet"
+  Users ||--o{ Employees : "manages team (ManagerUserId)"
   Employees ||--o{ EmployeeSkills : "has skills"
   Employees ||--o{ Projects : "manages"
   Skills ||--o{ EmployeeSkills : "assigned via"

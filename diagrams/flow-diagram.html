@@ -103,19 +103,17 @@
 
   <div class="node purple" style="width:320px">
     Main screen
-    <sub>1. Login &nbsp;&nbsp; 2. Sign Up &nbsp;&nbsp; 3. Exit</sub>
+    <sub>1. Login &nbsp;&nbsp; 2. Exit</sub>
   </div>
   <div class="arrow"></div>
 
   <svg class="connector" style="height:32px;max-width:1060px" viewBox="0 0 1060 32" preserveAspectRatio="xMidYMid meet">
     <line x1="530" y1="0" x2="530" y2="12" stroke="var(--text2)" stroke-width="1.5"/>
-    <line x1="140" y1="12" x2="920" y2="12" stroke="var(--text2)" stroke-width="1.5"/>
-    <line x1="140" y1="12" x2="140" y2="32" stroke="var(--text2)" stroke-width="1.5" marker-end="url(#arr)"/>
-    <line x1="530" y1="12" x2="530" y2="32" stroke="var(--text2)" stroke-width="1.5" marker-end="url(#arr)"/>
-    <line x1="920" y1="12" x2="920" y2="32" stroke="var(--text2)" stroke-width="1.5" marker-end="url(#arr)"/>
-    <text x="140" y="10" text-anchor="middle" font-size="11" fill="var(--text2)">3. Exit</text>
-    <text x="530" y="10" text-anchor="middle" font-size="11" fill="var(--text2)">1. Login</text>
-    <text x="920" y="10" text-anchor="middle" font-size="11" fill="var(--text2)">2. Sign Up</text>
+    <line x1="200" y1="12" x2="860" y2="12" stroke="var(--text2)" stroke-width="1.5"/>
+    <line x1="200" y1="12" x2="200" y2="32" stroke="var(--text2)" stroke-width="1.5" marker-end="url(#arr)"/>
+    <line x1="860" y1="12" x2="860" y2="32" stroke="var(--text2)" stroke-width="1.5" marker-end="url(#arr)"/>
+    <text x="200" y="10" text-anchor="middle" font-size="11" fill="var(--text2)">2. Exit</text>
+    <text x="860" y="10" text-anchor="middle" font-size="11" fill="var(--text2)">1. Login</text>
     <defs>
       <marker id="arr" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
         <path d="M2 2L8 5L2 8" fill="none" stroke="var(--text2)" stroke-width="1.5" stroke-linecap="round"/>
@@ -228,84 +226,7 @@
   </svg>
 </div>
 
-    <!-- ── SIGN UP lane ── -->
-    <div class="lane" style="max-width:300px;">
-      <div class="node purple" style="width:260px">
-        Sign Up screen
-        <sub>Full name, email, username, password, role</sub>
-      </div>
-      <div class="arrow short"></div>
-      <div class="note" style="width:260px;background:var(--purple-fill);border:1px solid var(--purple-stroke);border-radius:6px;padding:6px 8px;color:var(--purple-text)">
-        Role: Manager or Employee only<br>
-        <span style="font-size:10px;opacity:.8">ℹ Admin accounts can only be created by an existing Admin</span>
-      </div>
-      <div class="arrow"></div>
-      <div class="node purple" style="width:260px">
-        Server validates input
-        <sub>Email format · unique username · password 8+ chars, one uppercase, one number</sub>
-      </div>
-      <div class="arrow"></div>
-  <!-- Valid? branch for Sign Up -->
-  <svg viewBox="0 0 420 580" width="420" height="580" xmlns="http://www.w3.org/2000/svg" style="overflow:visible;display:block;">
-    <defs>
-      <marker id="arr-valid" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-        <path d="M2 1L8 5L2 9" fill="none" stroke="var(--text2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </marker>
-    </defs>
-
-    <!-- Valid? -->
-    <text x="210" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="var(--purple-text)" font-family="system-ui,sans-serif">Valid?</text>
-
-    <!-- Split line -->
-    <line x1="210" y1="24" x2="210" y2="36" stroke="var(--text2)" stroke-width="1.5"/>
-    <line x1="90"  y1="36" x2="330" y2="36" stroke="var(--text2)" stroke-width="1.5"/>
-    <line x1="90"  y1="36" x2="90"  y2="60" stroke="var(--text2)" stroke-width="1.5" marker-end="url(#arr-valid)"/>
-    <line x1="330" y1="36" x2="330" y2="60" stroke="var(--text2)" stroke-width="1.5" marker-end="url(#arr-valid)"/>
-    <text x="68"  y="50" text-anchor="middle" font-size="11" fill="var(--text2)" font-family="system-ui,sans-serif">No</text>
-    <text x="352" y="50" text-anchor="middle" font-size="11" fill="var(--text2)" font-family="system-ui,sans-serif">Yes</text>
-
-    <!-- Show error box -->
-    <rect x="10" y="64" width="160" height="64" rx="8" fill="var(--coral-fill)" stroke="var(--coral-stroke)" stroke-width="1"/>
-    <text x="90" y="84" text-anchor="middle" font-size="13" font-weight="700" fill="var(--coral-text)" font-family="system-ui,sans-serif">Show error</text>
-    <text x="90" y="101" text-anchor="middle" font-size="10" fill="var(--coral-text)" font-family="system-ui,sans-serif" opacity=".85">Invalid email / duplicate</text>
-    <text x="90" y="114" text-anchor="middle" font-size="10" fill="var(--coral-text)" font-family="system-ui,sans-serif" opacity=".85">username / weak password</text>
-
-    <!-- Arrow down to Return to Sign Up -->
-    <line x1="90" y1="128" x2="90" y2="152" stroke="var(--text2)" stroke-width="1.5" marker-end="url(#arr-valid)"/>
-
-    <!-- Return to Sign Up screen -->
-    <rect x="10" y="156" width="160" height="58" rx="8" fill="var(--gray-fill)" stroke="var(--gray-stroke)" stroke-width="1"/>
-    <text x="90" y="176" text-anchor="middle" font-size="12" font-weight="600" fill="var(--gray-text)" font-family="system-ui,sans-serif">Return to Sign Up</text>
-    <text x="90" y="192" text-anchor="middle" font-size="12" font-weight="600" fill="var(--gray-text)" font-family="system-ui,sans-serif">screen</text>
-    <text x="90" y="205" text-anchor="middle" font-size="12" font-weight="600" fill="var(--gray-text)" font-family="system-ui,sans-serif">(Application Start screen)</text>
-
-    <!-- Create account box -->
-    <rect x="250" y="64" width="160" height="58" rx="8" fill="var(--purple-fill)" stroke="var(--purple-stroke)" stroke-width="1"/>
-    <text x="330" y="84" text-anchor="middle" font-size="13" font-weight="600" fill="var(--purple-text)" font-family="system-ui,sans-serif">Create account</text>
-    <text x="330" y="101" text-anchor="middle" font-size="10" fill="var(--purple-text)" font-family="system-ui,sans-serif" opacity=".85">Manager or Employee</text>
-    <text x="330" y="114" text-anchor="middle" font-size="10" fill="var(--purple-text)" font-family="system-ui,sans-serif" opacity=".85">self-registration</text>
-
-    <!-- Arrow down to Show success -->
-    <line x1="330" y1="122" x2="330" y2="152" stroke="var(--text2)" stroke-width="1.5" marker-end="url(#arr-valid)"/>
-
-    <!-- Show success box -->
-    <rect x="250" y="156" width="160" height="58" rx="8" fill="var(--teal-fill)" stroke="var(--teal-stroke)" stroke-width="1"/>
-    <text x="330" y="176" text-anchor="middle" font-size="13" font-weight="600" fill="var(--teal-text)" font-family="system-ui,sans-serif">Show success</text>
-    <text x="330" y="193" text-anchor="middle" font-size="10" fill="var(--teal-text)" font-family="system-ui,sans-serif" opacity=".85">Account created.</text>
-    <text x="330" y="206" text-anchor="middle" font-size="10" fill="var(--teal-text)" font-family="system-ui,sans-serif" opacity=".85">Please log in.</text>
-
-    <!-- Arrow down to Return to Login -->
-    <line x1="330" y1="214" x2="330" y2="244" stroke="var(--text2)" stroke-width="1.5" marker-end="url(#arr-valid)"/>
-
-    <!-- Return to Login screen -->
-    <rect x="250" y="248" width="160" height="58" rx="8" fill="var(--gray-fill)" stroke="var(--gray-stroke)" stroke-width="1"/>
-    <text x="330" y="268" text-anchor="middle" font-size="12" font-weight="600" fill="var(--gray-text)" font-family="system-ui,sans-serif">Return to Login</text>
-    <text x="330" y="284" text-anchor="middle" font-size="12" font-weight="600" fill="var(--gray-text)" font-family="system-ui,sans-serif">screen</text>
-    <text x="330" y="297" text-anchor="middle" font-size="12" font-weight="600" fill="var(--gray-text)" font-family="system-ui,sans-serif">(Application Start / Login)</text>
-  </svg>
-    </div>    
-
-  </div><!-- end branch3 -->
+    </div><!-- end branch3 -->
 
   <div class="divider"></div>
 
@@ -330,6 +251,8 @@
         <div class="mini-arrow"></div>
         <div class="step coral">Update employee details<sub>Full name, email, department, designation</sub></div>
         <div class="mini-arrow"></div>
+        <div class="step coral">Assign manager to employee<sub>V4 — links ManagerUserId; scopes manager dashboard + AI search</sub></div>
+        <div class="mini-arrow"></div>
         <div class="step coral">Deactivate employee<sub>Ends active allocations today and blocks login</sub></div>
 
         <div class="sec">Skill management</div>
@@ -338,11 +261,11 @@
         <div class="step coral">Update proficiency or remove skill</div>
 
         <div class="sec">Project management</div>
-        <div class="step coral">Create project<sub>Name, description, start date, end date, status, assign manager</sub></div>
+        <div class="step coral">Create project<sub>Name, description, dates, status, assign manager, total story points (V4)</sub></div>
         <div class="mini-arrow"></div>
-        <div class="step coral">Update project details</div>
+        <div class="step coral">Update project details<sub>V4 — all fields editable incl. story points; COMPLETED is a valid status</sub></div>
         <div class="mini-arrow"></div>
-        <div class="step coral">Manage milestones<sub>Add milestone or update milestone status</sub></div>
+        <div class="step coral">Manage milestones<sub>Add milestone (with story points V4) or update milestone status (NOT_STARTED / IN_PROGRESS / DONE)</sub></div>
         <div class="mini-arrow"></div>
         <div class="step coral">View all allocations<sub>Filter by employee or project</sub></div>
 
@@ -361,14 +284,14 @@
       <div class="col-box">
 
         <div class="sec">Resource dashboard</div>
-        <div class="step teal">View resource dashboard<sub>Bench employees, active employees, utilisation, availability</sub></div>
+        <div class="step teal">View own team resource dashboard<sub>V4 — scoped to employees WHERE ManagerUserId = this manager</sub></div>
         <div class="mini-arrow"></div>
         <div class="step teal">Drill into employee<sub>Department, profile skills, active allocations, recent activity tags</sub></div>
 
         <div class="sec">AI-assisted allocation</div>
         <div class="step amber">Enter natural language requirement<sub>Example: Java + microservices for 3 months</sub></div>
         <div class="mini-arrow"></div>
-        <div class="step amber">Server queries DB + builds prompt<sub>Available employees + skills</sub></div>
+        <div class="step amber">Server queries own team DB + builds prompt<sub>V4 — only this manager's employees considered</sub></div>
         <div class="mini-arrow"></div>
         <div class="step amber">LLM returns ranked suggestions<sub>Shown with AI-generated disclaimer</sub></div>
 
@@ -382,20 +305,18 @@
         <div class="step teal">End an existing allocation<sub>Set to_date to today; scheduler recomputes employee status</sub></div>
 
         <div class="sec">My Projects</div>
-        <div class="step teal">View assigned projects and health status<sub>On Track / Attention / At Risk</sub></div>
+        <div class="step teal">View assigned projects and health status<sub>V4 — table shows SP Done / Total (story points)</sub></div>
         <div class="mini-arrow"></div>
-        <div class="step teal">Open project detail<sub>Risk flags, milestones, allocated resources</sub></div>
+        <div class="step teal">Open project detail<sub>Risk flags, milestones with story points, allocated resources</sub></div>
         <div class="mini-arrow"></div>
         <div class="step amber">AI risk summary<sub>Plain-English from LLM based on milestones + timesheets</sub></div>
 
-        <div class="sec">Timesheet review</div>
-        <div class="step teal">View submitted timesheets<sub>All employees on manager's projects</sub></div>
+        <div class="sec">Timesheet review (read-only in V4)</div>
+        <div class="step teal">View team timesheets<sub>V4 — own team only; filter by week; MISSED ⚠ rows highlighted</sub></div>
         <div class="mini-arrow"></div>
-        <div class="step teal">Approve timesheet<sub>Locked (cannot change); notification created for employee</sub></div>
+        <div class="step teal">[V] View employee week detail<sub>Employee / Project / Hrs / Status per row</sub></div>
         <div class="mini-arrow"></div>
-        <div class="step teal">Reject timesheet<sub>Enter reason; notification created for employee</sub></div>
-        <div class="mini-arrow"></div>
-        <div class="step teal">View missed submissions<sub>Flagged by background scheduler</sub></div>
+        <div class="step gray" style="opacity:.5;text-decoration:line-through">Approve / Reject timesheet<sub>⚠ Removed from console in V4 — endpoint exists server-side</sub></div>
       </div>
     </div>
 
@@ -404,8 +325,8 @@
       <div class="lane-label" style="color:var(--blue-text)">Employee</div>
       <div class="col-box">
 
-        <div class="sec">Menu reminder</div>
-        <div class="step blue">Show missing-timesheet reminder<sub>Displayed only if the most recent completed week is missing</sub></div>
+        <div class="sec">Menu reminder (V4)</div>
+        <div class="step blue">Show missing-timesheet banner<sub>Checks last completed week; shown if no entry exists for that Monday</sub></div>
 
         <div class="sec">Timesheet submission</div>
         <div class="step blue">Select week<sub>Enter date or press Enter for last Monday</sub></div>
@@ -420,21 +341,14 @@
         <div class="mini-arrow"></div>
         <div class="step blue">Submit timesheet<sub>Status: SUBMITTED</sub></div>
 
-        <div class="sec">After manager action</div>
-        <div class="step blue">Approved: locked, no changes<sub>Employee sees Approved status</sub></div>
+        <div class="sec">History &amp; allocations (V4)</div>
+        <div class="step blue">View my timesheets<sub>Week-summarised history; MISSED ⚠ shown if scheduler marked a week</sub></div>
         <div class="mini-arrow"></div>
-        <div class="or-label">— or —</div>
-        <div class="mini-arrow"></div>
-        <div class="step coral">Rejected: view reason<sub>Employee sees rejection reason and may resubmit</sub></div>
-        <div class="mini-arrow"></div>
-        <div class="step blue">Correct and resubmit<sub>Only allowed after rejection</sub></div>
-
-        <div class="sec">History &amp; allocations</div>
-        <div class="step blue">View my timesheets<sub>Submitted and missed status history</sub></div>
-        <div class="mini-arrow"></div>
-        <div class="step blue">View week detail<sub>Hours and activity tags by project</sub></div>
+        <div class="step blue">[V] View week detail<sub>Hours and activity tags by project</sub></div>
         <div class="mini-arrow"></div>
         <div class="step blue">View my allocations<sub>Project, %, from, to, status</sub></div>
+        <div class="mini-arrow"></div>
+        <div class="step gray" style="opacity:.5;text-decoration:line-through">Rejected: correct &amp; resubmit<sub>⚠ Removed from console in V4</sub></div>
       </div>
     </div>
 
