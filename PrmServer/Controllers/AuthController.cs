@@ -24,9 +24,9 @@ namespace PrmServer.Controllers
                 var result = await _authService.LoginAsync(dto);
                 return Ok(result);
             }
-            catch (UnauthorizedAccessException)
+            catch (UnauthorizedAccessException ex)
             {
-                return Unauthorized(new { message = "Invalid username or password." });
+                return Unauthorized(new { message = ex.Message });
             }
         }
 

@@ -100,11 +100,18 @@ namespace PrmServer.Services
             var allocation = await _allocationRepository.GetByIdAsync(allocationId)
                 ?? throw new KeyNotFoundException($"Allocation {allocationId} not found.");
 
-            allocation.IsActive = false;
-            allocation.EndDate = DateTime.UtcNow.Date;
-            allocation.UpdatedAt = DateTime.UtcNow;
-
-            await _allocationRepository.UpdateAsync(allocation);
+            var today = DateTime.UtcNow.Date;
+            if (allocation.StartDate > today)
+            {
+                await _allocationRepository.DeleteAsync(allocation.Id);
+            }
+            else
+            {
+                allocation.IsActive = false;
+                allocation.EndDate = today;
+                allocation.UpdatedAt = DateTime.UtcNow;
+                await _allocationRepository.UpdateAsync(allocation);
+            }
 
             await UpdateEmployeeStatusAsync(allocation.UserId);
         }
@@ -113,13 +120,21 @@ namespace PrmServer.Services
         {
             var allocations = await _allocationRepository.GetByUserIdAsync(employeeId);
             var active = allocations.Where(a => a.IsActive).ToList();
+            var today = DateTime.UtcNow.Date;
 
             foreach (var allocation in active)
             {
-                allocation.IsActive = false;
-                allocation.EndDate = DateTime.UtcNow.Date;
-                allocation.UpdatedAt = DateTime.UtcNow;
-                await _allocationRepository.UpdateAsync(allocation);
+                if (allocation.StartDate > today)
+                {
+                    await _allocationRepository.DeleteAsync(allocation.Id);
+                }
+                else
+                {
+                    allocation.IsActive = false;
+                    allocation.EndDate = today;
+                    allocation.UpdatedAt = DateTime.UtcNow;
+                    await _allocationRepository.UpdateAsync(allocation);
+                }
             }
         }
 

@@ -61,11 +61,11 @@ namespace PrmClient.UI.Common
                     _          => "login"
                 };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Console.WriteLine("\n  Error: Invalid username or password.");
+                Console.WriteLine($"\n  Error: {ex.Message}");
                 Console.WriteLine("  Press any key to return...");
-                Console.ReadKey();
+                Console.ReadKey(intercept: true);
                 AppState.CurrentScreen = "start";
             }
         }
