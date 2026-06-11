@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="PrmClient/PrmClient.csproj" />
+  <Project Path="PrmServer/PrmServer.csproj" />
+</Solution>
