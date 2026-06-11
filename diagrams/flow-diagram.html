@@ -251,7 +251,7 @@
         <div class="mini-arrow"></div>
         <div class="step coral">Update employee details<sub>Full name, email, department, designation</sub></div>
         <div class="mini-arrow"></div>
-        <div class="step coral">Assign manager to employee<sub>V4 — links ManagerUserId; scopes manager dashboard + AI search</sub></div>
+        <div class="step coral">Assign manager to employee<sub>links ManagerUserId; scopes manager dashboard + AI search</sub></div>
         <div class="mini-arrow"></div>
         <div class="step coral">Deactivate employee<sub>Ends active allocations today and blocks login</sub></div>
 
@@ -261,11 +261,11 @@
         <div class="step coral">Update proficiency or remove skill</div>
 
         <div class="sec">Project management</div>
-        <div class="step coral">Create project<sub>Name, description, dates, status, assign manager, total story points (V4)</sub></div>
+        <div class="step coral">Create project<sub>Name, description, dates, status, assign manager, total story points</sub></div>
         <div class="mini-arrow"></div>
-        <div class="step coral">Update project details<sub>V4 — all fields editable incl. story points; COMPLETED is a valid status</sub></div>
+        <div class="step coral">Update project details<sub>all fields editable incl. story points; COMPLETED is a valid status</sub></div>
         <div class="mini-arrow"></div>
-        <div class="step coral">Manage milestones<sub>Add milestone (with story points V4) or update milestone status (NOT_STARTED / IN_PROGRESS / DONE)</sub></div>
+        <div class="step coral">Manage milestones<sub>Add milestone (with story points) or update milestone status (NOT_STARTED / IN_PROGRESS / DONE)</sub></div>
         <div class="mini-arrow"></div>
         <div class="step coral">View all allocations<sub>Filter by employee or project</sub></div>
 
@@ -284,14 +284,14 @@
       <div class="col-box">
 
         <div class="sec">Resource dashboard</div>
-        <div class="step teal">View own team resource dashboard<sub>V4 — scoped to employees WHERE ManagerUserId = this manager</sub></div>
+        <div class="step teal">View own team resource dashboard<sub>scoped to employees WHERE ManagerUserId = this manager</sub></div>
         <div class="mini-arrow"></div>
         <div class="step teal">Drill into employee<sub>Department, profile skills, active allocations, recent activity tags</sub></div>
 
         <div class="sec">AI-assisted allocation</div>
         <div class="step amber">Enter natural language requirement<sub>Example: Java + microservices for 3 months</sub></div>
         <div class="mini-arrow"></div>
-        <div class="step amber">Server queries own team DB + builds prompt<sub>V4 — only this manager's employees considered</sub></div>
+        <div class="step amber">Server queries own team DB + builds prompt<sub>only this manager's employees considered</sub></div>
         <div class="mini-arrow"></div>
         <div class="step amber">LLM returns ranked suggestions<sub>Shown with AI-generated disclaimer</sub></div>
 
@@ -305,18 +305,16 @@
         <div class="step teal">End an existing allocation<sub>Set to_date to today; scheduler recomputes employee status</sub></div>
 
         <div class="sec">My Projects</div>
-        <div class="step teal">View assigned projects and health status<sub>V4 — table shows SP Done / Total (story points)</sub></div>
+        <div class="step teal">View assigned projects and health status<sub>table shows SP Done / Total (story points)</sub></div>
         <div class="mini-arrow"></div>
         <div class="step teal">Open project detail<sub>Risk flags, milestones with story points, allocated resources</sub></div>
         <div class="mini-arrow"></div>
         <div class="step amber">AI risk summary<sub>Plain-English from LLM based on milestones + timesheets</sub></div>
 
-        <div class="sec">Timesheet review (read-only in V4)</div>
-        <div class="step teal">View team timesheets<sub>V4 — own team only; filter by week; MISSED ⚠ rows highlighted</sub></div>
+        <div class="sec">Timesheet review (read-only)</div>
+        <div class="step teal">View team timesheets<sub>own team only; filter by week; MISSED ⚠ rows highlighted</sub></div>
         <div class="mini-arrow"></div>
-        <div class="step teal">[V] View employee week detail<sub>Employee / Project / Hrs / Status per row</sub></div>
-        <div class="mini-arrow"></div>
-        <div class="step gray" style="opacity:.5;text-decoration:line-through">Approve / Reject timesheet<sub>⚠ Removed from console in V4 — endpoint exists server-side</sub></div>
+        <div class="step teal">View employee week detail<sub>Employee / Project / Hrs / Status per row</sub></div>
       </div>
     </div>
 
@@ -325,7 +323,7 @@
       <div class="lane-label" style="color:var(--blue-text)">Employee</div>
       <div class="col-box">
 
-        <div class="sec">Menu reminder (V4)</div>
+        <div class="sec">Menu reminder</div>
         <div class="step blue">Show missing-timesheet banner<sub>Checks last completed week; shown if no entry exists for that Monday</sub></div>
 
         <div class="sec">Timesheet submission</div>
@@ -341,14 +339,12 @@
         <div class="mini-arrow"></div>
         <div class="step blue">Submit timesheet<sub>Status: SUBMITTED</sub></div>
 
-        <div class="sec">History &amp; allocations (V4)</div>
+        <div class="sec">History &amp; allocations</div>
         <div class="step blue">View my timesheets<sub>Week-summarised history; MISSED ⚠ shown if scheduler marked a week</sub></div>
         <div class="mini-arrow"></div>
-        <div class="step blue">[V] View week detail<sub>Hours and activity tags by project</sub></div>
+        <div class="step blue">View week detail<sub>Hours and activity tags by project</sub></div>
         <div class="mini-arrow"></div>
         <div class="step blue">View my allocations<sub>Project, %, from, to, status</sub></div>
-        <div class="mini-arrow"></div>
-        <div class="step gray" style="opacity:.5;text-decoration:line-through">Rejected: correct &amp; resubmit<sub>⚠ Removed from console in V4</sub></div>
       </div>
     </div>
 

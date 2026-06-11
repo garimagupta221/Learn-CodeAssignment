@@ -48,21 +48,6 @@ svg text { font-family: system-ui, -apple-system, sans-serif; }
 </head>
 <body>
 <h1>Project Resource Management Tool - Use Case Diagram</h1>
-<p class="subtitle">V4 — Updated for Phase 1–4 changes</p>
-
-<div style="background:#e7f3ff;border:1px solid #0066cc;border-radius:8px;padding:14px 18px;margin-bottom:20px;color:#004080;font-size:12px;">
-  <strong>V4 Changes reflected in this diagram:</strong>
-  <ul style="margin:8px 0 0 18px;">
-    <li>Self-register (employee/manager) use cases struck through — replaced by Admin-only account creation</li>
-    <li>New Admin use case: <em>Assign manager to employee</em> (ManagerUserId)</li>
-    <li>New Admin use case: <em>Update project details</em> with Story Points &amp; COMPLETED status</li>
-    <li>Manager team availability now scoped to own team via ManagerUserId</li>
-    <li>Manager AI search now scoped to own team only</li>
-    <li>Approve / Reject timesheet use cases struck through — manager console is now read-only</li>
-    <li>Employee reminder banner use case added</li>
-    <li>Employee timesheet history now week-summarised with MISSED ⚠ indicator; resubmit flow removed</li>
-  </ul>
-</div>
 
 <div class="wrap">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1700 3200" width="1700" style="display:block">
@@ -133,11 +118,9 @@ svg text { font-family: system-ui, -apple-system, sans-serif; }
 
 <ellipse cx="385" cy="800" rx="155" ry="19" fill="#ddf4ff" stroke="#1F6FEB" stroke-width="0.8"/>
 <text x="385" y="797" font-size="11" fill="#0550ae" text-anchor="middle">Assign manager to employee</text>
-<text x="385" y="810" font-size="11" fill="#0550ae" text-anchor="middle">[V4 — ManagerUserId]</text>
 
 <ellipse cx="385" cy="857" rx="155" ry="19" fill="#ddf4ff" stroke="#1F6FEB" stroke-width="0.8"/>
 <text x="385" y="854" font-size="11" fill="#0550ae" text-anchor="middle">Update project details</text>
-<text x="385" y="867" font-size="11" fill="#0550ae" text-anchor="middle">[V4 — story points / COMPLETED]</text>
 
 <circle cx="62" cy="390" r="18" fill="none" stroke="#1F6FEB" stroke-width="1.5"/>
 <line x1="62" y1="408" x2="62" y2="455" stroke="#1F6FEB" stroke-width="1.5"/>
@@ -171,7 +154,7 @@ svg text { font-family: system-ui, -apple-system, sans-serif; }
 
 <ellipse cx="385" cy="1155" rx="155" ry="19" fill="#d2f4ea" stroke="#2DA44E" stroke-width="0.8"/>
 <text x="385" y="1152" font-size="11" fill="#116329" text-anchor="middle">View own team</text>
-<text x="385" y="1165" font-size="11" fill="#116329" text-anchor="middle">employee availability [V4]</text>
+<text x="385" y="1165" font-size="11" fill="#116329" text-anchor="middle">employee availability</text>
 
 <ellipse cx="385" cy="1210" rx="155" ry="19" fill="#d2f4ea" stroke="#2DA44E" stroke-width="0.8"/>
 <text x="385" y="1207" font-size="11" fill="#116329" text-anchor="middle">Drill down into</text>
@@ -179,7 +162,7 @@ svg text { font-family: system-ui, -apple-system, sans-serif; }
 
 <ellipse cx="385" cy="1265" rx="155" ry="19" fill="#d2f4ea" stroke="#2DA44E" stroke-width="0.8"/>
 <text x="385" y="1262" font-size="11" fill="#116329" text-anchor="middle">Search own team employees</text>
-<text x="385" y="1275" font-size="11" fill="#116329" text-anchor="middle">via natural language [V4]</text>
+<text x="385" y="1275" font-size="11" fill="#116329" text-anchor="middle">via natural language</text>
 
 <ellipse cx="385" cy="1320" rx="155" ry="19" fill="#d2f4ea" stroke="#2DA44E" stroke-width="0.8"/>
 <text x="385" y="1317" font-size="11" fill="#116329" text-anchor="middle">Allocate employee</text>
@@ -191,7 +174,7 @@ svg text { font-family: system-ui, -apple-system, sans-serif; }
 
 <ellipse cx="385" cy="1430" rx="155" ry="19" fill="#d2f4ea" stroke="#2DA44E" stroke-width="0.8"/>
 <text x="385" y="1427" font-size="11" fill="#116329" text-anchor="middle">View assigned projects</text>
-<text x="385" y="1440" font-size="11" fill="#116329" text-anchor="middle">with health + SP [V4]</text>
+<text x="385" y="1440" font-size="11" fill="#116329" text-anchor="middle">with health + SP</text>
 
 <ellipse cx="385" cy="1485" rx="155" ry="19" fill="#d2f4ea" stroke="#2DA44E" stroke-width="0.8"/>
 <text x="385" y="1482" font-size="11" fill="#116329" text-anchor="middle">Drill down into</text>
@@ -203,16 +186,10 @@ svg text { font-family: system-ui, -apple-system, sans-serif; }
 
 <ellipse cx="385" cy="1595" rx="170" ry="19" fill="#d2f4ea" stroke="#2DA44E" stroke-width="0.8"/>
 <text x="385" y="1592" font-size="11" fill="#116329" text-anchor="middle">View team timesheets</text>
-<text x="385" y="1605" font-size="11" fill="#116329" text-anchor="middle">(read-only) [V4]</text>
+<text x="385" y="1605" font-size="11" fill="#116329" text-anchor="middle">(read-only)</text>
 
-<!-- Approve / Reject REMOVED in V4 — struck-through -->
-<ellipse cx="385" cy="1650" rx="170" ry="19" fill="#f1f3f9" stroke="#aaa" stroke-width="0.8" stroke-dasharray="4 3" opacity="0.6"/>
-<text x="385" y="1654" font-size="12" fill="#888" text-anchor="middle" text-decoration="line-through">Approve submitted timesheet</text>
-<text x="305" y="1668" font-size="10" fill="#CF7C35" text-anchor="middle">⚠ Removed in V4 console</text>
-
-<ellipse cx="385" cy="1700" rx="170" ry="19" fill="#f1f3f9" stroke="#aaa" stroke-width="0.8" stroke-dasharray="4 3" opacity="0.6"/>
-<text x="385" y="1704" font-size="12" fill="#888" text-anchor="middle" text-decoration="line-through">Reject submitted timesheet</text>
-<text x="305" y="1718" font-size="10" fill="#CF7C35" text-anchor="middle">⚠ Removed in V4 console</text>
+<!-- Approve / Reject REMOVED — struck-through -->
+<!-- Approve / Reject REMOVED — struck-through (removed) -->
 
 <circle cx="62" cy="1430" r="18" fill="none" stroke="#2DA44E" stroke-width="1.5"/>
 <line x1="62" y1="1448" x2="62" y2="1495" stroke="#2DA44E" stroke-width="1.5"/>
@@ -231,13 +208,11 @@ svg text { font-family: system-ui, -apple-system, sans-serif; }
 <line x1="80" y1="1452" x2="230" y2="1540" stroke="#d0d7de" stroke-width="0.7"/>
 <line x1="80" y1="1452" x2="230" y2="1595" stroke="#d0d7de" stroke-width="0.7"/>
 
-<ellipse cx="800" cy="1760" rx="155" ry="19" fill="#fff8f0" stroke="#CF7C35" stroke-width="0.8" stroke-dasharray="5 2" opacity="0.5"/>
-<text x="800" y="1757" font-size="11" fill="#7d4e17" text-anchor="middle">Enter rejection reason</text>
-<text x="800" y="1770" font-size="11" fill="#a8622a" text-anchor="middle">[V4: endpoint exists server-side only]</text>
+<!-- Enter rejection reason REMOVED (removed) -->
 
 <ellipse cx="800" cy="1210" rx="165" ry="19" fill="#f1f3f9" stroke="#6E7781" stroke-width="0.8"/>
 <text x="800" y="1207" font-size="11" fill="#424a53" text-anchor="middle">Query own team DB</text>
-<text x="800" y="1220" font-size="11" fill="#424a53" text-anchor="middle">WHERE ManagerUserId = caller [V4]</text>
+<text x="800" y="1220" font-size="11" fill="#424a53" text-anchor="middle">WHERE ManagerUserId = caller</text>
 
 <ellipse cx="1150" cy="1230" rx="155" ry="19" fill="#fbefff" stroke="#8250DF" stroke-width="0.8"/>
 <text x="1150" y="1227" font-size="11" fill="#5a2d91" text-anchor="middle">Call LLM API to rank</text>
@@ -286,7 +261,7 @@ svg text { font-family: system-ui, -apple-system, sans-serif; }
 
 <ellipse cx="360" cy="1875" rx="165" ry="19" fill="#fff3cc" stroke="#E16F24" stroke-width="0.8"/>
 <text x="360" y="1872" font-size="11" fill="#7d4e17" text-anchor="middle">Show missing-timesheet</text>
-<text x="360" y="1885" font-size="11" fill="#7d4e17" text-anchor="middle">reminder banner [V4]</text>
+<text x="360" y="1885" font-size="11" fill="#7d4e17" text-anchor="middle">reminder banner</text>
 
 <ellipse cx="360" cy="1930" rx="155" ry="19" fill="#fff3cc" stroke="#E16F24" stroke-width="0.8"/>
 <text x="360" y="1927" font-size="11" fill="#7d4e17" text-anchor="middle">Submit weekly timesheets</text>
@@ -305,12 +280,9 @@ svg text { font-family: system-ui, -apple-system, sans-serif; }
 
 <ellipse cx="360" cy="2155" rx="165" ry="19" fill="#fff3cc" stroke="#E16F24" stroke-width="0.8"/>
 <text x="360" y="2152" font-size="11" fill="#7d4e17" text-anchor="middle">View timesheet history</text>
-<text x="360" y="2165" font-size="11" fill="#7d4e17" text-anchor="middle">(week summary + MISSED ⚠) [V4]</text>
 
-<!-- Resubmit REMOVED in V4 -->
-<ellipse cx="690" cy="1930" rx="155" ry="19" fill="#f1f3f9" stroke="#aaa" stroke-width="0.8" stroke-dasharray="4 3" opacity="0.6"/>
-<text x="690" y="1927" font-size="11" fill="#888" text-anchor="middle" text-decoration="line-through">Correct &amp; resubmit</text>
-<text x="690" y="1940" font-size="10" fill="#CF7C35" text-anchor="middle">⚠ Removed in V4</text>
+<!-- Resubmit REMOVED -->
+<!-- Resubmit REMOVED (removed) -->
 
 <circle cx="62" cy="2050" r="18" fill="none" stroke="#E16F24" stroke-width="1.5"/>
 <line x1="62" y1="2068" x2="62" y2="2115" stroke="#E16F24" stroke-width="1.5"/>
@@ -378,14 +350,8 @@ svg text { font-family: system-ui, -apple-system, sans-serif; }
 <text x="485" y="2877" font-size="11" fill="#424a53" text-anchor="middle">View in-app notifications</text>
 <text x="485" y="2890" font-size="11" fill="#424a53" text-anchor="middle">at menu load</text>
 
-<!-- Self-register REMOVED in V4 -->
-<ellipse cx="485" cy="2945" rx="160" ry="19" fill="#f1f3f9" stroke="#aaa" stroke-width="0.8" stroke-dasharray="4 3" opacity="0.6"/>
-<text x="485" y="2949" font-size="12" fill="#888" text-anchor="middle" text-decoration="line-through">Self-register employee account</text>
-<text x="340" y="2963" font-size="10" fill="#CF7C35" text-anchor="middle">⚠ Removed V4 — Admin creates accounts</text>
-
-<ellipse cx="485" cy="3010" rx="160" ry="19" fill="#f1f3f9" stroke="#aaa" stroke-width="0.8" stroke-dasharray="4 3" opacity="0.6"/>
-<text x="485" y="3014" font-size="12" fill="#888" text-anchor="middle" text-decoration="line-through">Self-register manager account</text>
-<text x="340" y="3028" font-size="10" fill="#CF7C35" text-anchor="middle">⚠ Removed V4 — Admin creates accounts</text>
+<!-- Self-register REMOVED -->
+<!-- Self-register REMOVED (removed) -->
 
 </svg>
 </div>
