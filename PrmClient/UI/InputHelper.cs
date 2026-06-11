@@ -56,7 +56,7 @@ namespace PrmClient.UI
                 if (DateTime.TryParse(input, out DateTime value))
                     return value;
 
-                Console.WriteLine("  Invalid date. Please use format yyyy-MM-dd (e.g. 2025-12-31).");
+                Console.WriteLine("  Invalid date. Please use format dd-MM-yyyy (e.g. 31-12-2025).");
             }
         }
 

@@ -56,7 +56,7 @@ namespace PrmClient.UI.Employee
                 foreach (var (weekStart, totalHrs, status) in weekSummaries)
                 {
                     string statusDisplay = status == "MISSED" ? "MISSED    ⚠" : status;
-                    Console.WriteLine($"  {weekStart:dd-MMM-yyyy,-16} {totalHrs + " hrs",-12} {statusDisplay}");
+                    Console.WriteLine($"  {weekStart,-16:dd-MM-yyyy} {totalHrs + " hrs",-12} {statusDisplay}");
                 }
             }
 
@@ -102,7 +102,7 @@ namespace PrmClient.UI.Employee
 
             string weekStatus = weekSheets.Any(t => t.Status == "MISSED") ? "MISSED" : weekSheets.First().Status;
             Console.WriteLine();
-            Console.WriteLine($"  ── Week: {weekDate:dd-MMM-yyyy} — Status: {weekStatus} ─────");
+            Console.WriteLine($"  ── Week: {weekDate:dd-MM-yyyy} — Status: {weekStatus} ─────");
             Console.WriteLine();
             Console.WriteLine($"  {"Project",-22} {"Hrs",-7} Status");
             Console.WriteLine($"  {new string('─', 44)}");

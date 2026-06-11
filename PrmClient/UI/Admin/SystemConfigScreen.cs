@@ -1,5 +1,8 @@
 using PrmClient.Models;
 using PrmClient.Services;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
 
 namespace PrmClient.UI.Admin
 {
@@ -16,60 +19,78 @@ namespace PrmClient.UI.Admin
         {
             ConsoleHelper.ClearScreen();
             ConsoleHelper.PrintHeader(AppState.Role);
-            Console.WriteLine("System Config");
+            
+            var config = GetConfig();
+            
+            string llmProvider = config.GetValueOrDefault("ActiveAiProvider", "Google Gemini");
+            string llmApiKey = config.GetValueOrDefault("AiApiKey", "");
+            string maskedApiKey = string.IsNullOrEmpty(llmApiKey) ? "" : new string('*', 28);
+            string schedulerInterval = config.GetValueOrDefault("SchedulerInterval", "4 hours");
+            string maxWeeklyHours = config.GetValueOrDefault("MaxWeeklyHours", "40");
+
+            Console.WriteLine("╔══════════════════════════════════════════════╗");
+            Console.WriteLine("║    SYSTEM CONFIGURATION                      ║");
+            Console.WriteLine("╚══════════════════════════════════════════════╝");
             Console.WriteLine();
-            Console.WriteLine("  1. View All Config");
-            Console.WriteLine("  2. Set Config Value");
-            Console.WriteLine("  3. Back");
+            Console.WriteLine("Current Settings:");
+            Console.WriteLine($"  LLM Provider        :  {llmProvider}");
+            Console.WriteLine($"  LLM API Key         :  {maskedApiKey}");
+            Console.WriteLine($"  Scheduler Interval  :  {schedulerInterval}");
+            Console.WriteLine($"  Max Weekly Hours    :  {maxWeeklyHours}");
+            Console.WriteLine();
+            Console.WriteLine("──────────────────────────────────────────────");
+            Console.WriteLine("1. Update LLM API Key");
+            Console.WriteLine("2. Change LLM Provider  (Gemini / Groq)");
+            Console.WriteLine("3. Update Scheduler Interval");
+            Console.WriteLine("4. Update Max Weekly Hours");
+            Console.WriteLine("5. Back");
             Console.WriteLine();
 
-            int choice = InputHelper.GetValidIntOption("Enter option: ", 1, 3);
+            int choice = InputHelper.GetValidIntOption("Enter option: ", 1, 5);
 
             switch (choice)
             {
-                case 1: ViewConfig(); break;
-                case 2: SetConfig();  break;
-                case 3:
+                case 1: 
+                    UpdateConfigValue("AiApiKey", InputHelper.GetRequiredString("  New LLM API Key: ")); 
+                    break;
+                case 2:
+                    Console.WriteLine("\n  Available Providers:");
+                    Console.WriteLine("  1. Gemini");
+                    Console.WriteLine("  2. Groq");
+                    int providerChoice = InputHelper.GetValidIntOption("  Enter provider option: ", 1, 2);
+                    string provider = providerChoice == 1 ? "Gemini" : "Groq";
+                    UpdateConfigValue("ActiveAiProvider", provider);
+                    break;
+                case 3: 
+                    int interval = InputHelper.GetValidIntOption("  New Scheduler Interval (hours): ", 1, 168);
+                    UpdateConfigValue("SchedulerInterval", interval.ToString());
+                    break;
+                case 4: 
+                    int hours = InputHelper.GetValidIntOption("  New Max Weekly Hours: ", 1, 168);
+                    UpdateConfigValue("MaxWeeklyHours", hours.ToString());
+                    break;
+                case 5:
                     AppState.CurrentScreen = "admin-menu";
                     return;
             }
-
-            Console.WriteLine("\n  Press any key to continue...");
-            Console.ReadKey(intercept: true);
         }
 
-        private void ViewConfig()
+        private Dictionary<string, string> GetConfig()
         {
-            Console.WriteLine();
             try
             {
-                var config = _api.GetAsync<Dictionary<string, string>>("api/config")
-                                 .GetAwaiter().GetResult()
-                             ?? new Dictionary<string, string>();
-
-                if (config.Count == 0)
-                {
-                    Console.WriteLine("  No config entries found.");
-                    return;
-                }
-
-                Console.WriteLine($"  {"Key",-30} {"Value",-40}");
-                Console.WriteLine($"  {new string('-', 30),-30} {new string('-', 40),-40}");
-                foreach (var kv in config)
-                    Console.WriteLine($"  {kv.Key,-30} {kv.Value,-40}");
+                return _api.GetAsync<Dictionary<string, string>>("api/config")
+                           .GetAwaiter().GetResult()
+                       ?? new Dictionary<string, string>();
             }
-            catch (HttpRequestException ex)
+            catch (HttpRequestException)
             {
-                Console.WriteLine($"  Error: {ex.Message}");
+                return new Dictionary<string, string>();
             }
         }
 
-        private void SetConfig()
+        private void UpdateConfigValue(string key, string value)
         {
-            Console.WriteLine();
-            string key   = InputHelper.GetRequiredString("  Config Key: ");
-            string value = InputHelper.GetRequiredString("  Config Value: ");
-
             try
             {
                 _api.PutAsync<SetConfigRequest>("api/config", new SetConfigRequest { Key = key, Value = value })
@@ -80,6 +101,9 @@ namespace PrmClient.UI.Admin
             {
                 Console.WriteLine($"\n  Error: {ex.Message}");
             }
+            
+            Console.WriteLine("\n  Press any key to continue...");
+            Console.ReadKey(intercept: true);
         }
     }
 }

@@ -23,7 +23,7 @@ namespace PrmClient.UI.Employee
 
             if (isMissing)
             {
-                Console.WriteLine($"  ⚠  Reminder: Timesheet for week {previousMonday:dd-MMM-yyyy} has not been submitted.");
+                Console.WriteLine($"  ⚠  Reminder: Timesheet for week {previousMonday:dd-MM-yyyy} has not been submitted.");
                 Console.WriteLine("  ──────────────────────────────────────────────");
             }
 

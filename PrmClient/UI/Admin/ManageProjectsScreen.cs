@@ -171,8 +171,8 @@ namespace PrmClient.UI.Admin
 
             string name = InputHelper.GetRequiredString($"  Project Name         : {current.Name,-30}  (editable) → ");
             string description = InputHelper.GetRequiredString($"  Description          : {current.Description,-30}  (editable) → ");
-            DateTime startDate = InputHelper.GetValidDate($"  Start Date           : {current.StartDate,-15:dd-MMM-yy}  (editable) → (DD-MM-YYYY) ");
-            DateTime endDate   = InputHelper.GetValidDate($"  End Date             : {current.EndDate,-15:dd-MMM-yy}  (editable) → (DD-MM-YYYY) ");
+            DateTime startDate = InputHelper.GetValidDate($"  Start Date           : {current.StartDate,-15:dd-MM-yyyy}  (editable) → (DD-MM-YYYY) ");
+            DateTime endDate   = InputHelper.GetValidDate($"  End Date             : {current.EndDate,-15:dd-MM-yyyy}  (editable) → (DD-MM-YYYY) ");
 
             Console.Write("  Status               : (1) PLANNED   (2) ACTIVE   (3) ON_HOLD   (4) COMPLETED → ");
             int statusChoice = InputHelper.GetValidIntOption("", 1, 4);
@@ -230,7 +230,7 @@ namespace PrmClient.UI.Admin
                 if (managerDisplay.Length > 14) managerDisplay = managerDisplay.Substring(0, 14);
 
                 Console.WriteLine(
-                    $"  {p.Id,-5} {p.Name,-18} {managerDisplay,-15} {p.EndDate,-12:dd-MMM-yy} {p.Status,-10} {spCol,-13}");
+                    $"  {p.Id,-5} {p.Name,-18} {managerDisplay,-15} {p.EndDate,-12:dd-MM-yyyy} {p.Status,-10} {spCol,-13}");
             }
 
             Console.WriteLine(

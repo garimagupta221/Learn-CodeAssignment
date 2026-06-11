@@ -20,7 +20,7 @@ namespace PrmClient.UI.Manager
                 ConsoleHelper.PrintHeader(AppState.Role);
                 Console.WriteLine("  Allocate Resource");
                 Console.WriteLine();
-                Console.WriteLine("  1. AI-Assisted Search");
+                Console.WriteLine("  1. Find resource using AI (recommended)");
                 Console.WriteLine("  2. Direct Allocation");
                 Console.WriteLine("  3. End Allocation");
                 Console.WriteLine("  4. Back");
@@ -40,7 +40,7 @@ namespace PrmClient.UI.Manager
             }
         }
 
-        // ─── AI-Assisted Search ────────────────────────────────────────────────
+        // ─── Find resource using AI (recommended) ────────────────────────────────────────────────
 
         private void AiAssistedSearch()
         {
@@ -87,28 +87,143 @@ namespace PrmClient.UI.Manager
             Console.WriteLine("  ── Direct Allocation ──────────────────────────────────────────────────────");
             Console.WriteLine();
 
-            int projectId     = InputHelper.GetValidIntOption("  Project ID:        ", 1, int.MaxValue);
-            int employeeId    = InputHelper.GetValidIntOption("  Employee ID:       ", 1, int.MaxValue);
-            int utilization   = InputHelper.GetValidIntOption("  Utilisation % (1-100): ", 1, 100);
-            DateTime startDate = InputHelper.GetValidDate("  Start Date (yyyy-MM-dd): ");
-            DateTime endDate   = InputHelper.GetValidDate("  End Date   (yyyy-MM-dd): ");
-
             try
             {
-                var result = _api.PostAsync<CreateAllocationRequest, AllocationModel>(
-                    "api/allocations",
-                    new CreateAllocationRequest
+                var projects = _api.GetAsync<List<ProjectModel>>($"api/projects/manager/{AppState.UserId}").GetAwaiter().GetResult() ?? new List<ProjectModel>();
+                if (projects.Count == 0)
+                {
+                    Console.WriteLine("  No projects assigned to you.");
+                    Console.WriteLine("\n  Press any key to continue...");
+                    Console.ReadKey(intercept: true);
+                    return;
+                }
+                
+                Console.WriteLine("  Your Projects:");
+                foreach (var p in projects)
+                {
+                    Console.WriteLine($"    {p.Id} - {p.Name}");
+                }
+                Console.WriteLine();
+
+                int projectId;
+                ProjectModel? selectedProject;
+                while (true)
+                {
+                    projectId = InputHelper.GetValidIntOption("  Select Project ID: ", 1, int.MaxValue);
+                    selectedProject = projects.FirstOrDefault(p => p.Id == projectId);
+                    if (selectedProject == null)
                     {
-                        EmployeeId     = employeeId,
-                        ProjectId      = projectId,
-                        UtilizationPct = utilization,
-                        StartDate      = startDate,
-                        EndDate        = endDate
+                        Console.WriteLine("  Invalid Project ID. Please select from the list above.");
                     }
-                ).GetAwaiter().GetResult();
+                    else if (!selectedProject.Status.Equals("ACTIVE", StringComparison.OrdinalIgnoreCase) && 
+                             !selectedProject.Status.Equals("PLANNED", StringComparison.OrdinalIgnoreCase))
+                    {
+                        Console.WriteLine($"  Project '{selectedProject.Name}' is currently {selectedProject.Status}. Only ACTIVE or PLANNED projects are allowed.");
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                var employees = _api.GetAsync<List<EmployeeModel>>($"api/employees/by-manager/{AppState.UserId}").GetAwaiter().GetResult() ?? new List<EmployeeModel>();
+                if (employees.Count == 0)
+                {
+                    Console.WriteLine("  No employees assigned to you.");
+                    Console.WriteLine("\n  Press any key to continue...");
+                    Console.ReadKey(intercept: true);
+                    return;
+                }
 
                 Console.WriteLine();
-                Console.WriteLine($"  Allocation created successfully (ID: {result?.Id}).");
+                Console.WriteLine("  Your Team:");
+                foreach (var e in employees)
+                {
+                    Console.WriteLine($"    {e.Id} - {e.FullName} ({e.Status})");
+                }
+                Console.WriteLine();
+
+                int employeeId;
+                EmployeeModel? selectedEmployee;
+                while (true)
+                {
+                    employeeId = InputHelper.GetValidIntOption("  Enter Employee ID: ", 1, int.MaxValue);
+                    selectedEmployee = employees.FirstOrDefault(e => e.Id == employeeId);
+                    if (selectedEmployee != null) break;
+                    Console.WriteLine("  Invalid Employee ID. Please select from the list above.");
+                }
+
+                Console.WriteLine();
+                Console.WriteLine($"  ── {selectedEmployee.FullName} ─────────────────────────────────");
+                
+                var allocs = _api.GetAsync<List<AllocationModel>>($"api/allocations/employee/{employeeId}").GetAwaiter().GetResult() ?? new List<AllocationModel>();
+                int currentUtil = allocs.Where(a => a.IsActive && a.StartDate <= DateTime.UtcNow && a.EndDate >= DateTime.UtcNow).Sum(a => a.UtilizationPct);
+                
+                string benchStatus = currentUtil == 0 ? "fully on bench" : (currentUtil >= 100 ? "fully allocated" : $"{100 - currentUtil}% free");
+                Console.WriteLine($"  Current Utilisation: {currentUtil}%   ({benchStatus})");
+                Console.WriteLine();
+
+                Console.WriteLine("  Set Allocation:");
+                int utilization = InputHelper.GetValidIntOption("    Utilisation %   : ", 1, 100);
+                DateTime startDate = InputHelper.GetValidDate("    From Date (dd-MM-yyyy) : ");
+                DateTime endDate = InputHelper.GetValidDate("    To Date   (dd-MM-yyyy) : ");
+                
+                if (startDate >= endDate)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("    X Invalid (From Date must be before To Date)");
+                    Console.WriteLine();
+                    Console.WriteLine("  Press any key to go back...");
+                    Console.ReadKey(intercept: true);
+                    return;
+                }
+
+                Console.WriteLine();
+                Console.WriteLine("  Validating...");
+                
+                int overlappingUtil = allocs.Where(a => a.IsActive && a.StartDate < endDate && a.EndDate > startDate).Sum(a => a.UtilizationPct);
+                int totalUtil = overlappingUtil + utilization;
+                
+                if (totalUtil > 100)
+                {
+                    Console.WriteLine($"    {selectedEmployee.FullName} total in this period: {overlappingUtil}% + {utilization}% = {totalUtil}%   X Invalid (Exceeds 100%)");
+                    Console.WriteLine();
+                    Console.WriteLine("  Press any key to go back...");
+                    Console.ReadKey(intercept: true);
+                    return;
+                }
+                else
+                {
+                    Console.WriteLine($"    {selectedEmployee.FullName} total in this period: {overlappingUtil}% + {utilization}% = {totalUtil}%   ✓ Valid");
+                }
+
+                Console.WriteLine();
+                Console.Write("  [C] Confirm     [B] Back > ");
+                string confirm = Console.ReadLine()?.Trim().ToUpper() ?? "B";
+                
+                if (confirm == "C")
+                {
+                    var result = _api.PostAsync<CreateAllocationRequest, AllocationModel>(
+                        "api/allocations",
+                        new CreateAllocationRequest
+                        {
+                            EmployeeId     = employeeId,
+                            ProjectId      = projectId,
+                            AllocatedBy    = AppState.UserId,
+                            UtilizationPct = utilization,
+                            StartDate      = startDate,
+                            EndDate        = endDate
+                        }
+                    ).GetAwaiter().GetResult();
+
+                    Console.WriteLine();
+                    Console.WriteLine($"  Allocation created successfully (ID: {result?.Id}).");
+                }
+                else
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("  Allocation cancelled.");
+                }
             }
             catch (HttpRequestException ex)
             {
@@ -129,10 +244,34 @@ namespace PrmClient.UI.Manager
             Console.WriteLine("  ── End Allocation ─────────────────────────────────────────────────────────");
             Console.WriteLine();
 
-            int projectId = InputHelper.GetValidIntOption("  Project ID: ", 1, int.MaxValue);
-
             try
             {
+                var projects = _api.GetAsync<List<ProjectModel>>($"api/projects/manager/{AppState.UserId}").GetAwaiter().GetResult() ?? new List<ProjectModel>();
+                if (projects.Count == 0)
+                {
+                    Console.WriteLine("  No projects assigned to you.");
+                    Console.WriteLine();
+                    Console.WriteLine("  Press any key to continue...");
+                    Console.ReadKey(intercept: true);
+                    return;
+                }
+
+                Console.WriteLine("  Your Projects:");
+                foreach (var p in projects)
+                {
+                    Console.WriteLine($"    {p.Id} - {p.Name}");
+                }
+                Console.WriteLine();
+
+                int projectId;
+                ProjectModel? selectedProject;
+                while (true)
+                {
+                    projectId = InputHelper.GetValidIntOption("  Select Project ID: ", 1, int.MaxValue);
+                    selectedProject = projects.FirstOrDefault(p => p.Id == projectId);
+                    if (selectedProject != null) break;
+                    Console.WriteLine("  Invalid Project ID. Please select from the list above.");
+                }
                 var allocations = _api.GetAsync<List<AllocationModel>>($"api/allocations/project/{projectId}")
                                       .GetAwaiter().GetResult()
                                   ?? new List<AllocationModel>();
@@ -149,16 +288,45 @@ namespace PrmClient.UI.Manager
                 }
 
                 Console.WriteLine();
-                PrintAllocationTable(active);
+                Console.WriteLine($"  Active Allocations on this project:");
+                Console.WriteLine($"    {"#",-3} {"Employee",-15} {"%",-5} {"From",-12} {"To"}");
+
+                var activeWithNames = new List<(int Index, AllocationModel Alloc, string EmpName)>();
+                int index = 1;
+                foreach (var a in active)
+                {
+                    var emp = _api.GetAsync<EmployeeModel>($"api/employees/{a.EmployeeId}").GetAwaiter().GetResult();
+                    string empName = emp?.FullName ?? $"Employee {a.EmployeeId}";
+                    activeWithNames.Add((index, a, empName));
+                    Console.WriteLine($"    {index + ".",-3} {empName,-15} {$"{a.UtilizationPct}%",-5} {a.StartDate,-12:dd-MM-yyyy} {a.EndDate:dd-MM-yyyy}");
+                    index++;
+                }
+                Console.WriteLine("  ──────────────────────────────────────────────");
                 Console.WriteLine();
 
-                int allocationId = InputHelper.GetValidIntOption("  Enter Allocation ID to end: ", 1, int.MaxValue);
-
-                _api.PutAsync($"api/allocations/{allocationId}/end")
-                    .GetAwaiter().GetResult();
+                int selectedIndex = InputHelper.GetValidIntOption("  Select allocation to end: ", 1, active.Count);
+                var selectedTuple = activeWithNames.First(t => t.Index == selectedIndex);
+                var allocToEnd = selectedTuple.Alloc;
+                string selectedEmpName = selectedTuple.EmpName;
 
                 Console.WriteLine();
-                Console.WriteLine($"  Allocation {allocationId} ended successfully.");
+                Console.WriteLine($"  End {selectedEmpName}'s allocation on {selectedProject?.Name ?? "this project"}?");
+                string todayStr = DateTime.UtcNow.ToString("dd-MM-yyyy");
+                Console.WriteLine($"  Set end date to today ({todayStr})?");
+                Console.WriteLine();
+                Console.Write("  [Y] Yes, End Now    [B] Back > ");
+                
+                string confirm = Console.ReadLine()?.Trim().ToUpper() ?? "";
+                if (confirm != "Y")
+                {
+                    return;
+                }
+
+                _api.PutAsync($"api/allocations/{allocToEnd.Id}/end").GetAwaiter().GetResult();
+
+                Console.WriteLine();
+                Console.WriteLine($"  Allocation ended. {selectedEmpName} freed from {selectedProject?.Name ?? "this project"} as of {todayStr}. ✓");
+                Console.WriteLine($"  Employee status updated to BENCH if no other active allocations remain.");
             }
             catch (HttpRequestException ex)
             {
@@ -169,22 +337,6 @@ namespace PrmClient.UI.Manager
             Console.WriteLine();
             Console.WriteLine("  Press any key to continue...");
             Console.ReadKey(intercept: true);
-        }
-
-        // ─── Table printer ─────────────────────────────────────────────────────
-
-        private static void PrintAllocationTable(List<AllocationModel> allocations)
-        {
-            Console.WriteLine(
-                $"  {"ID",-5} {"Employee ID",-12} {"Project ID",-11} {"Util %",-8} {"Start",-12} {"End",-12}");
-            Console.WriteLine(
-                $"  {new string('─', 5),-5} {new string('─', 12),-12} {new string('─', 11),-11} {new string('─', 8),-8} {new string('─', 12),-12} {new string('─', 12),-12}");
-
-            foreach (var a in allocations)
-            {
-                Console.WriteLine(
-                    $"  {a.Id,-5} {a.EmployeeId,-12} {a.ProjectId,-11} {a.UtilizationPct,-8} {a.StartDate:yyyy-MM-dd,-12} {a.EndDate:yyyy-MM-dd,-12}");
-            }
         }
     }
 }

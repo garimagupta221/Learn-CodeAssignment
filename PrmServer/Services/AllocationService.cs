@@ -46,6 +46,16 @@ namespace PrmServer.Services
             if (dto.StartDate >= dto.EndDate)
                 throw new ArgumentException("Start date must be before end date.");
 
+            var project = await _context.Projects.FindAsync(dto.ProjectId);
+            if (project == null)
+                throw new KeyNotFoundException($"Project {dto.ProjectId} not found.");
+
+            if (!project.Status.Equals("ACTIVE", StringComparison.OrdinalIgnoreCase) && 
+                !project.Status.Equals("PLANNED", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException("Project must be in ACTIVE or PLANNED status.");
+            }
+
             var overAllocated = await IsOverAllocatedAsync(
                 dto.EmployeeId, dto.UtilizationPct, dto.StartDate, dto.EndDate);
 

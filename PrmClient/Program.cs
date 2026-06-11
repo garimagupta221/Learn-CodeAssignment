@@ -1,4 +1,4 @@
-﻿using PrmClient;
+using PrmClient;
 using PrmClient.Models;
 using PrmClient.Services;
 using PrmClient.UI;

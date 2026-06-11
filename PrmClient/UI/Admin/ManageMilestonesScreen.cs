@@ -178,7 +178,7 @@ namespace PrmClient.UI.Admin
             {
                 var m = milestones[i];
                 Console.WriteLine(
-                    $"  {(i + 1) + ".",-4} {m.Title,-20} {m.DueDate,-12:dd-MMM-yy} {m.StoryPoints,-11} {m.Status,-12}");
+                    $"  {(i + 1) + ".",-4} {m.Title,-20} {m.DueDate,-12:dd-MM-yyyy} {m.StoryPoints,-11} {m.Status,-12}");
             }
 
             Console.WriteLine(

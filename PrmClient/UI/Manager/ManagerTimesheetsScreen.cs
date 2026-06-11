@@ -41,7 +41,7 @@ namespace PrmClient.UI.Manager
                 return;
             }
 
-            Console.WriteLine($"  Week: {weekStart:dd-MMM-yyyy}");
+            Console.WriteLine($"  Week: {weekStart:dd-MM-yyyy}");
             Console.WriteLine();
 
             // (empName, projName, hours, status)
@@ -132,7 +132,7 @@ namespace PrmClient.UI.Manager
 
             string empName = matched[0].empName;
             Console.WriteLine();
-            Console.WriteLine($"  ── {empName} — Week {weekStart:dd-MMM-yyyy} ──────────────────────");
+            Console.WriteLine($"  ── {empName} — Week {weekStart:dd-MM-yyyy} ──────────────────────");
             Console.WriteLine($"  {"Project",-22} {"Hrs",-7} Status");
             Console.WriteLine($"  {new string('─', 40)}");
 

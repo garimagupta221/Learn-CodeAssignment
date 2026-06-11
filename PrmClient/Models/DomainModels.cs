@@ -114,6 +114,7 @@ namespace PrmClient.Models
     {
         public int EmployeeId { get; set; }
         public int ProjectId { get; set; }
+        public int AllocatedBy { get; set; }
         public int UtilizationPct { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
@@ -128,6 +129,17 @@ namespace PrmClient.Models
         public float HoursLogged { get; set; }
         public string Status { get; set; } = string.Empty;
         public string? RejectionReason { get; set; }
+        public List<TimesheetTagModel> TimesheetTags { get; set; } = new();
+    }
+
+    public class TimesheetTagModel
+    {
+        public ActivityTagModel ActivityTag { get; set; } = new();
+    }
+
+    public class ActivityTagModel
+    {
+        public string TagName { get; set; } = string.Empty;
     }
 
     public class SubmitTimesheetRequest

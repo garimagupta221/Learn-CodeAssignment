@@ -19,7 +19,7 @@ namespace PrmClient.UI.Employee
             Console.WriteLine("  Submit Timesheet");
             Console.WriteLine();
 
-            DateTime weekStart = InputHelper.GetValidDate("  Week Start Date (yyyy-MM-dd): ");
+            DateTime weekStart = InputHelper.GetValidDate("  Week Start Date (dd-MM-yyyy): ");
             Console.WriteLine();
 
             try
@@ -41,7 +41,7 @@ namespace PrmClient.UI.Employee
                     return;
                 }
 
-                Console.WriteLine($"  Active projects for week of {weekStart:yyyy-MM-dd}:");
+                Console.WriteLine($"  Active projects for week of {weekStart:dd-MM-yyyy}:");
                 Console.WriteLine();
 
                 int submitted = 0;

@@ -72,8 +72,8 @@ namespace PrmClient.UI.Manager
                     Console.WriteLine($"  {"ID:",-15} {project.Id}");
                     Console.WriteLine($"  {"Name:",-15} {project.Name}");
                     Console.WriteLine($"  {"Description:",-15} {project.Description}");
-                    Console.WriteLine($"  {"Start Date:",-15} {project.StartDate:yyyy-MM-dd}");
-                    Console.WriteLine($"  {"End Date:",-15} {project.EndDate:yyyy-MM-dd}");
+                    Console.WriteLine($"  {"Start Date:",-15} {project.StartDate:dd-MM-yyyy}");
+                    Console.WriteLine($"  {"End Date:",-15} {project.EndDate:dd-MM-yyyy}");
                     Console.WriteLine($"  {"Status:",-15} {project.Status}");
                     Console.WriteLine($"  {"Health:",-15} {project.Health}");
                     Console.WriteLine();
@@ -96,8 +96,7 @@ namespace PrmClient.UI.Manager
 
                         foreach (var m in milestones)
                         {
-                            Console.WriteLine(
-                                $"  {m.Id,-5} {m.Title,-30} {m.DueDate:yyyy-MM-dd,-12} {m.Status,-12}");
+                            Console.WriteLine($"  {m.Id,-5} {m.Title,-30} {m.DueDate,-12:dd-MM-yyyy} {m.Status,-12}");
                         }
                     }
                 }
@@ -121,8 +120,7 @@ namespace PrmClient.UI.Manager
 
             foreach (var p in projects)
             {
-                Console.WriteLine(
-                    $"  {p.Id,-5} {p.Name,-35} {p.EndDate:yyyy-MM-dd,-14} {p.Health,-12} {p.Status,-12}");
+                Console.WriteLine($"  {p.Id,-5} {p.Name,-35} {p.EndDate,-14:dd-MM-yyyy} {p.Health,-12} {p.Status,-12}");
             }
         }
     }

@@ -14,6 +14,10 @@ using PrmServer.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
 builder.Services.AddSwaggerDocumentation();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

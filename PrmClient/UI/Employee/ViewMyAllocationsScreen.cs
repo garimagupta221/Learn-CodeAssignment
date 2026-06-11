@@ -16,7 +16,9 @@ namespace PrmClient.UI.Employee
         {
             ConsoleHelper.ClearScreen();
             ConsoleHelper.PrintHeader(AppState.Role);
-            Console.WriteLine("  My Allocations");
+            Console.WriteLine("  ╔══════════════════════════════════════════════╗");
+            Console.WriteLine("  ║    MY ALLOCATIONS                            ║");
+            Console.WriteLine("  ╚══════════════════════════════════════════════╝");
             Console.WriteLine();
 
             try
@@ -43,25 +45,41 @@ namespace PrmClient.UI.Employee
             AppState.CurrentScreen = "employee-menu";
         }
 
-        private static void PrintAllocationsTable(List<AllocationModel> allocations)
+        private void PrintAllocationsTable(List<AllocationModel> allocations)
         {
-            Console.WriteLine(
-                $"  {"ID",-5} {"Project ID",-11} {"Utilisation %",-15} {"Start Date",-12} {"End Date",-12} {"Active",-7}");
-            Console.WriteLine(
-                $"  {new string('─', 5),-5} {new string('─', 11),-11} {new string('─', 15),-15} {new string('─', 12),-12} {new string('─', 12),-12} {new string('─', 7),-7}");
+            Console.WriteLine($"  {"Project",-17} {"%",-6} {"From",-12} {"To",-12} {"Status"}");
+            Console.WriteLine($"  {new string('─', 58)}");
+
+            int activeUtilisation = 0;
 
             foreach (var a in allocations)
             {
-                Console.WriteLine(
-                    $"  {a.Id,-5} {a.ProjectId,-11} {a.UtilizationPct,-15} {a.StartDate:yyyy-MM-dd,-12} {a.EndDate:yyyy-MM-dd,-12} {(a.IsActive ? "Yes" : "No"),-7}");
+                var p = _api.GetAsync<ProjectModel>($"api/projects/{a.ProjectId}").GetAwaiter().GetResult();
+                string pName = p?.Name ?? $"Project {a.ProjectId}";
+                string status = a.IsActive ? "ACTIVE" : "ENDED";
+                
+                if (a.IsActive)
+                {
+                    activeUtilisation += a.UtilizationPct;
+                }
+
+                Console.WriteLine($"  {pName,-17} {$"{a.UtilizationPct}%",-6} {a.StartDate,-12:dd-MM-yyyy} {a.EndDate,-12:dd-MM-yyyy} {status}");
             }
+            
+            Console.WriteLine($"  {new string('─', 58)}");
+            Console.WriteLine($"  Total Utilisation: {activeUtilisation}%");
         }
 
         private static void Pause()
         {
             Console.WriteLine();
-            Console.WriteLine("  Press any key to return to menu...");
-            Console.ReadKey(intercept: true);
+            Console.Write("  [B] Back > ");
+            while (true)
+            {
+                var key = Console.ReadKey(intercept: true).Key;
+                if (key == ConsoleKey.B || key == ConsoleKey.Enter) break;
+            }
+            Console.WriteLine();
         }
     }
 }
