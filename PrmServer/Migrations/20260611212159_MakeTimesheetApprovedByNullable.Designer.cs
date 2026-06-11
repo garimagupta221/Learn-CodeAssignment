@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PrmServer.Entities;
 
@@ -11,9 +12,11 @@ using PrmServer.Entities;
 namespace PrmServer.Migrations
 {
     [DbContext(typeof(PrmDbContext))]
-    partial class PrmDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260611212159_MakeTimesheetApprovedByNullable")]
+    partial class MakeTimesheetApprovedByNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -263,11 +266,21 @@ namespace PrmServer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("ApprovedBy")
+                        .HasColumnType("int");
+
                     b.Property<float>("HoursLogged")
                         .HasColumnType("real");
 
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
+
+                    b.Property<string>("RejectionReason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -283,6 +296,8 @@ namespace PrmServer.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ApprovedBy");
 
                     b.HasIndex("ProjectId");
 
@@ -509,6 +524,11 @@ namespace PrmServer.Migrations
 
             modelBuilder.Entity("PrmServer.Entities.Timesheet", b =>
                 {
+                    b.HasOne("PrmServer.Entities.User", "Approver")
+                        .WithMany("ApprovedTimesheets")
+                        .HasForeignKey("ApprovedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PrmServer.Entities.Project", "Project")
                         .WithMany("Timesheets")
                         .HasForeignKey("ProjectId")
@@ -520,6 +540,8 @@ namespace PrmServer.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Approver");
 
                     b.Navigation("Project");
 
@@ -636,6 +658,8 @@ namespace PrmServer.Migrations
             modelBuilder.Entity("PrmServer.Entities.User", b =>
                 {
                     b.Navigation("Allocations");
+
+                    b.Navigation("ApprovedTimesheets");
 
                     b.Navigation("CreatedAllocations");
 

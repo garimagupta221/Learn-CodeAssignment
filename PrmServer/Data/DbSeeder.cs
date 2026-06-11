@@ -55,6 +55,28 @@ namespace PrmServer.Data
 
                 await context.SaveChangesAsync();
             }
+
+            // Seed the BRD activity tags if not already present
+            if (!context.ActivityTags.Any())
+            {
+                var tags = new[]
+                {
+                    new ActivityTag { TagName = "Backend API Development",      Category = "Development", IsActive = true, CreatedAt = DateTime.UtcNow },
+                    new ActivityTag { TagName = "Microservices / Architecture", Category = "Development", IsActive = true, CreatedAt = DateTime.UtcNow },
+                    new ActivityTag { TagName = "Database Design & Queries",    Category = "Development", IsActive = true, CreatedAt = DateTime.UtcNow },
+                    new ActivityTag { TagName = "WebSocket / Real-time Features", Category = "Development", IsActive = true, CreatedAt = DateTime.UtcNow },
+                    new ActivityTag { TagName = "Frontend Development",         Category = "Development", IsActive = true, CreatedAt = DateTime.UtcNow },
+                    new ActivityTag { TagName = "Code Review / Mentoring",      Category = "Quality",     IsActive = true, CreatedAt = DateTime.UtcNow },
+                    new ActivityTag { TagName = "Bug Fixing",                   Category = "Quality",     IsActive = true, CreatedAt = DateTime.UtcNow },
+                    new ActivityTag { TagName = "DevOps / Deployment",          Category = "Operations",  IsActive = true, CreatedAt = DateTime.UtcNow },
+                    new ActivityTag { TagName = "Testing & QA",                 Category = "Quality",     IsActive = true, CreatedAt = DateTime.UtcNow },
+                    new ActivityTag { TagName = "Documentation",                Category = "General",     IsActive = true, CreatedAt = DateTime.UtcNow },
+                    new ActivityTag { TagName = "Other",                        Category = "General",     IsActive = true, CreatedAt = DateTime.UtcNow },
+                };
+
+                context.ActivityTags.AddRange(tags);
+                await context.SaveChangesAsync();
+            }
         }
     }
 }

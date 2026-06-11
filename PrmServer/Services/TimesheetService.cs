@@ -44,6 +44,8 @@ namespace PrmServer.Services
         {
             ValidateWeekStart(dto.WeekStart);
             ValidateHours(dto.HoursLogged);
+            await ValidateProjectHoursCapAsync(dto);
+            await ValidateNoDuplicateAsync(dto);
 
             var timesheet = new Timesheet
             {
@@ -51,8 +53,7 @@ namespace PrmServer.Services
                 ProjectId = dto.ProjectId,
                 WeekStart = dto.WeekStart.Date,
                 HoursLogged = dto.HoursLogged,
-                Status = "PENDING",
-                RejectionReason = string.Empty,
+                Status = "SUBMITTED",
                 SubmittedAt = DateTime.UtcNow
             };
 
@@ -60,67 +61,49 @@ namespace PrmServer.Services
 
             await AttachTagsAsync(created.Id, dto.TagIds);
 
-            // Fetch created timesheet eagerly loading relationships
             return await _timesheetRepository.GetByIdAsync(created.Id);
         }
 
-        public async Task<Timesheet> UpdateAsync(int id, UpdateTimesheetDto dto)
-        {
-            var timesheet = await _timesheetRepository.GetByIdAsync(id)
-                ?? throw new KeyNotFoundException($"Timesheet {id} not found.");
-
-            if (timesheet.Status != "REJECTED")
-                throw new InvalidOperationException("Only rejected timesheets can be resubmitted.");
-
-            ValidateHours(dto.HoursLogged);
-
-            timesheet.HoursLogged = dto.HoursLogged;
-            timesheet.Status = "PENDING";
-            timesheet.RejectionReason = string.Empty;
-            timesheet.SubmittedAt = DateTime.UtcNow;
-
-            var updated = await _timesheetRepository.UpdateAsync(timesheet);
-
-            await ReplaceTagsAsync(id, dto.TagIds);
-
-            return await _timesheetRepository.GetByIdAsync(id);
-        }
-
-        public async Task ApproveAsync(int id, int approverId)
-        {
-            var timesheet = await _timesheetRepository.GetByIdAsync(id)
-                ?? throw new KeyNotFoundException($"Timesheet {id} not found.");
-
-            if (timesheet.Status != "PENDING")
-                throw new InvalidOperationException("Only pending timesheets can be approved.");
-
-            timesheet.Status = "APPROVED";
-            timesheet.ApprovedBy = approverId;
-            timesheet.ReviewedAt = DateTime.UtcNow;
-
-            await _timesheetRepository.UpdateAsync(timesheet);
-        }
-
-        public async Task RejectAsync(int id, string reason, int approverId)
-        {
-            var timesheet = await _timesheetRepository.GetByIdAsync(id)
-                ?? throw new KeyNotFoundException($"Timesheet {id} not found.");
-
-            if (timesheet.Status != "PENDING")
-                throw new InvalidOperationException("Only pending timesheets can be rejected.");
-
-            if (string.IsNullOrWhiteSpace(reason))
-                throw new ArgumentException("A rejection reason must be provided.");
-
-            timesheet.Status = "REJECTED";
-            timesheet.RejectionReason = reason;
-            timesheet.ApprovedBy = approverId;
-            timesheet.ReviewedAt = DateTime.UtcNow;
-
-            await _timesheetRepository.UpdateAsync(timesheet);
-        }
-
         // --- Private helpers ---
+
+        private async Task ValidateProjectHoursCapAsync(SubmitTimesheetDto dto)
+        {
+            var weekEnd = dto.WeekStart.Date.AddDays(6);
+
+            var allocation = await _db.Allocations
+                .FirstOrDefaultAsync(a =>
+                    a.UserId    == dto.EmployeeId &&
+                    a.ProjectId == dto.ProjectId  &&
+                    a.IsActive                    &&
+                    a.StartDate.Date <= weekEnd   &&
+                    a.EndDate.Date   >= dto.WeekStart.Date);
+
+            if (allocation == null)
+                throw new InvalidOperationException(
+                    $"No active allocation found for employee {dto.EmployeeId} " +
+                    $"on project {dto.ProjectId} during week {dto.WeekStart:dd-MM-yyyy}.");
+
+            var maxHours = float.Parse(_configuration["Timesheet:MaxWeeklyHours"] ?? "40");
+            var projectCap = (allocation.UtilizationPct / 100f) * maxHours;
+
+            if (dto.HoursLogged > projectCap)
+                throw new ArgumentException(
+                    $"Hours logged ({dto.HoursLogged}) exceed the project cap of {projectCap} hrs " +
+                    $"({allocation.UtilizationPct}% allocation × {maxHours} hrs/week).");
+        }
+
+        private async Task ValidateNoDuplicateAsync(SubmitTimesheetDto dto)
+        {
+            var exists = await _db.Timesheets.AnyAsync(t =>
+                t.UserId    == dto.EmployeeId &&
+                t.ProjectId == dto.ProjectId  &&
+                t.WeekStart.Date == dto.WeekStart.Date);
+
+            if (exists)
+                throw new InvalidOperationException(
+                    $"A timesheet for project {dto.ProjectId} and week " +
+                    $"{dto.WeekStart:dd-MM-yyyy} has already been submitted.");
+        }
 
         private void ValidateWeekStart(DateTime weekStart)
         {
@@ -154,17 +137,6 @@ namespace PrmServer.Services
                     ActivityTagId = tagId
                 });
             }
-        }
-
-        private async Task ReplaceTagsAsync(int timesheetId, List<int> tagIds)
-        {
-            var existing = await _timesheetTagRepository.GetAllAsync();
-            var toDelete = existing.Where(t => t.TimesheetId == timesheetId).ToList();
-
-            foreach (var tag in toDelete)
-                await _timesheetTagRepository.DeleteAsync(tag.Id);
-
-            await AttachTagsAsync(timesheetId, tagIds);
         }
 
         public async Task<List<Employee>> GetEmployeesMissingCurrentWeekAsync()
@@ -269,7 +241,6 @@ namespace PrmServer.Services
                     WeekStart = previousMonday,
                     HoursLogged = 0,
                     Status = "MISSED",
-                    RejectionReason = string.Empty,
                     SubmittedAt = now
                 });
             }

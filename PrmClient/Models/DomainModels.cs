@@ -81,6 +81,7 @@ namespace PrmClient.Models
         public int Id { get; set; }
         public int EmployeeId { get; set; }
         public int ProjectId { get; set; }
+        public string ProjectName { get; set; } = string.Empty;
         public int UtilizationPct { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
@@ -125,10 +126,10 @@ namespace PrmClient.Models
         public int Id { get; set; }
         public int EmployeeId { get; set; }
         public int ProjectId { get; set; }
+        public string ProjectName { get; set; } = string.Empty;
         public DateTime WeekStart { get; set; }
         public float HoursLogged { get; set; }
-        public string Status { get; set; } = string.Empty;
-        public string? RejectionReason { get; set; }
+        public string Status { get; set; } = string.Empty;   // "SUBMITTED" | "MISSED"
         public List<TimesheetTagModel> TimesheetTags { get; set; } = new();
     }
 
@@ -139,6 +140,7 @@ namespace PrmClient.Models
 
     public class ActivityTagModel
     {
+        public int Id { get; set; }
         public string TagName { get; set; } = string.Empty;
     }
 
@@ -177,11 +179,6 @@ namespace PrmClient.Models
         public string Proficiency { get; set; } = string.Empty;
     }
 
-    public class UpdateTimesheetRequest
-    {
-        public float HoursLogged { get; set; }
-        public List<int> TagIds { get; set; } = new();
-    }
 
     public class MissingTimesheetEmployee
     {

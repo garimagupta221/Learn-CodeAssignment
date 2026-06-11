@@ -104,13 +104,21 @@ namespace PrmClient.UI.Employee
             Console.WriteLine();
             Console.WriteLine($"  ── Week: {weekDate:dd-MM-yyyy} — Status: {weekStatus} ─────");
             Console.WriteLine();
-            Console.WriteLine($"  {"Project",-22} {"Hrs",-7} Status");
+            Console.WriteLine($"  {"Project",-20} {"Hrs",-6} Activity Tags");
             Console.WriteLine($"  {new string('─', 44)}");
 
             foreach (var t in weekSheets)
             {
-                string statusDisplay = t.Status == "MISSED" ? "MISSED ⚠" : t.Status;
-                Console.WriteLine($"  {"Project " + t.ProjectId,-22} {t.HoursLogged,-7:F0} {statusDisplay}");
+                string projectName = !string.IsNullOrWhiteSpace(t.ProjectName)
+                    ? t.ProjectName
+                    : $"Project {t.ProjectId}";
+
+                string tags = t.TimesheetTags.Count > 0
+                    ? string.Join(", ", t.TimesheetTags.Select(tt => tt.ActivityTag.TagName))
+                    : "—";
+
+                string statusDisplay = t.Status == "MISSED" ? "MISSED ⚠" : string.Empty;
+                Console.WriteLine($"  {projectName,-20} {t.HoursLogged,-6:F0} {tags}{(statusDisplay.Length > 0 ? "  " + statusDisplay : "")}");
             }
 
             Console.WriteLine($"  {new string('─', 44)}");

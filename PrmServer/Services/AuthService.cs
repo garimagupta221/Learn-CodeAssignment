@@ -46,6 +46,7 @@ namespace PrmServer.Services
             {
                 Token               = GenerateToken(user),
                 UserId              = user.Id,
+                FullName            = user.FullName,
                 Role                = user.Role,
                 IsTemporaryPassword = user.IsTemporaryPassword
             };

@@ -38,9 +38,10 @@ namespace PrmClient.UI.Common
                 }
 
                 _api.SetToken(response.Token);
-                AppState.UserId = response.UserId;
-                AppState.Role = response.Role;
+                AppState.UserId   = response.UserId;
+                AppState.Role     = response.Role;
                 AppState.Username = username;
+                AppState.FullName = response.FullName;
 
                 Console.WriteLine($"\n  Welcome! Logged in as {response.Role}.");
 

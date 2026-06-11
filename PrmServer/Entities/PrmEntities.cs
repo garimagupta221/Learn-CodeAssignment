@@ -29,7 +29,6 @@ namespace PrmServer.Entities
         public ICollection<Allocation> Allocations { get; set; }
         public ICollection<Allocation> CreatedAllocations { get; set; }
         public ICollection<Timesheet> Timesheets { get; set; }
-        public ICollection<Timesheet> ApprovedTimesheets { get; set; }
         public ICollection<Project> ManagedProjects { get; set; }
 
         // Backward compatibility helper
@@ -168,6 +167,9 @@ namespace PrmServer.Entities
         }
 
         [NotMapped]
+        public string ProjectName => Project?.Name ?? string.Empty;
+
+        [NotMapped]
         public Employee Employee => new Employee
         {
             Id = UserId,
@@ -182,25 +184,29 @@ namespace PrmServer.Entities
         };
     }
 
+    /// <summary>
+    /// Represents a weekly timesheet entry for an employee on a project.
+    /// Status is either SUBMITTED (by employee) or MISSED (auto-created by background job).
+    /// There is no approve/reject workflow — managers have read-only access.
+    /// </summary>
     public class Timesheet
     {
         public int Id { get; set; }
         public int UserId { get; set; }
         public int ProjectId { get; set; }
-        public int ApprovedBy { get; set; }
         public DateTime WeekStart { get; set; }
         public float HoursLogged { get; set; }
-        public string Status { get; set; }
-        public string RejectionReason { get; set; }
+        public string Status { get; set; }   // "SUBMITTED" | "MISSED"
         public DateTime SubmittedAt { get; set; }
-        public DateTime? ReviewedAt { get; set; }
 
         public User User { get; set; }
         public Project Project { get; set; }
-        public User Approver { get; set; }
         public ICollection<TimesheetTag> TimesheetTags { get; set; }
 
         // Backward compatibility helper
+        [NotMapped]
+        public string ProjectName => Project?.Name ?? string.Empty;
+
         [NotMapped]
         public int EmployeeId
         {
@@ -296,12 +302,6 @@ namespace PrmServer.Entities
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Timesheet relationships
-            modelBuilder.Entity<Timesheet>()
-                .HasOne(t => t.Approver)
-                .WithMany(u => u.ApprovedTimesheets)
-                .HasForeignKey(t => t.ApprovedBy)
-                .OnDelete(DeleteBehavior.Restrict);
-
             modelBuilder.Entity<Timesheet>()
                 .HasOne(t => t.User)
                 .WithMany(u => u.Timesheets)
