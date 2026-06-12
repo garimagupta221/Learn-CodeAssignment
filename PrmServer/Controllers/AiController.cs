@@ -9,6 +9,7 @@ namespace PrmServer.Controllers
     [ApiController]
     [Route("api/ai")]
     [Authorize(Roles = "Manager,Admin")]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class AiController : ControllerBase
     {
         private readonly IAiService _aiService;
@@ -18,6 +19,9 @@ namespace PrmServer.Controllers
             _aiService = aiService;
         }
 
+        /// <summary>
+        /// Gets a skill match for a specific project requirement.
+        /// </summary>
         [HttpPost("skill-match")]
         public async Task<IActionResult> SkillMatch([FromBody] SkillMatchRequestDto dto)
         {
@@ -27,6 +31,9 @@ namespace PrmServer.Controllers
             return Ok(new AiResponseDto { Result = result });
         }
 
+        /// <summary>
+        /// Retrieves a risk summary for a given project.
+        /// </summary>
         [HttpGet("risk-summary/{projectId}")]
         public async Task<IActionResult> RiskSummary(int projectId)
         {

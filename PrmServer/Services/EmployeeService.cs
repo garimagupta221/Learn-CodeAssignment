@@ -90,7 +90,7 @@ namespace PrmServer.Services
         {
             var allocations = await _allocationService.GetByEmployeeAsync(employeeId);
             return allocations
-                .Where(a => a.IsActive && a.EndDate >= DateTime.UtcNow.Date)
+                .Where(a => a.IsActive && a.StartDate.Date <= DateTime.UtcNow.Date && a.EndDate.Date >= DateTime.UtcNow.Date)
                 .Sum(a => (float)a.UtilizationPct);
         }
 
@@ -179,6 +179,25 @@ namespace PrmServer.Services
             user.IsActive = false;
             user.UpdatedAt = DateTime.UtcNow;
             await _userRepository.UpdateAsync(user);
+
+            // Set user status to DEACTIVATED
+            var status = await _context.UserStatuses.FirstOrDefaultAsync(us => us.UserId == id);
+            if (status != null)
+            {
+                status.Status = "DEACTIVATED";
+                status.UpdatedAt = DateTime.UtcNow;
+                _context.UserStatuses.Update(status);
+            }
+            else
+            {
+                _context.UserStatuses.Add(new UserStatus
+                {
+                    UserId = id,
+                    Status = "DEACTIVATED",
+                    UpdatedAt = DateTime.UtcNow
+                });
+            }
+            await _context.SaveChangesAsync();
         }
 
         public async Task ReactivateAsync(int id)

@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="PrmClient/PrmClient.csproj" />
+  <Project Path="PrmServer.Tests/PrmServer.Tests.csproj" />
   <Project Path="PrmServer/PrmServer.csproj" />
 </Solution>

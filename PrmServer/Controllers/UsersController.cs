@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using PrmServer.DTOs;
 using PrmServer.Entities;
 using PrmServer.Repositories.Interfaces;
+using PrmServer.Services.Interfaces;
 
 namespace PrmServer.Controllers
 {
@@ -10,12 +13,22 @@ namespace PrmServer.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
+        private readonly PrmDbContext _context;
+        private readonly IAllocationService _allocationService;
 
-        public UsersController(IUserRepository userRepository)
+        public UsersController(
+            IUserRepository userRepository,
+            PrmDbContext context,
+            IAllocationService allocationService)
         {
             _userRepository = userRepository;
+            _context = context;
+            _allocationService = allocationService;
         }
 
+        /// <summary>
+        /// Retrieves all users.
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -33,6 +46,9 @@ namespace PrmServer.Controllers
             return Ok(dtos);
         }
 
+        /// <summary>
+        /// Retrieves a user by ID.
+        /// </summary>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -52,6 +68,9 @@ namespace PrmServer.Controllers
             });
         }
 
+        /// <summary>
+        /// Deactivates a user.
+        /// </summary>
         [HttpPut("{id}/deactivate")]
         public async Task<IActionResult> Deactivate(int id)
         {
@@ -59,12 +78,50 @@ namespace PrmServer.Controllers
             if (user is null)
                 return NotFound($"User {id} not found.");
 
+            // Self-deactivation check
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)
+                ?? User.FindFirst("sub");
+            if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int loggedInId) && loggedInId == id)
+            {
+                return BadRequest(new { message = "Admin cannot deactivate itself." });
+            }
+
+            // End active allocations if they are an Engineer
+            var isEngineer = user.UserRoles?.Any(ur => ur.Role.RoleName == "Engineer") ?? false;
+            if (isEngineer)
+            {
+                await _allocationService.EndAllActiveAllocationsAsync(id);
+            }
+
             user.IsActive    = false;
             user.UpdatedAt   = DateTime.UtcNow;
             await _userRepository.UpdateAsync(user);
-            return Ok(new { });
+
+            // Update user status to DEACTIVATED
+            var statusObj = await _context.UserStatuses.FirstOrDefaultAsync(us => us.UserId == id);
+            if (statusObj != null)
+            {
+                statusObj.Status = "DEACTIVATED";
+                statusObj.UpdatedAt = DateTime.UtcNow;
+                _context.UserStatuses.Update(statusObj);
+            }
+            else
+            {
+                _context.UserStatuses.Add(new UserStatus
+                {
+                    UserId = id,
+                    Status = "DEACTIVATED",
+                    UpdatedAt = DateTime.UtcNow
+                });
+            }
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "User deactivated successfully." });
         }
 
+        /// <summary>
+        /// Activates a user.
+        /// </summary>
         [HttpPut("{id}/activate")]
         public async Task<IActionResult> Activate(int id)
         {
@@ -78,9 +135,32 @@ namespace PrmServer.Controllers
             user.IsActive  = true;
             user.UpdatedAt = DateTime.UtcNow;
             await _userRepository.UpdateAsync(user);
-            return Ok(new { });
+
+            // Set user status to BENCH on reactivation
+            var statusObj = await _context.UserStatuses.FirstOrDefaultAsync(us => us.UserId == id);
+            if (statusObj != null)
+            {
+                statusObj.Status = "BENCH";
+                statusObj.UpdatedAt = DateTime.UtcNow;
+                _context.UserStatuses.Update(statusObj);
+            }
+            else
+            {
+                _context.UserStatuses.Add(new UserStatus
+                {
+                    UserId = id,
+                    Status = "BENCH",
+                    UpdatedAt = DateTime.UtcNow
+                });
+            }
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "User activated successfully." });
         }
 
+        /// <summary>
+        /// Forces a password reset for a user on their next login.
+        /// </summary>
         [HttpPut("{id}/force-password-reset")]
         public async Task<IActionResult> ForcePasswordReset(int id)
         {
@@ -94,6 +174,9 @@ namespace PrmServer.Controllers
             return Ok(new { });
         }
 
+        /// <summary>
+        /// Looks up a user by ID or username.
+        /// </summary>
         [HttpGet("lookup/{identifier}")]
         public async Task<IActionResult> Lookup(string identifier)
         {
@@ -123,6 +206,9 @@ namespace PrmServer.Controllers
             });
         }
 
+        /// <summary>
+        /// Resets a user's password.
+        /// </summary>
         [HttpPut("{id}/reset-password")]
         public async Task<IActionResult> ResetPassword(int id, [FromBody] ResetPasswordDto dto)
         {

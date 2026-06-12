@@ -16,6 +16,9 @@ namespace PrmServer.Controllers
             _timesheetService = timesheetService;
         }
 
+        /// <summary>
+        /// Retrieves timesheets for a specific employee.
+        /// </summary>
         [HttpGet("employee/{id}")]
         public async Task<IActionResult> GetByEmployee(int id)
         {
@@ -23,6 +26,9 @@ namespace PrmServer.Controllers
             return Ok(timesheets);
         }
 
+        /// <summary>
+        /// Submits a new timesheet.
+        /// </summary>
         [HttpPost]
         public async Task<IActionResult> Submit([FromBody] SubmitTimesheetDto dto)
         {
@@ -41,6 +47,9 @@ namespace PrmServer.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves employees who are missing timesheets for the current week.
+        /// </summary>
         [HttpGet("missing-current-week")]
         [Authorize(Roles = "Manager,Admin")]
         public async Task<IActionResult> GetMissingCurrentWeek()

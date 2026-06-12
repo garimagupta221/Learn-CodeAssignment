@@ -1,10 +1,12 @@
-using PrmServer.Repositories.Interfaces;
 using PrmServer.Services.Interfaces;
 
 namespace PrmServer.Services.BackgroundTasks
 {
     public class SystemSchedulerService : BackgroundService
     {
+        private const int StartupDelaySeconds = 30;
+        private const int DefaultIntervalHours = 4;
+
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ISystemConfigService _config;
         private readonly ILogger<SystemSchedulerService> _logger;
@@ -15,75 +17,93 @@ namespace PrmServer.Services.BackgroundTasks
             ILogger<SystemSchedulerService> logger)
         {
             _scopeFactory = scopeFactory;
-            _config = config;
-            _logger = logger;
+            _config       = config;
+            _logger       = logger;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("SystemSchedulerService started.");
+            _logger.LogInformation(
+                "SystemSchedulerService started. Waiting {Delay}s before first cycle.",
+                StartupDelaySeconds);
+
+            await Task.Delay(TimeSpan.FromSeconds(StartupDelaySeconds), stoppingToken);
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                var intervalMinutes = GetIntervalMinutes();
+                var intervalHours = ResolveIntervalHours();
+
                 _logger.LogInformation(
-                    "Scheduler running. Next cycle in {Minutes} minute(s).", intervalMinutes);
+                    "=== Scheduler cycle starting. Next run in {Hours:F1} hour(s). ===", intervalHours);
 
-                try
-                {
-                    await RunCycleAsync();
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error during scheduler cycle.");
-                }
+                await RunAllTasksAsync(stoppingToken);
 
-                await Task.Delay(TimeSpan.FromMinutes(intervalMinutes), stoppingToken);
+                await Task.Delay(TimeSpan.FromHours(intervalHours), stoppingToken);
             }
 
             _logger.LogInformation("SystemSchedulerService stopped.");
         }
 
-        private async Task RunCycleAsync()
+        // ── Private helpers ────────────────────────────────────────────────────
+
+        private async Task RunAllTasksAsync(CancellationToken stoppingToken)
         {
+            // Create a single scope shared across all tasks in one cycle
             await using var scope = _scopeFactory.CreateAsyncScope();
-            var allocationService = scope.ServiceProvider.GetRequiredService<IAllocationService>();
-            await allocationService.RecomputeAllEmployeeStatusesAsync();
 
-            // Update project health indicators
-            var projectService = scope.ServiceProvider.GetRequiredService<IProjectService>();
-            var projectRepository = scope.ServiceProvider.GetRequiredService<IProjectRepository>();
+            var tasks = scope.ServiceProvider.GetServices<IScheduledTask>().ToList();
 
-            var projects = await projectRepository.GetAllAsync();
-            foreach (var project in projects)
+            foreach (var task in tasks)
             {
-                var health = await projectService.GetHealthAsync(project.Id);
-                if (project.Health != health)
+                if (stoppingToken.IsCancellationRequested)
+                    break;
+
+                var sw = System.Diagnostics.Stopwatch.StartNew();
+                try
                 {
-                    project.Health = health;
-                    await projectRepository.UpdateAsync(project);
+                    _logger.LogInformation("[{Task}] Starting.", task.TaskName);
+                    await task.ExecuteAsync(scope, stoppingToken);
+                    sw.Stop();
+                    _logger.LogInformation(
+                        "[{Task}] Completed in {ElapsedMs}ms.", task.TaskName, sw.ElapsedMilliseconds);
+                }
+                catch (OperationCanceledException)
+                {
+                    _logger.LogWarning("[{Task}] Cancelled by shutdown request.", task.TaskName);
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    sw.Stop();
+                    _logger.LogError(
+                        ex,
+                        "[{Task}] Failed after {ElapsedMs}ms. Other tasks will still run.",
+                        task.TaskName, sw.ElapsedMilliseconds);
+                    // Intentionally continue to next task — one failure must not block others
                 }
             }
-
-            // Mark missed timesheets for the previous week
-            var timesheetService = scope.ServiceProvider.GetRequiredService<ITimesheetService>();
-            await timesheetService.MarkMissedTimesheetsAsync();
         }
 
-        private int GetIntervalMinutes()
+        /// <summary>
+        /// Reads the scheduler interval from persistent config (unit: hours).
+        /// Falls back to <see cref="DefaultIntervalHours"/> if the key is missing or invalid.
+        /// Re-read on every cycle so Admin changes take effect without a restart.
+        /// </summary>
+        private double ResolveIntervalHours()
         {
             try
             {
-                var raw = _config.Get("Scheduler:IntervalMinutes");
-                if (int.TryParse(raw, out int parsed) && parsed > 0)
+                var raw = _config.Get("SchedulerInterval");
+                if (double.TryParse(raw, out double parsed) && parsed > 0)
                     return parsed;
             }
-            catch
+            catch (Exception ex)
             {
-                // Fall through to default
+                _logger.LogWarning(ex, "Could not read SchedulerInterval from config. Using default {Default}h.",
+                    DefaultIntervalHours);
             }
 
-            return 60; // default: every 60 minutes
+            return DefaultIntervalHours;
         }
     }
 }

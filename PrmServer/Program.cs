@@ -56,6 +56,10 @@ builder.Services.AddScoped<IAiProvider, GrokProvider>();
 builder.Services.AddScoped<IAiService, AiService>();
 
 // Background Services
+// Each IScheduledTask is a Strategy — order determines execution sequence per cycle.
+builder.Services.AddScoped<IScheduledTask, RecomputeUtilizationTask>();
+builder.Services.AddScoped<IScheduledTask, EvaluateProjectHealthTask>();
+builder.Services.AddScoped<IScheduledTask, MarkMissedTimesheetsTask>();
 builder.Services.AddHostedService<SystemSchedulerService>();
 
 // JWT Authentication
@@ -90,7 +94,12 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "PRM Tool API v1");
+        c.DocumentTitle = "PRM Tool API";
+        c.DefaultModelsExpandDepth(-1);
+    });
 }
 
 app.UseHttpsRedirection();

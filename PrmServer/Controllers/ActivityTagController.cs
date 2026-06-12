@@ -14,6 +14,9 @@ namespace PrmServer.Controllers
             _activityTagRepository = activityTagRepository;
         }
 
+        /// <summary>
+        /// Retrieves all activity tags.
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {

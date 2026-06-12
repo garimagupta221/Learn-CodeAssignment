@@ -17,6 +17,9 @@ namespace PrmServer.Controllers
             _notificationService = notificationService;
         }
 
+        /// <summary>
+        /// Retrieves unread notifications for the current user.
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetUnread()
         {

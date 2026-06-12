@@ -185,7 +185,7 @@ namespace PrmServer.Services
             }).ToList();
         }
 
-        public async Task MarkMissedTimesheetsAsync()
+        public async Task<List<int>> MarkMissedTimesheetsAsync()
         {
             // Previous week's Monday
             var today = DateTime.UtcNow.Date;
@@ -214,7 +214,7 @@ namespace PrmServer.Services
                 .ToList();
 
             if (!missingUserIds.Any())
-                return;
+                return missingUserIds;
 
             // Resolve a project for each missing employee (first active allocation's project)
             var allocations = await _db.Allocations
@@ -246,6 +246,8 @@ namespace PrmServer.Services
             }
 
             await _db.SaveChangesAsync();
+
+            return missingUserIds;
         }
     }
 }

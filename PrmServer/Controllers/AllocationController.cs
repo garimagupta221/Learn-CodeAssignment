@@ -15,13 +15,20 @@ namespace PrmServer.Controllers
             _allocationService = allocationService;
         }
 
+        /// <summary>
+        /// Retrieves all allocations.
+        /// </summary>
         [HttpGet]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> GetAll()
         {
             var allocations = await _allocationService.GetAllAsync();
             return Ok(allocations);
         }
 
+        /// <summary>
+        /// Retrieves allocations for a specific employee.
+        /// </summary>
         [HttpGet("employee/{id}")]
         public async Task<IActionResult> GetByEmployee(int id)
         {
@@ -29,6 +36,9 @@ namespace PrmServer.Controllers
             return Ok(allocations);
         }
 
+        /// <summary>
+        /// Retrieves allocations for a specific project.
+        /// </summary>
         [HttpGet("project/{id}")]
         public async Task<IActionResult> GetByProject(int id)
         {
@@ -36,13 +46,34 @@ namespace PrmServer.Controllers
             return Ok(allocations);
         }
 
+        /// <summary>
+        /// Creates a new allocation.
+        /// </summary>
         [HttpPost]
         public async Task<IActionResult> Allocate([FromBody] CreateAllocationDto dto)
         {
-            var allocation = await _allocationService.AllocateAsync(dto);
-            return Ok(allocation);
+            try
+            {
+                var allocation = await _allocationService.AllocateAsync(dto);
+                return Ok(allocation);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
+        /// <summary>
+        /// Ends a specific allocation.
+        /// </summary>
         [HttpPut("{id}/end")]
         public async Task<IActionResult> End(int id)
         {

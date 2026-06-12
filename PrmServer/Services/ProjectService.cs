@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using PrmServer.DTOs;
 using PrmServer.Entities;
 using PrmServer.Repositories.Interfaces;
@@ -10,6 +11,7 @@ namespace PrmServer.Services
         private readonly IProjectRepository _projectRepository;
         private readonly IMilestoneRepository _milestoneRepository;
         private readonly IUserRepository _userRepository;
+        private readonly ILogger<ProjectService> _logger;
 
         // Number of days before due date that a pending milestone triggers AMBER health
         private const int AmberWarningDays = 7;
@@ -17,11 +19,13 @@ namespace PrmServer.Services
         public ProjectService(
             IProjectRepository projectRepository,
             IMilestoneRepository milestoneRepository,
-            IUserRepository userRepository)
+            IUserRepository userRepository,
+            ILogger<ProjectService> logger)
         {
             _projectRepository = projectRepository;
             _milestoneRepository = milestoneRepository;
             _userRepository = userRepository;
+            _logger = logger;
         }
 
         public async Task<List<ProjectSummaryDto>> GetAllAsync()
@@ -99,20 +103,47 @@ namespace PrmServer.Services
             var milestones = await _milestoneRepository.GetByProjectIdAsync(projectId);
 
             if (!milestones.Any())
+            {
+                _logger.LogInformation("Project {ProjectId}: No milestones found. Health is GREEN.", projectId);
                 return "GREEN";
+            }
 
             var today = DateTime.UtcNow.Date;
 
-            var hasOverdue = milestones.Any(m =>
-                m.Status != "COMPLETED" && m.DueDate.Date < today);
+            // Log details of all milestones
+            _logger.LogInformation("Project {ProjectId}: Evaluating {Count} milestone(s) relative to today ({Today:yyyy-MM-dd}).", 
+                projectId, milestones.Count, today);
 
-            if (hasOverdue)
+            foreach (var m in milestones)
+            {
+                _logger.LogInformation("  - Milestone '{Title}' (ID {Id}): Status={Status}, DueDate={DueDate:yyyy-MM-dd}", 
+                    m.Title, m.Id, m.Status, m.DueDate);
+            }
+
+            var overdueMilestones = milestones.Where(m =>
+                m.Status != "COMPLETED" && m.DueDate.Date < today).ToList();
+
+            if (overdueMilestones.Any())
+            {
+                var overdueTitles = string.Join(", ", overdueMilestones.Select(m => $"'{m.Title}' (due {m.DueDate:yyyy-MM-dd})"));
+                _logger.LogWarning("Project {ProjectId}: Overdue milestone(s) detected: {Milestones}. Health evaluates to RED 🔴.", 
+                    projectId, overdueTitles);
                 return "RED";
+            }
 
-            var hasApproachingDeadline = milestones.Any(m =>
-                m.Status == "PENDING" && m.DueDate.Date <= today.AddDays(AmberWarningDays));
+            var approachingMilestones = milestones.Where(m =>
+                m.Status == "PENDING" && m.DueDate.Date <= today.AddDays(AmberWarningDays)).ToList();
 
-            return hasApproachingDeadline ? "AMBER" : "GREEN";
+            if (approachingMilestones.Any())
+            {
+                var approachingTitles = string.Join(", ", approachingMilestones.Select(m => $"'{m.Title}' (due {m.DueDate:yyyy-MM-dd})"));
+                _logger.LogWarning("Project {ProjectId}: Pending milestone(s) within {Days} days detected: {Milestones}. Health evaluates to AMBER 🟡.", 
+                    projectId, AmberWarningDays, approachingTitles);
+                return "AMBER";
+            }
+
+            _logger.LogInformation("Project {ProjectId}: All milestones are on track. Health evaluates to GREEN 🟢.", projectId);
+            return "GREEN";
         }
 
         public async Task<Milestone> AddMilestoneAsync(int projectId, AddMilestoneDto dto)

@@ -1,4 +1,5 @@
 using Microsoft.OpenApi;
+using System.Reflection;
 
 namespace PrmServer.Extensions;
 
@@ -8,6 +9,11 @@ public static class SwaggerServiceExtensions
     {
         services.AddSwaggerGen(c =>
         {
+
+            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            c.IncludeXmlComments(xmlPath);
+
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Name = "Authorization",
@@ -15,7 +21,7 @@ public static class SwaggerServiceExtensions
                 Scheme = "Bearer",
                 BearerFormat = "JWT",
                 In = ParameterLocation.Header,
-                Description = "Enter your JWT token in the field below."
+                Description = "Enter your JWT token below. Example: **eyJhbGci...**"
             });
 
             c.AddSecurityRequirement(doc =>

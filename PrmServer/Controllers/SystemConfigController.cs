@@ -15,6 +15,9 @@ namespace PrmServer.Controllers
             _configService = configService;
         }
 
+        /// <summary>
+        /// Retrieves all system configurations.
+        /// </summary>
         [HttpGet]
         public IActionResult GetAll()
         {
@@ -22,6 +25,9 @@ namespace PrmServer.Controllers
             return Ok(config);
         }
 
+        /// <summary>
+        /// Sets a system configuration value.
+        /// </summary>
         [HttpPut]
         public IActionResult Set([FromBody] SetConfigDto dto)
         {

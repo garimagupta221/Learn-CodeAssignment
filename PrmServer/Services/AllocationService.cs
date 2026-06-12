@@ -50,6 +50,13 @@ namespace PrmServer.Services
             if (project == null)
                 throw new KeyNotFoundException($"Project {dto.ProjectId} not found.");
 
+            var employee = await _context.Users.FindAsync(dto.EmployeeId);
+            if (employee == null)
+                throw new KeyNotFoundException($"Employee {dto.EmployeeId} not found.");
+
+            if (!employee.IsActive)
+                throw new InvalidOperationException("Cannot allocate a deactivated employee.");
+
             if (!project.Status.Equals("ACTIVE", StringComparison.OrdinalIgnoreCase) && 
                 !project.Status.Equals("PLANNED", StringComparison.OrdinalIgnoreCase))
             {
@@ -158,7 +165,7 @@ namespace PrmServer.Services
                 return;
 
             var allocations = await _allocationRepository.GetByUserIdAsync(userId);
-            var hasActiveAllocation = allocations.Any(a => a.IsActive && a.EndDate >= DateTime.UtcNow.Date);
+            var hasActiveAllocation = allocations.Any(a => a.IsActive && a.StartDate.Date <= DateTime.UtcNow.Date && a.EndDate.Date >= DateTime.UtcNow.Date);
 
             var newStatusValue = hasActiveAllocation ? "ALLOCATED" : "BENCH";
 

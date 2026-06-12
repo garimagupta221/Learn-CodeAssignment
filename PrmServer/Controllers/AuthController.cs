@@ -16,6 +16,9 @@ namespace PrmServer.Controllers
             _authService = authService;
         }
 
+        /// <summary>
+        /// Authenticates a user and returns a JWT token.
+        /// </summary>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
@@ -30,6 +33,10 @@ namespace PrmServer.Controllers
             }
         }
 
+        /// <summary>
+        /// [Admin Only] Creates a new user account (Admin, Manager, or Employee).
+        /// All accounts must be created by an Admin.
+        /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPost("signup")]
         public async Task<IActionResult> SignUp([FromBody] SignUpDto dto)
@@ -45,6 +52,9 @@ namespace PrmServer.Controllers
             }
         }
 
+        /// <summary>
+        /// Changes the password for the current user.
+        /// </summary>
         [HttpPost("change-password")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
         {
@@ -52,6 +62,9 @@ namespace PrmServer.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Logs out the current user.
+        /// </summary>
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {

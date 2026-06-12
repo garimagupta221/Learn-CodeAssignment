@@ -15,6 +15,9 @@ namespace PrmServer.Controllers
             _projectService = projectService;
         }
 
+        /// <summary>
+        /// Retrieves milestones for a specific project.
+        /// </summary>
         [HttpGet("project/{projectId}")]
         public async Task<IActionResult> GetByProject(int projectId)
         {
@@ -22,6 +25,9 @@ namespace PrmServer.Controllers
             return Ok(milestones);
         }
 
+        /// <summary>
+        /// Updates a milestone.
+        /// </summary>
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateMilestoneDto dto)
         {

@@ -15,6 +15,9 @@ namespace PrmServer.Controllers
             _projectService = projectService;
         }
 
+        /// <summary>
+        /// Retrieves all projects.
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -22,6 +25,9 @@ namespace PrmServer.Controllers
             return Ok(projects);
         }
 
+        /// <summary>
+        /// Retrieves a project by ID.
+        /// </summary>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -31,6 +37,9 @@ namespace PrmServer.Controllers
             return Ok(project);
         }
 
+        /// <summary>
+        /// Retrieves projects managed by a specific user ID.
+        /// </summary>
         [HttpGet("manager/{id}")]
         public async Task<IActionResult> GetByManager(int id)
         {
@@ -38,6 +47,9 @@ namespace PrmServer.Controllers
             return Ok(projects);
         }
 
+        /// <summary>
+        /// Creates a new project.
+        /// </summary>
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateProjectDto dto)
         {
@@ -60,6 +72,9 @@ namespace PrmServer.Controllers
             }
         }
 
+        /// <summary>
+        /// Updates an existing project.
+        /// </summary>
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateProjectDto dto)
         {
@@ -82,6 +97,9 @@ namespace PrmServer.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves the health status of a project.
+        /// </summary>
         [HttpGet("{id}/health")]
         public async Task<IActionResult> GetHealth(int id)
         {
@@ -89,6 +107,9 @@ namespace PrmServer.Controllers
             return Ok(new { health });
         }
 
+        /// <summary>
+        /// Adds a milestone to a project.
+        /// </summary>
         [HttpPost("{id}/milestones")]
         public async Task<IActionResult> AddMilestone(int id, [FromBody] AddMilestoneDto dto)
         {
