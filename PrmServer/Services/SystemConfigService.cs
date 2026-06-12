@@ -1,67 +1,50 @@
-using System.Text.Json;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
+using PrmServer.Entities;
 using PrmServer.Services.Interfaces;
 
 namespace PrmServer.Services
 {
     public class SystemConfigService : ISystemConfigService
     {
-        private readonly string _filePath;
-        private readonly object _lock = new();
+        private readonly IServiceScopeFactory _scopeFactory;
 
-        public SystemConfigService(IConfiguration configuration, IWebHostEnvironment environment)
+        public SystemConfigService(IServiceScopeFactory scopeFactory)
         {
-            var relativePath = configuration["SystemConfig:FilePath"] ?? "system_config.json";
-            _filePath = Path.Combine(environment.ContentRootPath, relativePath);
-
-            EnsureFileExists();
+            _scopeFactory = scopeFactory;
         }
 
         public string Get(string key)
         {
-            var config = ReadFromFile();
-            config.TryGetValue(key, out var value);
-            return value ?? string.Empty;
+            using var scope = _scopeFactory.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<PrmDbContext>();
+            var config = db.SystemConfigs.FirstOrDefault(c => c.Key == key);
+            return config?.Value ?? string.Empty;
         }
 
         public void Set(string key, string value)
         {
-            lock (_lock)
+            using var scope = _scopeFactory.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<PrmDbContext>();
+            var config = db.SystemConfigs.FirstOrDefault(c => c.Key == key);
+            if (config == null)
             {
-                var config = ReadFromFile();
-                config[key] = value;
-                WriteToFile(config);
+                config = new SystemConfig { Key = key, Value = value };
+                db.SystemConfigs.Add(config);
             }
+            else
+            {
+                config.Value = value;
+            }
+            db.SaveChanges();
         }
 
         public Dictionary<string, string> GetAll()
         {
-            return ReadFromFile();
-        }
-
-        // --- Private helpers ---
-
-        private void EnsureFileExists()
-        {
-            if (!File.Exists(_filePath))
-                WriteToFile(new Dictionary<string, string>());
-        }
-
-        private Dictionary<string, string> ReadFromFile()
-        {
-            var json = File.ReadAllText(_filePath);
-
-            return JsonSerializer.Deserialize<Dictionary<string, string>>(json)
-                ?? new Dictionary<string, string>();
-        }
-
-        private void WriteToFile(Dictionary<string, string> config)
-        {
-            var json = JsonSerializer.Serialize(config, new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
-
-            File.WriteAllText(_filePath, json);
+            using var scope = _scopeFactory.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<PrmDbContext>();
+            return db.SystemConfigs.ToDictionary(c => c.Key, c => c.Value);
         }
     }
 }

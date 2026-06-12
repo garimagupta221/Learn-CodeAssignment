@@ -189,12 +189,29 @@ namespace PrmClient.Models
     public class SkillMatchRequestDto
     {
         public string Requirement { get; set; } = string.Empty;
+        public int? ProjectId { get; set; }
         public int? MaxHours { get; set; }
     }
 
     public class AiResponseDto
     {
         public string Result { get; set; } = string.Empty;
+    }
+
+    public class SkillMatchRecommendationModel
+    {
+        public int EmployeeId { get; set; }
+        public string FullName { get; set; } = string.Empty;
+        public string SkillsMatch { get; set; } = string.Empty;
+        public string Availability { get; set; } = string.Empty;
+        public string RecentActivity { get; set; } = string.Empty;
+        public string Reason { get; set; } = string.Empty;
+    }
+
+    public class SkillMatchResponseDto
+    {
+        public List<SkillMatchRecommendationModel> Recommendations { get; set; } = new();
+        public string Provider { get; set; } = string.Empty;
     }
 
     public class AssignManagerRequest

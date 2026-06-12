@@ -47,9 +47,18 @@ namespace PrmClient.Services
             try
             {
                 using var doc = JsonDocument.Parse(body);
-                errorMessage = doc.RootElement.TryGetProperty("message", out var msgProp)
-                    ? msgProp.GetString() ?? body
-                    : body;
+                if (doc.RootElement.TryGetProperty("message", out var msgProp))
+                {
+                    errorMessage = msgProp.GetString() ?? body;
+                }
+                else if (doc.RootElement.TryGetProperty("error", out var errProp))
+                {
+                    errorMessage = errProp.GetString() ?? body;
+                }
+                else
+                {
+                    errorMessage = body;
+                }
             }
             catch
             {

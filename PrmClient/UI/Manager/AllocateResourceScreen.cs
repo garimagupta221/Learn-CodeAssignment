@@ -48,25 +48,163 @@ namespace PrmClient.UI.Manager
             Console.WriteLine("  ── AI-Assisted Search ─────────────────────────────────────────────────────");
             Console.WriteLine();
 
-            string requirement = InputHelper.GetRequiredString("  Skill Requirement Description: ");
-
-            Console.Write("  Max Hours (leave blank to skip): ");
-            string? maxHoursInput = Console.ReadLine();
-            int? maxHours = int.TryParse(maxHoursInput, out int parsed) ? parsed : null;
-
             try
             {
+                var projects = _api.GetAsync<List<ProjectModel>>($"api/projects/manager/{AppState.UserId}").GetAwaiter().GetResult() ?? new List<ProjectModel>();
+                if (projects.Count == 0)
+                {
+                    Console.WriteLine("  No projects assigned to you.");
+                    Console.WriteLine("\n  Press any key to continue...");
+                    Console.ReadKey(intercept: true);
+                    return;
+                }
+
+                Console.WriteLine("  Your Projects:");
+                foreach (var p in projects)
+                {
+                    Console.WriteLine($"    {p.Id} - {p.Name}");
+                }
+                Console.WriteLine();
+
+                int projectId;
+                ProjectModel? selectedProject;
+                while (true)
+                {
+                    projectId = InputHelper.GetValidIntOption("  Select Project ID: ", 1, int.MaxValue);
+                    selectedProject = projects.FirstOrDefault(p => p.Id == projectId);
+                    if (selectedProject == null)
+                    {
+                        Console.WriteLine("  Invalid Project ID. Please select from the list above.");
+                    }
+                    else if (!selectedProject.Status.Equals("ACTIVE", StringComparison.OrdinalIgnoreCase) && 
+                             !selectedProject.Status.Equals("PLANNED", StringComparison.OrdinalIgnoreCase))
+                    {
+                        Console.WriteLine($"  Project '{selectedProject.Name}' is currently {selectedProject.Status}. Only ACTIVE or PLANNED projects are allowed.");
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                string requirement = InputHelper.GetRequiredString("\n  Skill Requirement Description: ");
+
                 var dto = new SkillMatchRequestDto
                 {
                     Requirement = requirement,
-                    MaxHours    = maxHours
+                    ProjectId   = projectId,
+                    MaxHours    = null
                 };
 
-                var result = _api.PostAsync<SkillMatchRequestDto, AiResponseDto>("api/ai/skill-match", dto)
+                Console.WriteLine("\n  Searching... (AI matching in progress)");
+
+                var result = _api.PostAsync<SkillMatchRequestDto, SkillMatchResponseDto>("api/ai/skill-match", dto)
                                  .GetAwaiter().GetResult();
 
+                if (result == null || result.Recommendations == null || result.Recommendations.Count == 0)
+                {
+                    Console.WriteLine("\n  No matching recommendations returned by AI.");
+                    Console.WriteLine("\n  Press any key to continue...");
+                    Console.ReadKey(intercept: true);
+                    return;
+                }
+
                 Console.WriteLine();
-                Console.WriteLine(result?.Result);
+                Console.WriteLine("  ──────────────────────────────────────────────");
+                Console.WriteLine("  AI-MATCHED RESULTS");
+                Console.WriteLine("  ──────────────────────────────────────────────");
+                Console.WriteLine($"    {"#",-3} {"Name",-15} {"Skills Match",-25} {"Availability",-15} {"Recent Activity"}");
+                Console.WriteLine("  ──────────────────────────────────────────────");
+
+                for (int i = 0; i < result.Recommendations.Count; i++)
+                {
+                    var rec = result.Recommendations[i];
+                    Console.WriteLine($"    {i + 1,-3} {rec.FullName,-15} {rec.SkillsMatch,-25} {rec.Availability,-15} {rec.RecentActivity}");
+                }
+                Console.WriteLine("  ──────────────────────────────────────────────");
+                Console.WriteLine("  Note: Suggestions are AI-generated. Verify before confirming.");
+                Console.WriteLine();
+
+                int selectedIndex = InputHelper.GetValidIntOption("  Select employee (enter #, or 0 to search again): ", 0, result.Recommendations.Count);
+                if (selectedIndex == 0)
+                {
+                    return;
+                }
+
+                var selectedRec = result.Recommendations[selectedIndex - 1];
+                int employeeId = selectedRec.EmployeeId;
+
+                Console.WriteLine();
+                Console.WriteLine($"  ── {selectedRec.FullName} ─────────────────────────────────");
+
+                // Get current allocations to validate overlapping utilization
+                List<AllocationModel> allocs;
+                try
+                {
+                    allocs = _api.GetAsync<List<AllocationModel>>($"api/allocations/employee/{employeeId}").GetAwaiter().GetResult() ?? new List<AllocationModel>();
+                }
+                catch
+                {
+                    allocs = new List<AllocationModel>();
+                }
+
+                int currentUtil = allocs.Where(a => a.IsActive && a.StartDate <= DateTime.UtcNow && a.EndDate >= DateTime.UtcNow).Sum(a => a.UtilizationPct);
+                string benchStatus = currentUtil == 0 ? "fully on bench" : (currentUtil >= 100 ? "fully allocated" : $"{100 - currentUtil}% free");
+                Console.WriteLine($"  Current Utilisation: {currentUtil}%   ({benchStatus})");
+                Console.WriteLine();
+
+                Console.WriteLine("  Set Allocation:");
+                int utilization = InputHelper.GetValidIntOption("    Utilisation %   : ", 1, 100);
+                DateTime startDate = InputHelper.GetValidDate("    From Date (dd-MM-yyyy) : ");
+                DateTime endDate = InputHelper.GetValidDate("    To Date   (dd-MM-yyyy) : ");
+
+                if (startDate >= endDate)
+                {
+                    Console.WriteLine("\n    X Invalid (From Date must be before To Date)");
+                    Console.WriteLine("\n  Press any key to continue...");
+                    Console.ReadKey(intercept: true);
+                    return;
+                }
+
+                Console.WriteLine("\n  Validating...");
+
+                int overlappingUtil = allocs.Where(a => a.IsActive && a.StartDate < endDate && a.EndDate > startDate).Sum(a => a.UtilizationPct);
+                int totalUtil = overlappingUtil + utilization;
+
+                if (totalUtil > 100)
+                {
+                    Console.WriteLine($"    {selectedRec.FullName} total in this period: {overlappingUtil}% + {utilization}% = {totalUtil}%   X Invalid (Exceeds 100%)");
+                    Console.WriteLine("\n  Press any key to continue...");
+                    Console.ReadKey(intercept: true);
+                    return;
+                }
+
+                Console.WriteLine($"    {selectedRec.FullName} total in this period: {overlappingUtil}% + {utilization}% = {totalUtil}%   ✓ Valid");
+                Console.WriteLine();
+                Console.Write("  [C] Confirm Allocation     [B] Back > ");
+                string confirm = Console.ReadLine()?.Trim().ToUpper() ?? "B";
+
+                if (confirm == "C")
+                {
+                    var newAlloc = _api.PostAsync<CreateAllocationRequest, AllocationModel>(
+                        "api/allocations",
+                        new CreateAllocationRequest
+                        {
+                            EmployeeId     = employeeId,
+                            ProjectId      = projectId,
+                            AllocatedBy    = AppState.UserId,
+                            UtilizationPct = utilization,
+                            StartDate      = startDate,
+                            EndDate        = endDate
+                        }
+                    ).GetAwaiter().GetResult();
+
+                    Console.WriteLine();
+                    Console.WriteLine($"  Allocation saved. {selectedRec.FullName} → {selectedProject.Name} ({utilization}%, {startDate:MMM}–{endDate:MMM yyyy}) ✓");
+                }
+                else
+                {
+                    Console.WriteLine("\n  Allocation cancelled.");
+                }
             }
             catch (HttpRequestException ex)
             {

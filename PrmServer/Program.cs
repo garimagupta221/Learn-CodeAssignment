@@ -49,8 +49,11 @@ builder.Services.AddScoped<ITimesheetService, TimesheetService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddSingleton<ISystemConfigService, SystemConfigService>();
 
-// AI Providers (Strategy Pattern)
+// AI Providers (Factory / Strategy Pattern)
+// Add a new IAiProvider implementation + register it here to support a new LLM — zero other changes needed (OCP).
+// Active provider is resolved at runtime from system config key "ActiveAiProvider" (Admin-configurable).
 builder.Services.AddHttpClient();
+builder.Services.AddScoped<IAiProvider, GemmaProvider>();   // default — self-hosted Ollama Gemma endpoint
 builder.Services.AddScoped<IAiProvider, GeminiProvider>();
 builder.Services.AddScoped<IAiProvider, GrokProvider>();
 builder.Services.AddScoped<IAiService, AiService>();

@@ -77,6 +77,23 @@ namespace PrmServer.Data
                 context.ActivityTags.AddRange(tags);
                 await context.SaveChangesAsync();
             }
+
+            // Seed default system configurations
+            if (!context.SystemConfigs.Any())
+            {
+                var configs = new[]
+                {
+                    new SystemConfig { Key = "ActiveAiProvider", Value = "Gemini" },
+                    new SystemConfig { Key = "AiApiKey",         Value = "" },
+                    new SystemConfig { Key = "GemmaBaseUrl",     Value = "http://localhost:11434" },
+                    new SystemConfig { Key = "GemmaModel",       Value = "gemma3:12b-it-q8_0" },
+                    new SystemConfig { Key = "SchedulerInterval", Value = "4" },
+                    new SystemConfig { Key = "MaxWeeklyHours",   Value = "40" }
+                };
+
+                context.SystemConfigs.AddRange(configs);
+                await context.SaveChangesAsync();
+            }
         }
     }
 }

@@ -4,7 +4,14 @@ namespace PrmClient.UI
     {
         public static void ClearScreen()
         {
-            Console.Clear();
+            try
+            {
+                Console.Clear();
+            }
+            catch (System.IO.IOException)
+            {
+                // Ignore console clear failure when stdout/stdin is redirected in test/background tasks
+            }
         }
 
         public static void PrintHeader(string role, DateTime? date = null)

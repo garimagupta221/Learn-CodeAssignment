@@ -1,0 +1,7 @@
+{
+  "ActiveAiProvider": "Gemini",
+  "AiApiKey": "",
+  "GemmaBaseUrl": "http://<IP>",
+  "GemmaModel": "gemma3:12b-it-q8_0",
+  "SchedulerInterval": "0.00027"
+}

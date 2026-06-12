@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using PrmServer.DTOs;
 using PrmServer.Entities;
@@ -26,7 +27,8 @@ namespace PrmServer.Tests.Services
             _projectService = new ProjectService(
                 _projectRepositoryMock.Object,
                 _milestoneRepositoryMock.Object,
-                _userRepositoryMock.Object
+                _userRepositoryMock.Object,
+                NullLogger<ProjectService>.Instance
             );
         }
 

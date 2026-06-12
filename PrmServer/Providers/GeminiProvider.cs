@@ -7,7 +7,7 @@ namespace PrmServer.Providers
     public class GeminiProvider : IAiProvider
     {
         private readonly IHttpClientFactory _httpClientFactory;
-        private const string ApiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
+        private const string ApiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
         public string ProviderName => "Gemini";
 

@@ -204,9 +204,6 @@ namespace PrmClient.UI.Admin
                 return;
             }
 
-            Console.WriteLine();
-            Console.WriteLine($"  ── {employee.FullName} (Dept: {employee.Department}, Desig: {employee.Designation}) ──");
-            Console.WriteLine();
 
             string fullName    = InputHelper.GetRequiredString("  New Full Name: ");
             string department  = InputHelper.GetRequiredString("  New Department: ");

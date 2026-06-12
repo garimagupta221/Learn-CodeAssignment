@@ -262,6 +262,13 @@ namespace PrmServer.Entities
         public User User { get; set; }
     }
 
+    public class SystemConfig
+    {
+        public int Id { get; set; }
+        public string Key { get; set; }
+        public string Value { get; set; }
+    }
+
     public class PrmDbContext : DbContext
     {
         public PrmDbContext(DbContextOptions<PrmDbContext> options) : base(options) { }
@@ -279,6 +286,7 @@ namespace PrmServer.Entities
         public DbSet<ActivityTag> ActivityTags { get; set; }
         public DbSet<TimesheetTag> TimesheetTags { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<SystemConfig> SystemConfigs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
