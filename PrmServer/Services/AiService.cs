@@ -159,16 +159,22 @@ namespace PrmServer.Services
             var employeesJson = System.Text.Json.JsonSerializer.Serialize(employeeContextList);
 
             var prompt =
-                $"You are a resource planning assistant. Based on the following employee profiles and the project's required skills, " +
-                $"identify who best matches this requirement: \"{requirement}\".\n\n" +
+                $"You are a resource planning assistant. Analyze the following employee profiles against this requirement: \"{requirement}\".\n\n" +
                 $"Employees Context (JSON):\n{employeesJson}\n\n" +
-                $"You MUST return your answer in a strict JSON format. The response must be a JSON array of recommendation objects, with no markdown code blocks (e.g. do not wrap in ```json), and no extra text outside the JSON array. Each object in the array must have the following keys:\n" +
+                $"IMPORTANT INSTRUCTIONS:\n" +
+                $"1. ONLY include employees whose skills are relevant to the requirement. If an employee has NO matching or related skills, EXCLUDE them entirely.\n" +
+                $"2. Rank the matching employees from best fit to least fit.\n" +
+                $"3. Ranking criteria (in order of priority): (a) number of directly matching skills, (b) proficiency level (Expert/Advanced > Intermediate > Beginner), (c) availability (Bench/free > partially allocated > fully allocated).\n" +
+                $"4. Be smart about related skills — e.g. if the requirement mentions 'ML', also consider Python, TensorFlow, Scikit-learn etc. as relevant.\n" +
+                $"5. The response must be a JSON array with no markdown code blocks and no extra text outside the JSON array.\n" +
+                $"6. If NO employees match the requirement at all, return an empty array: []\n\n" +
+                $"Each object in the array must have these keys:\n" +
                 $"- \"EmployeeId\" (integer, must match the ID from context)\n" +
                 $"- \"FullName\" (string)\n" +
-                $"- \"SkillsMatch\" (string, comma-separated list of matching skills or category)\n" +
-                $"- \"Availability\" (string, e.g. \"100% free\", \"50% free\")\n" +
+                $"- \"SkillsMatch\" (string, comma-separated list of matching skills)\n" +
+                $"- \"Availability\" (string, e.g. \"100% free\", \"50% free\", \"Fully Allocated\")\n" +
                 $"- \"RecentActivity\" (string, brief summary of recent activity tags or \"None\")\n" +
-                $"- \"Reason\" (string, explanation of matching context)\n\n" +
+                $"- \"Reason\" (string, explain why this person is ranked here — mention matching skills and proficiency)\n\n" +
                 $"Format as: [ {{ \"EmployeeId\": 123, \"FullName\": \"...\", \"SkillsMatch\": \"...\", \"Availability\": \"...\", \"RecentActivity\": \"...\", \"Reason\": \"...\" }} ]";
 
             var provider = GetActiveProvider();

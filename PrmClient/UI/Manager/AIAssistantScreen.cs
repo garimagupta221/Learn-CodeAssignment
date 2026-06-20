@@ -70,21 +70,29 @@ namespace PrmClient.UI.Manager
 
                 if (result == null || result.Recommendations == null || result.Recommendations.Count == 0)
                 {
-                    Console.WriteLine("\n  No matching recommendations returned by AI.");
+                    Console.WriteLine("\n  No employees found matching your requirement.");
+                    Console.WriteLine("  Try broadening your search or check employee skill profiles.");
                 }
                 else
                 {
                     Console.WriteLine("\n  AI-MATCHED RESULTS");
-                    Console.WriteLine("  ────────────────────────────────────────────────────────────────────────────────────────────────────");
-                    Console.WriteLine($"    {"Name of Engineer",-30} {"Allocation %",-15} {"Reason"}");
-                    Console.WriteLine("  ────────────────────────────────────────────────────────────────────────────────────────────────────");
+                    Console.WriteLine("  ─────────────────────────────────────────────────────────────────────────────────────────────────────────");
+                    Console.WriteLine($"    {"Rank",-6} {"Name of Engineer",-25} {"Allocation %",-15} {"Reason"}");
+                    Console.WriteLine("  ─────────────────────────────────────────────────────────────────────────────────────────────────────────");
 
                     for (int i = 0; i < result.Recommendations.Count; i++)
                     {
                         var rec = result.Recommendations[i];
-                        Console.WriteLine($"    {rec.FullName,-30} {rec.Availability,-15} {rec.Reason}");
+                        string rank = $"#{i + 1}";
+                        var reasonLines = WrapText(rec.Reason, 60);
+
+                        Console.WriteLine($"    {rank,-6} {rec.FullName,-25} {rec.Availability,-15} {reasonLines[0]}");
+                        for (int j = 1; j < reasonLines.Count; j++)
+                        {
+                            Console.WriteLine(new string(' ', 53) + reasonLines[j]);
+                        }
                     }
-                    Console.WriteLine("  ────────────────────────────────────────────────────────────────────────────────────────────────────");
+                    Console.WriteLine("  ─────────────────────────────────────────────────────────────────────────────────────────────────────────");
                 }
             }
             catch (HttpRequestException ex)
@@ -140,6 +148,43 @@ namespace PrmClient.UI.Manager
             Console.WriteLine();
             Console.Write("  Press Enter to return...");
             Console.ReadLine();
+        }
+
+        private static List<string> WrapText(string text, int maxWidth)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return new List<string> { "" };
+            var words = text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var lines = new List<string>();
+            var currentLine = "";
+
+            foreach (var word in words)
+            {
+                if (currentLine.Length + word.Length + 1 > maxWidth)
+                {
+                    if (!string.IsNullOrEmpty(currentLine))
+                    {
+                        lines.Add(currentLine);
+                        currentLine = word;
+                    }
+                    else
+                    {
+                        lines.Add(word);
+                        currentLine = "";
+                    }
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(currentLine))
+                        currentLine = word;
+                    else
+                        currentLine += " " + word;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(currentLine))
+                lines.Add(currentLine);
+
+            return lines;
         }
     }
 }
