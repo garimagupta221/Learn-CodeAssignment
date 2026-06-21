@@ -223,5 +223,96 @@ namespace PrmServer.Controllers
             await _userRepository.UpdateAsync(user);
             return Ok(new { });
         }
+
+        /// <summary>
+        /// Returns whether a user's timesheet submission is currently frozen.
+        /// </summary>
+        [HttpGet("{id}/freeze-status")]
+        public async Task<IActionResult> GetFreezeStatus(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user is null)
+                return NotFound($"User {id} not found.");
+
+            return Ok(new { userId = id, isTimesheetFrozen = user.TimesheetAccessFrozen });
+        }
+
+        /// <summary>
+        /// Returns all engineers whose timesheet access is currently frozen,
+        /// scoped to the direct reports of the calling manager.
+        /// Admin sees all frozen users.
+        /// </summary>
+        [HttpGet("frozen-timesheets")]
+        public async Task<IActionResult> GetFrozenEmployees()
+        {
+            var callerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier) ?? User.FindFirst("sub");
+            if (callerIdClaim == null || !int.TryParse(callerIdClaim.Value, out int callerId))
+                return Unauthorized();
+
+            var caller = await _context.Users
+                .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
+                .FirstOrDefaultAsync(u => u.Id == callerId);
+
+            if (caller == null) return Unauthorized();
+
+            bool isAdmin = caller.UserRoles.Any(ur => ur.Role.RoleName == "Admin");
+
+            var query = _context.Users
+                .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
+                .Where(u => u.TimesheetAccessFrozen);
+
+            if (!isAdmin)
+                query = query.Where(u => u.ManagerId == callerId);
+
+            var frozenUsers = await query.ToListAsync();
+
+            return Ok(frozenUsers.Select(u => new
+            {
+                userId   = u.Id,
+                fullName = u.FullName,
+                email    = u.Email
+            }));
+        }
+
+        /// <summary>
+        /// Restores a frozen employee's timesheet submission access.
+        /// Only the employee's reporting manager or an Admin may call this endpoint.
+        /// </summary>
+        [HttpPost("{id}/unfreeze-timesheet")]
+        public async Task<IActionResult> UnfreezeTimesheet(int id)
+        {
+            // Verify caller is Manager or Admin
+            var callerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier) ?? User.FindFirst("sub");
+            if (callerIdClaim == null || !int.TryParse(callerIdClaim.Value, out int callerId))
+                return Unauthorized();
+
+            var caller = await _context.Users
+                .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
+                .FirstOrDefaultAsync(u => u.Id == callerId);
+            if (caller == null) return Unauthorized();
+
+            bool isAdmin   = caller.UserRoles.Any(ur => ur.Role.RoleName == "Admin");
+            bool isManager = caller.UserRoles.Any(ur => ur.Role.RoleName == "Manager");
+
+            if (!isAdmin && !isManager)
+                return Forbid();
+
+            var user = await _context.Users.FindAsync(id);
+            if (user is null)
+                return NotFound($"User {id} not found.");
+
+            // Non-admin managers can only unfreeze their own direct reports
+            if (!isAdmin && user.ManagerId != callerId)
+                return Forbid();
+
+            if (!user.TimesheetAccessFrozen)
+                return BadRequest(new { message = "User's timesheet access is not currently frozen." });
+
+            user.TimesheetAccessFrozen = false;
+            user.UpdatedAt             = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = $"{user.FullName}'s timesheet access has been restored." });
+        }
     }
 }

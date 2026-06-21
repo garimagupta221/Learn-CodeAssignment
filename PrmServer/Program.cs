@@ -39,6 +39,7 @@ builder.Services.AddScoped<ITimesheetTagRepository, TimesheetTagRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<ISkillRepository, SkillRepository>();
 builder.Services.AddScoped<IActivityTagRepository, ActivityTagRepository>();
+builder.Services.AddScoped<ITimesheetReminderRepository, TimesheetReminderRepository>();
 
 // Services
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -47,6 +48,7 @@ builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IAllocationService, AllocationService>();
 builder.Services.AddScoped<ITimesheetService, TimesheetService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 builder.Services.AddSingleton<ISystemConfigService, SystemConfigService>();
 
 // AI Providers (Factory / Strategy Pattern)
@@ -63,6 +65,7 @@ builder.Services.AddScoped<IAiService, AiService>();
 builder.Services.AddScoped<IScheduledTask, RecomputeUtilizationTask>();
 builder.Services.AddScoped<IScheduledTask, EvaluateProjectHealthTask>();
 builder.Services.AddScoped<IScheduledTask, MarkMissedTimesheetsTask>();
+builder.Services.AddScoped<IScheduledTask, TimesheetReminderTask>();
 builder.Services.AddHostedService<SystemSchedulerService>();
 
 // JWT Authentication

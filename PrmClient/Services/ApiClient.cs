@@ -109,6 +109,12 @@ namespace PrmClient.Services
             await EnsureSuccessAsync(response);
         }
 
+        public async Task PostAsync(string endpoint)
+        {
+            var response = await _httpClient.PostAsync(endpoint, null);
+            await EnsureSuccessAsync(response);
+        }
+
         public async Task DeleteAsync(string endpoint)
         {
             var response = await _httpClient.DeleteAsync(endpoint);

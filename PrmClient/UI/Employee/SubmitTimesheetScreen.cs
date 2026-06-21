@@ -34,6 +34,21 @@ namespace PrmClient.UI.Employee
             ConsoleHelper.PrintHeader(AppState.Role);
             Console.WriteLine("  SUBMIT TIMESHEET");
             Console.WriteLine();
+
+            // ── Freeze guard ───────────────────────────────────────────────────
+            if (IsTimesheetFrozen())
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("  🔒 Your timesheet access is currently FROZEN.");
+                Console.WriteLine("     You cannot create, update, or submit timesheet entries.");
+                Console.ResetColor();
+                Console.WriteLine();
+                Console.WriteLine("  Please contact your reporting manager to restore access.");
+                Pause();
+                AppState.CurrentScreen = "employee-menu";
+                return;
+            }
+
             Console.WriteLine($"  Employee  : {AppState.FullName}");
 
             DateTime weekStart = PromptWeekStart();
@@ -312,6 +327,21 @@ namespace PrmClient.UI.Employee
             Console.WriteLine($"    Total           {totalHours,4} hrs / {maxWeeklyHours} hrs max   {totalCheck}");
             Console.WriteLine("  ──────────────────────────────────────────────");
             Console.WriteLine();
+        }
+
+        private bool IsTimesheetFrozen()
+        {
+            try
+            {
+                var result = _api.GetAsync<FreezeStatusModel>(
+                    $"api/users/{AppState.UserId}/freeze-status"
+                ).GetAwaiter().GetResult();
+                return result?.IsTimesheetFrozen ?? false;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private static void Pause()

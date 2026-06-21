@@ -256,5 +256,38 @@ namespace PrmServer.Tests.Services
             Assert.Equal("SUBMITTED", result.Status);
             _timesheetRepoMock.Verify(r => r.AddAsync(It.IsAny<Timesheet>()), Times.Once);
         }
+
+        [Fact]
+        public async Task SubmitAsync_ShouldThrow_WhenEmployeeTimesheetAccessIsFrozen()
+        {
+            // Seed a frozen user
+            var frozenUser = new User
+            {
+                Id = 5,
+                Username = "frozen.test",
+                Email = "frozen@prm.com",
+                FullName = "Frozen Employee",
+                TimesheetAccessFrozen = true,
+                Department = "Dev",
+                Designation = "SE",
+                PasswordHash = "dummy_hash"
+            };
+            _db.Users.Add(frozenUser);
+            await _db.SaveChangesAsync();
+
+            var dto = new SubmitTimesheetDto
+            {
+                EmployeeId = 5,
+                ProjectId = 1,
+                WeekStart = LastMonday(),
+                HoursLogged = 8,
+                TagIds = new List<int>()
+            };
+
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => _sut.SubmitAsync(dto));
+
+            Assert.Contains("Your timesheet access has been frozen", ex.Message);
+        }
     }
 }

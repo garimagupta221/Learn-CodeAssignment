@@ -17,11 +17,23 @@ namespace PrmClient.UI.Employee
             ConsoleHelper.ClearScreen();
             ConsoleHelper.PrintHeader(AppState.Role);
 
+            // ── Freeze status banner ──────────────────────────────────────────
+            bool isFrozen = IsTimesheetFrozen();
+            if (isFrozen)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("  🔒 Your timesheet submission access is currently FROZEN.");
+                Console.WriteLine("     Please contact your reporting manager to restore access.");
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine("  ──────────────────────────────────────────────");
+                Console.ResetColor();
+            }
+
             // ── Missed-timesheet reminder ──────────────────────────────────────
             DateTime previousMonday = GetPreviousMonday();
             bool isMissing = IsMissingTimesheetForWeek(previousMonday);
 
-            if (isMissing)
+            if (isMissing && !isFrozen)
             {
                 Console.WriteLine($"  ⚠  Reminder: Timesheet for week {previousMonday:dd-MM-yyyy} has not been submitted.");
                 Console.WriteLine("  ──────────────────────────────────────────────");
@@ -71,6 +83,21 @@ namespace PrmClient.UI.Employee
             int daysToMonday = ((int)today.DayOfWeek - (int)DayOfWeek.Monday + 7) % 7;
             // Previous Monday = current Monday minus 7 days
             return today.AddDays(-daysToMonday - 7);
+        }
+
+        private bool IsTimesheetFrozen()
+        {
+            try
+            {
+                var result = _api.GetAsync<FreezeStatusModel>(
+                    $"api/users/{AppState.UserId}/freeze-status"
+                ).GetAwaiter().GetResult();
+                return result?.IsTimesheetFrozen ?? false;
+            }
+            catch
+            {
+                return false; // If the check fails, silently skip the banner
+            }
         }
     }
 }

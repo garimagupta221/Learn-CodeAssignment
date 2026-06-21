@@ -17,6 +17,7 @@ namespace PrmServer.Entities
         public int? ManagerId { get; set; }
         public bool IsActive { get; set; }
         public bool IsTemporaryPassword { get; set; }
+        public bool TimesheetAccessFrozen { get; set; } = false;
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
@@ -269,6 +270,22 @@ namespace PrmServer.Entities
         public string Value { get; set; }
     }
 
+    /// <summary>
+    /// Tracks the reminder escalation state for an employee who missed a weekly timesheet.
+    /// One record per (UserId, WeekStart) pair — created on first reminder, updated on each step.
+    /// </summary>
+    public class TimesheetReminderLog
+    {
+        public int Id { get; set; }
+        public int UserId { get; set; }
+        public DateTime WeekStart { get; set; }          // Monday of the missed week
+        public DateTime? Reminder1SentAt { get; set; }   // null until Reminder 1 is dispatched
+        public DateTime? Reminder2SentAt { get; set; }   // null until Reminder 2 is dispatched
+        public bool IsFrozen { get; set; }               // true after freeze email is sent
+
+        public User User { get; set; }
+    }
+
     public class PrmDbContext : DbContext
     {
         public PrmDbContext(DbContextOptions<PrmDbContext> options) : base(options) { }
@@ -287,6 +304,7 @@ namespace PrmServer.Entities
         public DbSet<TimesheetTag> TimesheetTags { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<SystemConfig> SystemConfigs { get; set; }
+        public DbSet<TimesheetReminderLog> TimesheetReminderLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -368,6 +386,17 @@ namespace PrmServer.Entities
                 .WithOne(u => u.Status)
                 .HasForeignKey<UserStatus>(us => us.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // TimesheetReminderLog configuration
+            modelBuilder.Entity<TimesheetReminderLog>()
+                .HasOne(r => r.User)
+                .WithMany()
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<TimesheetReminderLog>()
+                .HasIndex(r => new { r.UserId, r.WeekStart })
+                .IsUnique();
         }
     }
 }

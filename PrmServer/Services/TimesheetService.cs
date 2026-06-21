@@ -42,6 +42,13 @@ namespace PrmServer.Services
 
         public async Task<Timesheet> SubmitAsync(SubmitTimesheetDto dto)
         {
+            // Guard: reject submission if the employee's timesheet access is frozen
+            var employee = await _db.Users.FindAsync(dto.EmployeeId);
+            if (employee?.TimesheetAccessFrozen == true)
+                throw new InvalidOperationException(
+                    "Your timesheet access has been frozen due to a missing submission. " +
+                    "Please contact your reporting manager to restore access.");
+
             ValidateWeekStart(dto.WeekStart);
             ValidateHours(dto.HoursLogged);
             await ValidateProjectHoursCapAsync(dto);

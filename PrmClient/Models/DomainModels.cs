@@ -219,4 +219,17 @@ namespace PrmClient.Models
         public int EmployeeUserId { get; set; }
         public int ManagerUserId { get; set; }
     }
+
+    public class FrozenEmployeeModel
+    {
+        public int UserId { get; set; }
+        public string FullName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+    }
+
+    public class FreezeStatusModel
+    {
+        public int UserId { get; set; }
+        public bool IsTimesheetFrozen { get; set; }
+    }
 }
