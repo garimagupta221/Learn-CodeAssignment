@@ -292,6 +292,171 @@ namespace PrmServer.Services
             }
         }
 
+        // ── Team Builder ─────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Staffs an entire project team in a single AI call.
+        /// Only 100%-bench employees are considered (no active allocation today).
+        /// Deduplication and gap reasoning run server-side for determinism.
+        /// Managers see all engineers company-wide.
+        /// </summary>
+        public async Task<TeamBuilderResult> BuildTeamAsync(TeamBuilderRequestDto request, int managerUserId)
+        {
+            if (string.IsNullOrWhiteSpace(request.TeamRequirement))
+                throw new InvalidOperationException("Please enter your team requirements before running Team Builder.");
+
+            var today = DateTime.UtcNow;
+
+            // ── 1. Load active allocations ───────────────────────
+            var activeAllocations = await _db.Allocations
+                .Include(a => a.User)
+                .Where(a => a.IsActive && a.StartDate <= today && a.EndDate >= today)
+                .ToListAsync();
+
+            var allocationMap = activeAllocations
+                .GroupBy(a => a.UserId)
+                .ToDictionary(g => g.Key, g => g.Max(a => a.EndDate));
+
+            // ── 2. Load ALL engineers (active) company-wide ─────────────────────────
+            var allEngineers = await _db.Users
+                .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
+                .Include(u => u.UserSkills).ThenInclude(us => us.Skill)
+                .Where(u => u.IsActive && u.UserRoles.Any(ur => ur.Role.RoleName == "Engineer"))
+                .ToListAsync();
+
+            // ── 3. Serialize all engineers with their skills and bench/allocation status ──
+            var employeesContext = allEngineers.Select(e => new
+            {
+                EmployeeId = e.Id,
+                FullName   = e.FullName,
+                Skills     = e.UserSkills.Select(us => new
+                {
+                    SkillName   = us.Skill.Name,
+                    Proficiency = us.Proficiency
+                }).ToList(),
+                BenchStatus = allocationMap.TryGetValue(e.Id, out var endDate) 
+                    ? $"ALLOCATED until {endDate:yyyy-MM-dd}" 
+                    : "BENCH"
+            }).ToList();
+
+            var employeesJson = System.Text.Json.JsonSerializer.Serialize(employeesContext);
+
+            // ── 4. Build AI prompt ───────────────────────────────────────────────────
+            var prompt =
+                $"You are a resource planning assistant. Staff a project team based on a plain English request.\n\n" +
+                $"Project: \"{request.ProjectName}\"\n" +
+                $"Team Request: \"{request.TeamRequirement}\"\n\n" +
+                $"EMPLOYEES DATABASE (Active engineers company-wide):\n{employeesJson}\n\n" +
+                $"INSTRUCTIONS:\n" +
+                $"1. Parse the 'Team Request' to identify all required roles. If a quantity is specified (e.g. '2 java developers'), create separate role slots (e.g. 'Java Developer 1' and 'Java Developer 2').\n" +
+                $"2. For each role slot, search the EMPLOYEES DATABASE to fill it:\n" +
+                $"   - Prefer active engineers who are currently 'BENCH'.\n" +
+                $"   - Ensure they have the required skills at or above a reasonable proficiency (Beginner, Intermediate, Advanced, Expert).\n" +
+                $"   - Deduplicate: Do not assign the same employee to multiple roles.\n" +
+                $"3. If a role can be filled:\n" +
+                $"   - Set \"Filled\": true\n" +
+                $"   - Set \"EmployeeId\", \"EmployeeName\", \"MatchedSkills\" (comma-separated list of their matching skills), and \"Reason\" (brief description of why they were picked).\n" +
+                $"4. If a role cannot be filled by a bench candidate:\n" +
+                $"   - Set \"Filled\": false\n" +
+                $"   - Determine \"GapReason\" and \"GapDetail\":\n" +
+                $"     - If no one in the company has the required skill, set \"GapReason\": \"NoSkill\" and \"GapDetail\": \"No employee in the company has the skill [SkillName]. Recommend hiring or training.\"\n" +
+                $"     - If employees have the skill but all are allocated, set \"GapReason\": \"Allocated\" and \"GapDetail\": \"[EmployeeName] has the skill but is allocated until [EndDate].\"\n" +
+                $"     - If the best match was already assigned to another role in this team and no other bench candidate is available, set \"GapReason\": \"NoAvailableBench\" and \"GapDetail\": \"The best match was already assigned to another role in this team.\"\n" +
+                $"5. Return ONLY a JSON array of roles with no markdown formatting. No backticks, no other text outside the JSON array.\n" +
+                $"Format for each role object:\n" +
+                $"{{\n" +
+                $"  \"RoleTitle\": \"...\",\n" +
+                $"  \"Filled\": true/false,\n" +
+                $"  \"EmployeeId\": <int or null>,\n" +
+                $"  \"EmployeeName\": \"...\",\n" +
+                $"  \"MatchedSkills\": \"...\",\n" +
+                $"  \"Reason\": \"...\",\n" +
+                $"  \"GapReason\": \"...\",\n" +
+                $"  \"GapDetail\": \"...\"\n" +
+                $"}}";
+
+            var provider     = GetActiveProvider();
+            var responseText = await provider.GenerateContentAsync(prompt, GetApiKey());
+            var cleanedJson  = CleanJsonText(responseText);
+
+            // ── 5. Parse AI response ─────────────────────────────────────────────────
+            List<AiTeamSlot> aiSlots;
+            try
+            {
+                aiSlots = System.Text.Json.JsonSerializer.Deserialize<List<AiTeamSlot>>(cleanedJson,
+                    new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+                    ?? new List<AiTeamSlot>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Team Builder AI response could not be deserialized. Raw: {Raw}", responseText);
+                throw new InvalidOperationException("AI response was not in the expected structured format. Please try again.");
+            }
+
+            // ── 6. Server-side deduplication ─────────────────────────────────────────
+            var usedEmployeeIds = new HashSet<int>();
+            var results         = new List<TeamRoleResultDto>();
+
+            foreach (var slot in aiSlots)
+            {
+                bool isDuplicate = slot.EmployeeId.HasValue && usedEmployeeIds.Contains(slot.EmployeeId.Value);
+
+                if (slot.Filled && slot.EmployeeId.HasValue && !isDuplicate)
+                {
+                    usedEmployeeIds.Add(slot.EmployeeId.Value);
+                    results.Add(new TeamRoleResultDto
+                    {
+                        RoleTitle     = slot.RoleTitle ?? "Unknown Role",
+                        Filled        = true,
+                        EmployeeId    = slot.EmployeeId,
+                        EmployeeName  = slot.EmployeeName,
+                        MatchedSkills = slot.MatchedSkills,
+                        Reason        = slot.Reason
+                    });
+                }
+                else
+                {
+                    var gapReason = slot.GapReason;
+                    var gapDetail = slot.GapDetail;
+
+                    if (isDuplicate)
+                    {
+                        gapReason = "NoAvailableBench";
+                        gapDetail = $"The best match for '{slot.RoleTitle}' was already assigned to another role in this team.";
+                    }
+                    else if (string.IsNullOrWhiteSpace(gapReason))
+                    {
+                        gapReason = "NoSkill";
+                        gapDetail = "Could not find a suitable bench match.";
+                    }
+
+                    results.Add(new TeamRoleResultDto
+                    {
+                        RoleTitle = slot.RoleTitle ?? "Unknown Role",
+                        Filled    = false,
+                        GapReason = gapReason,
+                        GapDetail = gapDetail
+                    });
+                }
+            }
+
+            return new TeamBuilderResult(request.ProjectName, results, provider.ProviderName);
+        }
+
+        // ─── Internal DTO for deserializing the AI team slot response ───────────────
+
+        private class AiTeamSlot
+        {
+            public string RoleTitle { get; set; }
+            public bool Filled { get; set; }
+            public int? EmployeeId { get; set; }
+            public string EmployeeName { get; set; }
+            public string MatchedSkills { get; set; }
+            public string Reason { get; set; }
+            public string GapReason { get; set; }
+            public string GapDetail { get; set; }
+        }
+
         // ── Private helpers ─────────────────────────────────────────────────────────
 
         private static string BuildFallbackRiskSummary(Project project, int overdueMilestones)

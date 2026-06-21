@@ -232,4 +232,48 @@ namespace PrmClient.Models
         public int UserId { get; set; }
         public bool IsTimesheetFrozen { get; set; }
     }
+
+    // ── Team Builder Models ──────────────────────────────────────────────────────
+
+    /// <summary>One role to staff — title, required skills, and minimum proficiency.</summary>
+    public class TeamRoleRequestModel
+    {
+        public string RoleTitle { get; set; } = string.Empty;
+        public List<string> RequiredSkills { get; set; } = new();
+        /// <summary>Beginner | Intermediate | Advanced | Expert</summary>
+        public string MinProficiency { get; set; } = "Intermediate";
+    }
+
+    /// <summary>Request sent to POST api/ai/team-builder.</summary>
+    public class TeamBuilderRequestModel
+    {
+        public string ProjectName { get; set; } = string.Empty;
+        public string TeamRequirement { get; set; } = string.Empty;
+    }
+
+    /// <summary>Per-role result — either filled with an employee, or a gap with an explanation.</summary>
+    public class TeamRoleResultModel
+    {
+        public string RoleTitle { get; set; } = string.Empty;
+        public bool Filled { get; set; }
+
+        // When Filled == true
+        public int? EmployeeId { get; set; }
+        public string EmployeeName { get; set; } = string.Empty;
+        public string MatchedSkills { get; set; } = string.Empty;
+        public string Reason { get; set; } = string.Empty;
+
+        // When Filled == false
+        /// <summary>"NoSkill" | "Allocated" | "NoAvailableBench"</summary>
+        public string GapReason { get; set; } = string.Empty;
+        public string GapDetail { get; set; } = string.Empty;
+    }
+
+    /// <summary>Response from POST api/ai/team-builder.</summary>
+    public class TeamBuilderResponseModel
+    {
+        public string ProjectName { get; set; } = string.Empty;
+        public List<TeamRoleResultModel> Results { get; set; } = new();
+        public string Provider { get; set; } = string.Empty;
+    }
 }

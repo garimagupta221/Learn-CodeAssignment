@@ -111,5 +111,43 @@ namespace PrmServer.Controllers
                 return StatusCode(403, new { error = ex.Message });
             }
         }
+        /// <summary>
+        /// Team Builder — staffs an entire project team in one AI pass.
+        /// Only 100%-bench employees (no active allocation today) are candidates.
+        /// Managers see all engineers company-wide.
+        /// Returns a per-role result: filled (with employee + reason) or a gap (NoSkill / Allocated).
+        /// </summary>
+        [HttpPost("team-builder")]
+        [ProducesResponseType(typeof(TeamBuilderResponseDto), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        public async Task<IActionResult> BuildTeam([FromBody] TeamBuilderRequestDto dto)
+        {
+            if (dto == null || string.IsNullOrWhiteSpace(dto.ProjectName))
+                return BadRequest(new { error = "ProjectName is required." });
+
+            if (string.IsNullOrWhiteSpace(dto.TeamRequirement))
+                return BadRequest(new { error = "Team requirement prompt is required." });
+
+            var managerUserId = int.Parse(
+                User.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? User.FindFirstValue("sub")!);
+
+            try
+            {
+                var result = await _aiService.BuildTeamAsync(dto, managerUserId);
+                return Ok(new TeamBuilderResponseDto
+                {
+                    ProjectName = result.ProjectName,
+                    Results     = result.Results,
+                    Provider    = result.Provider
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Team Builder failed for manager {ManagerId}", managerUserId);
+                return BadRequest(new { error = ex.Message });
+            }
+        }
     }
 }
