@@ -7,7 +7,6 @@ namespace PrmClient.UI.Employee
     {
         private readonly ApiClient _api;
 
-        // Activity tags as defined in the BRD (shown to the user for selection)
         private static readonly string[] ActivityTagNames =
         {
             "Backend API Development",
@@ -35,7 +34,6 @@ namespace PrmClient.UI.Employee
             Console.WriteLine("  SUBMIT TIMESHEET");
             Console.WriteLine();
 
-            // ── Freeze guard ───────────────────────────────────────────────────
             if (IsTimesheetFrozen())
             {
                 Console.ForegroundColor = ConsoleColor.Red;
@@ -74,7 +72,7 @@ namespace PrmClient.UI.Employee
                 var activeAllocations = allocations
                     .Where(a => a.IsActive
                         && a.StartDate.Date <= weekStart.Date
-                        && a.EndDate.Date >= weekStart.Date)
+                        && a.EndDate.Date   >= weekStart.Date)
                     .ToList();
 
                 if (activeAllocations.Count == 0)
@@ -85,7 +83,6 @@ namespace PrmClient.UI.Employee
                     return;
                 }
 
-                // Fetch submitted timesheets to proactively prevent duplicates
                 var timesheets = _api.GetAsync<List<TimesheetModel>>(
                     $"api/timesheets/employee/{AppState.UserId}"
                 ).GetAwaiter().GetResult() ?? new List<TimesheetModel>();
@@ -107,17 +104,14 @@ namespace PrmClient.UI.Employee
                     return;
                 }
 
-                // Fetch available activity tags from the server (fall back to built-in list)
-                var serverTags = FetchActivityTags();
-
-                // Collect entry for each allocated project
-                var entries = new List<(AllocationModel Allocation, float Hours, List<int> TagIds, List<string> TagNames)>();
+                var serverTags    = FetchActivityTags();
+                var entries       = new List<(AllocationModel Allocation, float Hours, List<int> TagIds, List<string> TagNames)>();
                 int maxWeeklyHours = GetMaxWeeklyHours();
 
                 for (int i = 0; i < pendingAllocations.Count; i++)
                 {
-                    var allocation = pendingAllocations[i];
-                    string projectName = allocation.ProjectName ?? $"Project {allocation.ProjectId}";
+                    var allocation   = pendingAllocations[i];
+                    string projectName  = allocation.ProjectName ?? $"Project {allocation.ProjectId}";
                     int expectedMaxHours = (int)Math.Round(allocation.UtilizationPct / 100.0 * maxWeeklyHours);
 
                     Console.WriteLine($"  ──────────────────────────────────────────────");
@@ -133,14 +127,13 @@ namespace PrmClient.UI.Employee
                     PrintTagMenu(serverTags);
 
                     Console.Write("  Select tags (comma-separated): ");
-                    string? tagInput = Console.ReadLine()?.Trim();
+                    string? tagInput    = Console.ReadLine()?.Trim();
                     var (tagIds, tagNames) = ParseTagSelections(tagInput, serverTags);
 
                     entries.Add((allocation, hours, tagIds, tagNames));
                     Console.WriteLine();
                 }
 
-                // Show summary and ask to confirm
                 PrintSummary(entries, maxWeeklyHours);
 
                 Console.Write("  [S] Submit Timesheet     [B] Back\n  > ");
@@ -152,7 +145,6 @@ namespace PrmClient.UI.Employee
                     return;
                 }
 
-                // Submit each entry
                 int submitted = 0;
                 foreach (var (allocation, hours, tagIds, _) in entries)
                 {
@@ -194,8 +186,6 @@ namespace PrmClient.UI.Employee
             AppState.CurrentScreen = "employee-menu";
         }
 
-        // --- Private helpers ---
-
         private DateTime PromptWeekStart()
         {
             Console.Write("  Week Start: Enter date (DD-MM-YYYY) or press Enter for last Monday\n  > ");
@@ -203,7 +193,6 @@ namespace PrmClient.UI.Employee
 
             if (string.IsNullOrWhiteSpace(input))
             {
-                // Default to last Monday
                 var today = DateTime.Today;
                 int daysSinceMonday = ((int)today.DayOfWeek - (int)DayOfWeek.Monday + 7) % 7;
                 var lastMonday = today.AddDays(-daysSinceMonday);
@@ -242,10 +231,9 @@ namespace PrmClient.UI.Employee
             }
             catch { /* fall through to built-in list */ }
 
-            // Built-in fallback matching the BRD list
             return ActivityTagNames.Select((name, idx) => new ActivityTagModel
             {
-                Id = idx + 1,
+                Id      = idx + 1,
                 TagName = name
             }).ToList();
         }
@@ -260,7 +248,7 @@ namespace PrmClient.UI.Employee
         private static (List<int> tagIds, List<string> tagNames) ParseTagSelections(
             string? input, List<ActivityTagModel> tags)
         {
-            var tagIds = new List<int>();
+            var tagIds   = new List<int>();
             var tagNames = new List<string>();
 
             if (string.IsNullOrWhiteSpace(input))
@@ -302,11 +290,7 @@ namespace PrmClient.UI.Employee
             }
         }
 
-        private static int GetMaxWeeklyHours()
-        {
-            // Default to 40 — the server enforces the configured value anyway
-            return 40;
-        }
+        private static int GetMaxWeeklyHours() => 40;
 
         private static void PrintSummary(
             List<(AllocationModel Allocation, float Hours, List<int> TagIds, List<string> TagNames)> entries,

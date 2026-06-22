@@ -17,7 +17,6 @@ namespace PrmClient.UI.Manager
             ConsoleHelper.ClearScreen();
             ConsoleHelper.PrintHeader(AppState.Role);
 
-            // Week selection — Enter = current week
             DateTime defaultMonday = GetCurrentWeekMonday();
             Console.Write("  Filter by week (DD-MM-YYYY) or press Enter for current week: ");
             string? weekInput = Console.ReadLine()?.Trim();
@@ -44,7 +43,6 @@ namespace PrmClient.UI.Manager
             Console.WriteLine($"  Week: {weekStart:dd-MM-yyyy}");
             Console.WriteLine();
 
-            // (empName, projName, hours, status)
             var rows = new List<(string empName, string projName, float hours, string status)>();
 
             try
@@ -110,8 +108,6 @@ namespace PrmClient.UI.Manager
             AppState.CurrentScreen = "manager-menu";
         }
 
-        // ─── Detail view ───────────────────────────────────────────────────────
-
         private static void ViewEmployeeDetail(
             List<(string empName, string projName, float hours, string status)> rows,
             DateTime weekStart)
@@ -144,8 +140,6 @@ namespace PrmClient.UI.Manager
 
             Console.WriteLine($"  {new string('─', 40)}");
         }
-
-        // ─── Helpers ──────────────────────────────────────────────────────────
 
         private static DateTime GetCurrentWeekMonday()
         {

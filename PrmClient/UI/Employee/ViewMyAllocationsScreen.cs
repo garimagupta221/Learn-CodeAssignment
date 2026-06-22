@@ -54,18 +54,16 @@ namespace PrmClient.UI.Employee
 
             foreach (var a in allocations)
             {
-                var p = _api.GetAsync<ProjectModel>($"api/projects/{a.ProjectId}").GetAwaiter().GetResult();
-                string pName = p?.Name ?? $"Project {a.ProjectId}";
+                var p      = _api.GetAsync<ProjectModel>($"api/projects/{a.ProjectId}").GetAwaiter().GetResult();
+                string pName  = p?.Name ?? $"Project {a.ProjectId}";
                 string status = a.IsActive ? "ACTIVE" : "ENDED";
-                
+
                 if (a.IsActive)
-                {
                     activeUtilisation += a.UtilizationPct;
-                }
 
                 Console.WriteLine($"  {pName,-17} {$"{a.UtilizationPct}%",-6} {a.StartDate,-12:dd-MM-yyyy} {a.EndDate,-12:dd-MM-yyyy} {status}");
             }
-            
+
             Console.WriteLine($"  {new string('─', 58)}");
             Console.WriteLine($"  Total Utilisation: {activeUtilisation}%");
         }

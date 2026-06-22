@@ -14,7 +14,6 @@ namespace PrmClient.UI.Common
 
         public void Render()
         {
-            // This screen cannot be skipped — loop until password is successfully changed
             while (true)
             {
                 Console.Clear();
@@ -35,14 +34,13 @@ namespace PrmClient.UI.Common
                     Console.ResetColor();
                     Console.WriteLine("\n  Press any key to continue...");
                     Console.ReadKey(intercept: true);
-                    continue;   // loop back — screen cannot be skipped
+                    continue;
                 }
 
                 Console.WriteLine();
                 Console.WriteLine("──────────────────────────────────────────────");
                 Console.WriteLine("[S] Save and Continue");
 
-                // Wait for S (any other key is silently ignored)
                 while (true)
                 {
                     var key = Console.ReadKey(intercept: true).Key;
@@ -66,7 +64,6 @@ namespace PrmClient.UI.Common
                     Console.WriteLine("\n  Press any key to continue...");
                     Console.ReadKey(intercept: true);
 
-                    // Navigate to the correct role menu after password change
                     AppState.CurrentScreen = AppState.Role.ToLower() switch
                     {
                         "admin"    => "admin-menu",
@@ -83,7 +80,6 @@ namespace PrmClient.UI.Common
                     Console.ResetColor();
                     Console.WriteLine("\n  Press any key to try again...");
                     Console.ReadKey(intercept: true);
-                    // loop back — screen cannot be skipped
                 }
             }
         }

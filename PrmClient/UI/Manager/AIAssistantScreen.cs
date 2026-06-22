@@ -1,8 +1,5 @@
 using PrmClient.Models;
 using PrmClient.Services;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
 
 namespace PrmClient.UI.Manager
 {
@@ -33,23 +30,15 @@ namespace PrmClient.UI.Manager
 
                 switch (choice)
                 {
-                    case 1:
-                        SkillMatchFlow();
-                        break;
-                    case 2:
-                        RiskSummaryFlow();
-                        break;
-                    case 3:
-                        TeamBuilderFlow();
-                        break;
+                    case 1: SkillMatchFlow();   break;
+                    case 2: RiskSummaryFlow();  break;
+                    case 3: TeamBuilderFlow();  break;
                     case 4:
                         AppState.CurrentScreen = "manager-menu";
                         return;
                 }
             }
         }
-
-        // ── Skill Match ──────────────────────────────────────────────────────────────
 
         private void SkillMatchFlow()
         {
@@ -88,8 +77,8 @@ namespace PrmClient.UI.Manager
 
                     for (int i = 0; i < result.Recommendations.Count; i++)
                     {
-                        var rec = result.Recommendations[i];
-                        string rank = $"#{i + 1}";
+                        var rec         = result.Recommendations[i];
+                        string rank     = $"#{i + 1}";
                         var reasonLines = WrapText(rec.Reason, 60);
 
                         Console.WriteLine($"    {rank,-6} {rec.FullName,-25} {rec.Availability,-15} {reasonLines[0]}");
@@ -110,8 +99,6 @@ namespace PrmClient.UI.Manager
             Console.Write("  [B] Back > ");
             Console.ReadLine();
         }
-
-        // ── Risk Summary ─────────────────────────────────────────────────────────────
 
         private void RiskSummaryFlow()
         {
@@ -158,8 +145,6 @@ namespace PrmClient.UI.Manager
             Console.ReadLine();
         }
 
-        // ── Team Builder ─────────────────────────────────────────────────────────────
-
         private void TeamBuilderFlow()
         {
             ConsoleHelper.ClearScreen();
@@ -172,7 +157,7 @@ namespace PrmClient.UI.Manager
             try
             {
                 string projectName = InputHelper.GetRequiredString("  Project name: ");
-                string teamReq = InputHelper.GetRequiredString("  Team requirements (e.g. 2 Java developers, 1 DevOps, 1 QA): ");
+                string teamReq     = InputHelper.GetRequiredString("  Team requirements (e.g. 2 Java developers, 1 DevOps, 1 QA): ");
 
                 Console.WriteLine();
                 Console.WriteLine($"  Searching for best bench employees for '{projectName}'... (calling AI)");
@@ -259,8 +244,6 @@ namespace PrmClient.UI.Manager
                 Console.WriteLine("    NoAvailableBench — Only qualified person was already assigned above.");
             }
         }
-
-        // ── Shared helpers ────────────────────────────────────────────────────────────
 
         private static List<string> WrapText(string text, int maxWidth)
         {

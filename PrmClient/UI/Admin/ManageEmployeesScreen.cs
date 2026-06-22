@@ -31,7 +31,7 @@ namespace PrmClient.UI.Admin
             switch (choice)
             {
                 case 1:
-                    ListEmployees();  // owns its own render loop; returns on [B]
+                    ListEmployees();
                     return;
                 case 2: UpdateEmployee();     break;
                 case 3: DeactivateEmployee(); break;
@@ -45,8 +45,6 @@ namespace PrmClient.UI.Admin
             Console.WriteLine("\n  Press any key to continue...");
             Console.ReadKey(intercept: true);
         }
-
-        // ─── List ────────────────────────────────────────────────────────────
 
         private void ListEmployees()
         {
@@ -63,7 +61,6 @@ namespace PrmClient.UI.Admin
                 return;
             }
 
-            // Active filter state (null = no filter applied)
             string? filterStatus     = null;
             string? filterDepartment = null;
 
@@ -77,7 +74,6 @@ namespace PrmClient.UI.Admin
                 Console.WriteLine("╚══════════════════════════════════════════════╝");
                 Console.WriteLine();
 
-                // Apply active filters
                 var view = allEmployees.AsEnumerable();
                 if (!string.IsNullOrEmpty(filterStatus))
                     view = view.Where(e => e.Status.Equals(filterStatus, StringComparison.OrdinalIgnoreCase));
@@ -86,7 +82,6 @@ namespace PrmClient.UI.Admin
 
                 var filtered = view.ToList();
 
-                // Show active filter hint
                 if (!string.IsNullOrEmpty(filterStatus) || !string.IsNullOrEmpty(filterDepartment))
                 {
                     var parts = new List<string>();
@@ -122,11 +117,8 @@ namespace PrmClient.UI.Admin
                     string deptInput = (Console.ReadLine() ?? string.Empty).Trim();
                     filterDepartment = string.IsNullOrWhiteSpace(deptInput) ? null : deptInput;
                 }
-                // Any other key — just redraw (ignore)
             }
         }
-
-        // ─── Add ─────────────────────────────────────────────────────────────
 
         private void AddEmployee()
         {
@@ -134,10 +126,10 @@ namespace PrmClient.UI.Admin
             Console.WriteLine("  Add Employee Profile");
             Console.WriteLine();
 
-            int userId        = InputHelper.GetValidIntOption("  Linked User ID: ", 1, int.MaxValue);
-            string fullName   = InputHelper.GetRequiredString("  Full Name: ");
-            string email      = InputHelper.GetValidEmail("  Email: ");
-            string department = InputHelper.GetRequiredString("  Department: ");
+            int userId         = InputHelper.GetValidIntOption("  Linked User ID: ", 1, int.MaxValue);
+            string fullName    = InputHelper.GetRequiredString("  Full Name: ");
+            string email       = InputHelper.GetValidEmail("  Email: ");
+            string department  = InputHelper.GetRequiredString("  Department: ");
             string designation = InputHelper.GetRequiredString("  Designation: ");
 
             try
@@ -162,12 +154,10 @@ namespace PrmClient.UI.Admin
             }
         }
 
-        // ─── Update ──────────────────────────────────────────────────────────
-
         private void UpdateEmployee()
         {
             Console.WriteLine();
-            
+
             try
             {
                 var allEmployees = _api.GetAsync<List<EmployeeModel>>("api/employees")
@@ -177,7 +167,7 @@ namespace PrmClient.UI.Admin
             }
             catch (Exception)
             {
-                // Ignore if fetch fails and proceed to prompt
+                /* Ignore if fetch fails and proceed to prompt */
             }
 
             int id = InputHelper.GetValidIntOption("  Employee ID to update: ", 1, int.MaxValue);
@@ -204,7 +194,6 @@ namespace PrmClient.UI.Admin
                 return;
             }
 
-
             string fullName    = InputHelper.GetRequiredString("  New Full Name: ");
             string department  = InputHelper.GetRequiredString("  New Department: ");
             string designation = InputHelper.GetRequiredString("  New Designation: ");
@@ -230,8 +219,6 @@ namespace PrmClient.UI.Admin
                 Console.ReadKey(intercept: true);
             }
         }
-
-        // ─── Deactivate ───────────────────────────────────────────────────────
 
         private void DeactivateEmployee()
         {
@@ -274,8 +261,6 @@ namespace PrmClient.UI.Admin
                 Console.WriteLine($"\n  Error: {ex.Message}");
             }
         }
-
-        // ─── Assign Skill ─────────────────────────────────────────────────────
 
         private void ManageSkills()
         {
@@ -330,7 +315,7 @@ namespace PrmClient.UI.Admin
                 }
                 catch (Exception)
                 {
-                    // Ignore and show empty list
+                    /* Ignore and show empty list */
                 }
 
                 if (skills.Count == 0)
@@ -410,8 +395,6 @@ namespace PrmClient.UI.Admin
             }
         }
 
-        // ─── Update Skill ─────────────────────────────────────────────────────
-
         private void UpdateSkill(int empId, List<EmployeeSkillModel> skills)
         {
             if (skills.Count == 0)
@@ -421,7 +404,7 @@ namespace PrmClient.UI.Admin
             }
 
             Console.WriteLine();
-            int index = InputHelper.GetValidIntOption("  Enter skill number to update: ", 1, skills.Count);
+            int index   = InputHelper.GetValidIntOption("  Enter skill number to update: ", 1, skills.Count);
             int skillId = skills[index - 1].SkillId;
 
             Console.WriteLine("  New Proficiency Level : (1) Beginner  (2) Intermediate  (3) Advanced");
@@ -448,8 +431,6 @@ namespace PrmClient.UI.Admin
             }
         }
 
-        // ─── Remove Skill ─────────────────────────────────────────────────────
-
         private void RemoveSkill(int empId, List<EmployeeSkillModel> skills)
         {
             if (skills.Count == 0)
@@ -459,7 +440,7 @@ namespace PrmClient.UI.Admin
             }
 
             Console.WriteLine();
-            int index = InputHelper.GetValidIntOption("  Enter skill number to remove: ", 1, skills.Count);
+            int index   = InputHelper.GetValidIntOption("  Enter skill number to remove: ", 1, skills.Count);
             int skillId = skills[index - 1].SkillId;
 
             try
@@ -472,8 +453,6 @@ namespace PrmClient.UI.Admin
                 Console.WriteLine($"\n  Error: {ex.Message}");
             }
         }
-
-        // ─── Assign Manager ───────────────────────────────────────────────────
 
         private void AssignManager()
         {
@@ -510,8 +489,6 @@ namespace PrmClient.UI.Admin
                 Console.WriteLine($"\n  Error: {ex.Message}");
             }
         }
-
-        // ─── Table printer ────────────────────────────────────────────────────
 
         private static void PrintEmployeeTable(List<EmployeeModel> employees)
         {

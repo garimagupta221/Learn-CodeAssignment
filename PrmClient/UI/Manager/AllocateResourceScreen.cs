@@ -30,17 +30,15 @@ namespace PrmClient.UI.Manager
 
                 switch (choice)
                 {
-                    case 1: AiAssistedSearch();  break;
-                    case 2: DirectAllocation();  break;
-                    case 3: EndAllocation();      break;
+                    case 1: AiAssistedSearch(); break;
+                    case 2: DirectAllocation(); break;
+                    case 3: EndAllocation();    break;
                     case 4:
                         AppState.CurrentScreen = "manager-menu";
                         return;
                 }
             }
         }
-
-        // ─── Find resource using AI (recommended) ────────────────────────────────────────────────
 
         private void AiAssistedSearch()
         {
@@ -70,13 +68,13 @@ namespace PrmClient.UI.Manager
                 ProjectModel? selectedProject;
                 while (true)
                 {
-                    projectId = InputHelper.GetValidIntOption("  Select Project ID: ", 1, int.MaxValue);
+                    projectId       = InputHelper.GetValidIntOption("  Select Project ID: ", 1, int.MaxValue);
                     selectedProject = projects.FirstOrDefault(p => p.Id == projectId);
                     if (selectedProject == null)
                     {
                         Console.WriteLine("  Invalid Project ID. Please select from the list above.");
                     }
-                    else if (!selectedProject.Status.Equals("ACTIVE", StringComparison.OrdinalIgnoreCase) && 
+                    else if (!selectedProject.Status.Equals("ACTIVE", StringComparison.OrdinalIgnoreCase) &&
                              !selectedProject.Status.Equals("PLANNED", StringComparison.OrdinalIgnoreCase))
                     {
                         Console.WriteLine($"  Project '{selectedProject.Name}' is currently {selectedProject.Status}. Only ACTIVE or PLANNED projects are allowed.");
@@ -126,17 +124,14 @@ namespace PrmClient.UI.Manager
 
                 int selectedIndex = InputHelper.GetValidIntOption("  Select employee (enter #, or 0 to search again): ", 0, result.Recommendations.Count);
                 if (selectedIndex == 0)
-                {
                     return;
-                }
 
                 var selectedRec = result.Recommendations[selectedIndex - 1];
-                int employeeId = selectedRec.EmployeeId;
+                int employeeId  = selectedRec.EmployeeId;
 
                 Console.WriteLine();
                 Console.WriteLine($"  ── {selectedRec.FullName} ─────────────────────────────────");
 
-                // Get current allocations to validate overlapping utilization
                 List<AllocationModel> allocs;
                 try
                 {
@@ -147,15 +142,15 @@ namespace PrmClient.UI.Manager
                     allocs = new List<AllocationModel>();
                 }
 
-                int currentUtil = allocs.Where(a => a.IsActive && a.StartDate <= DateTime.UtcNow && a.EndDate >= DateTime.UtcNow).Sum(a => a.UtilizationPct);
+                int currentUtil  = allocs.Where(a => a.IsActive && a.StartDate <= DateTime.UtcNow && a.EndDate >= DateTime.UtcNow).Sum(a => a.UtilizationPct);
                 string benchStatus = currentUtil == 0 ? "fully on bench" : (currentUtil >= 100 ? "fully allocated" : $"{100 - currentUtil}% free");
                 Console.WriteLine($"  Current Utilisation: {currentUtil}%   ({benchStatus})");
                 Console.WriteLine();
 
                 Console.WriteLine("  Set Allocation:");
-                int utilization = InputHelper.GetValidIntOption("    Utilisation %   : ", 1, 100);
-                DateTime startDate = InputHelper.GetValidDate("    From Date (dd-MM-yyyy) : ");
-                DateTime endDate = InputHelper.GetValidDate("    To Date   (dd-MM-yyyy) : ");
+                int utilization      = InputHelper.GetValidIntOption("    Utilisation %   : ", 1, 100);
+                DateTime startDate   = InputHelper.GetValidDate("    From Date (dd-MM-yyyy) : ");
+                DateTime endDate     = InputHelper.GetValidDate("    To Date   (dd-MM-yyyy) : ");
 
                 if (startDate >= endDate)
                 {
@@ -168,7 +163,7 @@ namespace PrmClient.UI.Manager
                 Console.WriteLine("\n  Validating...");
 
                 int overlappingUtil = allocs.Where(a => a.IsActive && a.StartDate < endDate && a.EndDate > startDate).Sum(a => a.UtilizationPct);
-                int totalUtil = overlappingUtil + utilization;
+                int totalUtil       = overlappingUtil + utilization;
 
                 if (totalUtil > 100)
                 {
@@ -217,8 +212,6 @@ namespace PrmClient.UI.Manager
             Console.ReadLine();
         }
 
-        // ─── Direct Allocation ─────────────────────────────────────────────────
-
         private void DirectAllocation()
         {
             Console.WriteLine();
@@ -235,7 +228,7 @@ namespace PrmClient.UI.Manager
                     Console.ReadKey(intercept: true);
                     return;
                 }
-                
+
                 Console.WriteLine("  Your Projects:");
                 foreach (var p in projects)
                 {
@@ -247,13 +240,13 @@ namespace PrmClient.UI.Manager
                 ProjectModel? selectedProject;
                 while (true)
                 {
-                    projectId = InputHelper.GetValidIntOption("  Select Project ID: ", 1, int.MaxValue);
+                    projectId       = InputHelper.GetValidIntOption("  Select Project ID: ", 1, int.MaxValue);
                     selectedProject = projects.FirstOrDefault(p => p.Id == projectId);
                     if (selectedProject == null)
                     {
                         Console.WriteLine("  Invalid Project ID. Please select from the list above.");
                     }
-                    else if (!selectedProject.Status.Equals("ACTIVE", StringComparison.OrdinalIgnoreCase) && 
+                    else if (!selectedProject.Status.Equals("ACTIVE", StringComparison.OrdinalIgnoreCase) &&
                              !selectedProject.Status.Equals("PLANNED", StringComparison.OrdinalIgnoreCase))
                     {
                         Console.WriteLine($"  Project '{selectedProject.Name}' is currently {selectedProject.Status}. Only ACTIVE or PLANNED projects are allowed.");
@@ -285,7 +278,7 @@ namespace PrmClient.UI.Manager
                 EmployeeModel? selectedEmployee;
                 while (true)
                 {
-                    employeeId = InputHelper.GetValidIntOption("  Enter Employee ID: ", 1, int.MaxValue);
+                    employeeId       = InputHelper.GetValidIntOption("  Enter Employee ID: ", 1, int.MaxValue);
                     selectedEmployee = employees.FirstOrDefault(e => e.Id == employeeId);
                     if (selectedEmployee != null) break;
                     Console.WriteLine("  Invalid Employee ID. Please select from the list above.");
@@ -293,19 +286,19 @@ namespace PrmClient.UI.Manager
 
                 Console.WriteLine();
                 Console.WriteLine($"  ── {selectedEmployee.FullName} ─────────────────────────────────");
-                
-                var allocs = _api.GetAsync<List<AllocationModel>>($"api/allocations/employee/{employeeId}").GetAwaiter().GetResult() ?? new List<AllocationModel>();
+
+                var allocs      = _api.GetAsync<List<AllocationModel>>($"api/allocations/employee/{employeeId}").GetAwaiter().GetResult() ?? new List<AllocationModel>();
                 int currentUtil = allocs.Where(a => a.IsActive && a.StartDate <= DateTime.UtcNow && a.EndDate >= DateTime.UtcNow).Sum(a => a.UtilizationPct);
-                
+
                 string benchStatus = currentUtil == 0 ? "fully on bench" : (currentUtil >= 100 ? "fully allocated" : $"{100 - currentUtil}% free");
                 Console.WriteLine($"  Current Utilisation: {currentUtil}%   ({benchStatus})");
                 Console.WriteLine();
 
                 Console.WriteLine("  Set Allocation:");
-                int utilization = InputHelper.GetValidIntOption("    Utilisation %   : ", 1, 100);
+                int utilization    = InputHelper.GetValidIntOption("    Utilisation %   : ", 1, 100);
                 DateTime startDate = InputHelper.GetValidDate("    From Date (dd-MM-yyyy) : ");
-                DateTime endDate = InputHelper.GetValidDate("    To Date   (dd-MM-yyyy) : ");
-                
+                DateTime endDate   = InputHelper.GetValidDate("    To Date   (dd-MM-yyyy) : ");
+
                 if (startDate >= endDate)
                 {
                     Console.WriteLine();
@@ -318,10 +311,10 @@ namespace PrmClient.UI.Manager
 
                 Console.WriteLine();
                 Console.WriteLine("  Validating...");
-                
+
                 int overlappingUtil = allocs.Where(a => a.IsActive && a.StartDate < endDate && a.EndDate > startDate).Sum(a => a.UtilizationPct);
-                int totalUtil = overlappingUtil + utilization;
-                
+                int totalUtil       = overlappingUtil + utilization;
+
                 if (totalUtil > 100)
                 {
                     Console.WriteLine($"    {selectedEmployee.FullName} total in this period: {overlappingUtil}% + {utilization}% = {totalUtil}%   X Invalid (Exceeds 100%)");
@@ -338,7 +331,7 @@ namespace PrmClient.UI.Manager
                 Console.WriteLine();
                 Console.Write("  [C] Confirm     [B] Back > ");
                 string confirm = Console.ReadLine()?.Trim().ToUpper() ?? "B";
-                
+
                 if (confirm == "C")
                 {
                     var result = _api.PostAsync<CreateAllocationRequest, AllocationModel>(
@@ -374,8 +367,6 @@ namespace PrmClient.UI.Manager
             Console.ReadKey(intercept: true);
         }
 
-        // ─── End Allocation ────────────────────────────────────────────────────
-
         private void EndAllocation()
         {
             Console.WriteLine();
@@ -405,7 +396,7 @@ namespace PrmClient.UI.Manager
                 ProjectModel? selectedProject;
                 while (true)
                 {
-                    projectId = InputHelper.GetValidIntOption("  Select Project ID: ", 1, int.MaxValue);
+                    projectId       = InputHelper.GetValidIntOption("  Select Project ID: ", 1, int.MaxValue);
                     selectedProject = projects.FirstOrDefault(p => p.Id == projectId);
                     if (selectedProject != null) break;
                     Console.WriteLine("  Invalid Project ID. Please select from the list above.");
@@ -433,7 +424,7 @@ namespace PrmClient.UI.Manager
                 int index = 1;
                 foreach (var a in active)
                 {
-                    var emp = _api.GetAsync<EmployeeModel>($"api/employees/{a.EmployeeId}").GetAwaiter().GetResult();
+                    var emp    = _api.GetAsync<EmployeeModel>($"api/employees/{a.EmployeeId}").GetAwaiter().GetResult();
                     string empName = emp?.FullName ?? $"Employee {a.EmployeeId}";
                     activeWithNames.Add((index, a, empName));
                     Console.WriteLine($"    {index + ".",-3} {empName,-15} {$"{a.UtilizationPct}%",-5} {a.StartDate,-12:dd-MM-yyyy} {a.EndDate:dd-MM-yyyy}");
@@ -442,9 +433,9 @@ namespace PrmClient.UI.Manager
                 Console.WriteLine("  ──────────────────────────────────────────────");
                 Console.WriteLine();
 
-                int selectedIndex = InputHelper.GetValidIntOption("  Select allocation to end: ", 1, active.Count);
-                var selectedTuple = activeWithNames.First(t => t.Index == selectedIndex);
-                var allocToEnd = selectedTuple.Alloc;
+                int selectedIndex    = InputHelper.GetValidIntOption("  Select allocation to end: ", 1, active.Count);
+                var selectedTuple    = activeWithNames.First(t => t.Index == selectedIndex);
+                var allocToEnd       = selectedTuple.Alloc;
                 string selectedEmpName = selectedTuple.EmpName;
 
                 Console.WriteLine();
@@ -453,12 +444,10 @@ namespace PrmClient.UI.Manager
                 Console.WriteLine($"  Set end date to today ({todayStr})?");
                 Console.WriteLine();
                 Console.Write("  [Y] Yes, End Now    [B] Back > ");
-                
+
                 string confirm = Console.ReadLine()?.Trim().ToUpper() ?? "";
                 if (confirm != "Y")
-                {
                     return;
-                }
 
                 _api.PutAsync($"api/allocations/{allocToEnd.Id}/end").GetAwaiter().GetResult();
 

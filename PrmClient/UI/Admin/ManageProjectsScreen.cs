@@ -27,8 +27,8 @@ namespace PrmClient.UI.Admin
 
             switch (choice)
             {
-                case 1: CreateProject();      break;
-                case 2: ViewAllProjects();    break;
+                case 1: CreateProject();        break;
+                case 2: ViewAllProjects();      break;
                 case 3: UpdateProjectDetails(); break;
                 case 4:
                     AppState.CurrentScreen = "admin-milestones";
@@ -42,8 +42,6 @@ namespace PrmClient.UI.Admin
             Console.ReadKey(intercept: true);
         }
 
-        // ─── Screen 3.2.1 — Create Project ───────────────────────────────────
-
         private void CreateProject()
         {
             ConsoleHelper.ClearScreen();
@@ -54,17 +52,17 @@ namespace PrmClient.UI.Admin
             Console.WriteLine("╚══════════════════════════════════════════════╝");
             Console.WriteLine();
 
-            string name        = InputHelper.GetRequiredString("  Project Name        : ");
-            string description = InputHelper.GetRequiredString("  Description         : ");
-            DateTime startDate = InputHelper.GetValidDate("  Start Date          : (DD-MM-YYYY) ");
-            DateTime endDate   = InputHelper.GetValidDate("  End Date            : (DD-MM-YYYY) ");
+            string   name        = InputHelper.GetRequiredString("  Project Name        : ");
+            string   description = InputHelper.GetRequiredString("  Description         : ");
+            DateTime startDate   = InputHelper.GetValidDate("  Start Date          : (DD-MM-YYYY) ");
+            DateTime endDate     = InputHelper.GetValidDate("  End Date            : (DD-MM-YYYY) ");
 
             Console.Write("  Status              : (1) PLANNED   (2) ACTIVE   (3) ON_HOLD  ");
             int statusChoice = InputHelper.GetValidIntOption("", 1, 3);
             string status = statusChoice switch { 1 => "PLANNED", 2 => "ACTIVE", _ => "ON_HOLD" };
 
-            int managerId       = InputHelper.GetValidIntOption("  Assign Manager      : (Enter Manager ID) ", 1, int.MaxValue);
-            int totalSP         = InputHelper.GetValidIntOption("  Total Story Points  : ", 0, int.MaxValue);
+            int managerId = InputHelper.GetValidIntOption("  Assign Manager      : (Enter Manager ID) ", 1, int.MaxValue);
+            int totalSP   = InputHelper.GetValidIntOption("  Total Story Points  : ", 0, int.MaxValue);
 
             Console.WriteLine();
             Console.WriteLine("  ──────────────────────────────────────────────");
@@ -72,9 +70,7 @@ namespace PrmClient.UI.Admin
 
             string action = Console.ReadLine()?.Trim().ToUpper() ?? "B";
             if (action != "S")
-            {
                 return;
-            }
 
             try
             {
@@ -103,8 +99,6 @@ namespace PrmClient.UI.Admin
             }
         }
 
-        // ─── Screen 3.2.2 — View All Projects ────────────────────────────────
-
         private void ViewAllProjects()
         {
             Console.WriteLine();
@@ -128,12 +122,10 @@ namespace PrmClient.UI.Admin
             }
         }
 
-        // ─── Screen 3.2.3 — Update Project Details ───────────────────────────
-
         private void UpdateProjectDetails()
         {
             Console.WriteLine();
-            
+
             try
             {
                 var allProjects = _api.GetAsync<List<ProjectModel>>("api/projects")
@@ -143,7 +135,7 @@ namespace PrmClient.UI.Admin
             }
             catch (Exception)
             {
-                // Ignore if fetch fails and proceed to prompt
+                /* Ignore if fetch fails and proceed to prompt */
             }
 
             int id = InputHelper.GetValidIntOption("  Enter Project ID: ", 1, int.MaxValue);
@@ -169,10 +161,10 @@ namespace PrmClient.UI.Admin
             Console.WriteLine();
             Console.WriteLine($"  ── {current.Name} ───────────────────────────────");
 
-            string name = InputHelper.GetRequiredString($"  Project Name         : {current.Name,-30}  (editable) → ");
-            string description = InputHelper.GetRequiredString($"  Description          : {current.Description,-30}  (editable) → ");
-            DateTime startDate = InputHelper.GetValidDate($"  Start Date           : {current.StartDate,-15:dd-MM-yyyy}  (editable) → (DD-MM-YYYY) ");
-            DateTime endDate   = InputHelper.GetValidDate($"  End Date             : {current.EndDate,-15:dd-MM-yyyy}  (editable) → (DD-MM-YYYY) ");
+            string   name        = InputHelper.GetRequiredString($"  Project Name         : {current.Name,-30}  (editable) → ");
+            string   description = InputHelper.GetRequiredString($"  Description          : {current.Description,-30}  (editable) → ");
+            DateTime startDate   = InputHelper.GetValidDate($"  Start Date           : {current.StartDate,-15:dd-MM-yyyy}  (editable) → (DD-MM-YYYY) ");
+            DateTime endDate     = InputHelper.GetValidDate($"  End Date             : {current.EndDate,-15:dd-MM-yyyy}  (editable) → (DD-MM-YYYY) ");
 
             Console.Write("  Status               : (1) PLANNED   (2) ACTIVE   (3) ON_HOLD   (4) COMPLETED → ");
             int statusChoice = InputHelper.GetValidIntOption("", 1, 4);
@@ -214,8 +206,6 @@ namespace PrmClient.UI.Admin
             }
         }
 
-        // ─── Table printer ────────────────────────────────────────────────────
-
         public static void PrintProjectTable(List<ProjectModel> projects)
         {
             Console.WriteLine(
@@ -225,7 +215,7 @@ namespace PrmClient.UI.Admin
 
             foreach (var p in projects)
             {
-                string spCol = $"{p.CompletedStoryPoints} / {p.TotalStoryPoints}";
+                string spCol          = $"{p.CompletedStoryPoints} / {p.TotalStoryPoints}";
                 string managerDisplay = string.IsNullOrEmpty(p.ManagerName) ? p.ManagerId.ToString() : p.ManagerName;
                 if (managerDisplay.Length > 14) managerDisplay = managerDisplay.Substring(0, 14);
 
@@ -238,4 +228,3 @@ namespace PrmClient.UI.Admin
         }
     }
 }
-

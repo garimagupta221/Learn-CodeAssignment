@@ -1,8 +1,5 @@
 using PrmClient.Models;
 using PrmClient.Services;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
 
 namespace PrmClient.UI.Admin
 {
@@ -19,14 +16,14 @@ namespace PrmClient.UI.Admin
         {
             ConsoleHelper.ClearScreen();
             ConsoleHelper.PrintHeader(AppState.Role);
-            
+
             var config = GetConfig();
-            
-            string llmProvider = config.GetValueOrDefault("ActiveAiProvider", "Google Gemini");
-            string llmApiKey = config.GetValueOrDefault("AiApiKey", "");
-            string maskedApiKey = string.IsNullOrEmpty(llmApiKey) ? "" : new string('*', 28);
+
+            string llmProvider       = config.GetValueOrDefault("ActiveAiProvider", "Google Gemini");
+            string llmApiKey         = config.GetValueOrDefault("AiApiKey", "");
+            string maskedApiKey      = string.IsNullOrEmpty(llmApiKey) ? "" : new string('*', 28);
             string schedulerInterval = config.GetValueOrDefault("SchedulerInterval", "4 hours");
-            string maxWeeklyHours = config.GetValueOrDefault("MaxWeeklyHours", "40");
+            string maxWeeklyHours    = config.GetValueOrDefault("MaxWeeklyHours", "40");
 
             Console.WriteLine("╔══════════════════════════════════════════════╗");
             Console.WriteLine("║    SYSTEM CONFIGURATION                      ║");
@@ -50,8 +47,8 @@ namespace PrmClient.UI.Admin
 
             switch (choice)
             {
-                case 1: 
-                    UpdateConfigValue("AiApiKey", InputHelper.GetRequiredString("  New LLM API Key: ")); 
+                case 1:
+                    UpdateConfigValue("AiApiKey", InputHelper.GetRequiredString("  New LLM API Key: "));
                     break;
                 case 2:
                     Console.WriteLine("\n  Available Providers:");
@@ -61,11 +58,11 @@ namespace PrmClient.UI.Admin
                     string provider = providerChoice == 1 ? "Gemini" : "Groq";
                     UpdateConfigValue("ActiveAiProvider", provider);
                     break;
-                case 3: 
+                case 3:
                     int interval = InputHelper.GetValidIntOption("  New Scheduler Interval (hours): ", 1, 168);
                     UpdateConfigValue("SchedulerInterval", interval.ToString());
                     break;
-                case 4: 
+                case 4:
                     int hours = InputHelper.GetValidIntOption("  New Max Weekly Hours: ", 1, 168);
                     UpdateConfigValue("MaxWeeklyHours", hours.ToString());
                     break;
@@ -101,7 +98,7 @@ namespace PrmClient.UI.Admin
             {
                 Console.WriteLine($"\n  Error: {ex.Message}");
             }
-            
+
             Console.WriteLine("\n  Press any key to continue...");
             Console.ReadKey(intercept: true);
         }

@@ -17,7 +17,6 @@ namespace PrmClient.UI.Employee
             ConsoleHelper.ClearScreen();
             ConsoleHelper.PrintHeader(AppState.Role);
 
-            // ── Freeze status banner ──────────────────────────────────────────
             bool isFrozen = IsTimesheetFrozen();
             if (isFrozen)
             {
@@ -29,7 +28,6 @@ namespace PrmClient.UI.Employee
                 Console.ResetColor();
             }
 
-            // ── Missed-timesheet reminder ──────────────────────────────────────
             DateTime previousMonday = GetPreviousMonday();
             bool isMissing = IsMissingTimesheetForWeek(previousMonday);
 
@@ -57,8 +55,6 @@ namespace PrmClient.UI.Employee
             };
         }
 
-        // ─── Helpers ──────────────────────────────────────────────────────────
-
         private bool IsMissingTimesheetForWeek(DateTime weekMonday)
         {
             try
@@ -67,13 +63,11 @@ namespace PrmClient.UI.Employee
                     $"api/timesheets/employee/{AppState.UserId}"
                 ).GetAwaiter().GetResult() ?? new List<TimesheetModel>();
 
-                // A timesheet exists for that week (any status, including MISSED) means the
-                // server already recorded it; we only warn when there is NO record at all.
                 return !timesheets.Any(t => t.WeekStart.Date == weekMonday.Date);
             }
             catch
             {
-                return false; // If the check fails, silently skip the banner
+                return false;
             }
         }
 
@@ -81,7 +75,6 @@ namespace PrmClient.UI.Employee
         {
             var today = DateTime.Now.Date;
             int daysToMonday = ((int)today.DayOfWeek - (int)DayOfWeek.Monday + 7) % 7;
-            // Previous Monday = current Monday minus 7 days
             return today.AddDays(-daysToMonday - 7);
         }
 
@@ -96,7 +89,7 @@ namespace PrmClient.UI.Employee
             }
             catch
             {
-                return false; // If the check fails, silently skip the banner
+                return false;
             }
         }
     }

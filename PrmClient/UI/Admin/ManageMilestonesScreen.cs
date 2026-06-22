@@ -26,14 +26,13 @@ namespace PrmClient.UI.Admin
             }
             catch (Exception)
             {
-                // Ignore if fetch fails
+                /* Ignore if fetch fails */
             }
 
             int projectId = InputHelper.GetValidIntOption("  Enter Project ID: ", 1, int.MaxValue);
 
             Console.WriteLine();
-            
-            // Validate project exists first
+
             ProjectModel? project = null;
             try
             {
@@ -42,7 +41,7 @@ namespace PrmClient.UI.Admin
             }
             catch (HttpRequestException)
             {
-                // Likely a 404
+                /* Likely a 404 */
             }
 
             if (project == null)
@@ -108,15 +107,13 @@ namespace PrmClient.UI.Admin
             AppState.CurrentScreen = "admin-milestones";
         }
 
-        // ─── Add ─────────────────────────────────────────────────────────────
-
         private void AddMilestone(int projectId)
         {
             Console.WriteLine();
 
-            string title    = InputHelper.GetRequiredString("  Milestone Title  : ");
-            DateTime dueDate = InputHelper.GetValidDate("  Due Date         : (DD-MM-YYYY) ");
-            int storyPoints  = InputHelper.GetValidIntOption("  Story Points     : ", 0, int.MaxValue);
+            string   title       = InputHelper.GetRequiredString("  Milestone Title  : ");
+            DateTime dueDate     = InputHelper.GetValidDate("  Due Date         : (DD-MM-YYYY) ");
+            int      storyPoints = InputHelper.GetValidIntOption("  Story Points     : ", 0, int.MaxValue);
 
             try
             {
@@ -137,8 +134,6 @@ namespace PrmClient.UI.Admin
                 Console.WriteLine($"\n  Error: {ex.Message}");
             }
         }
-
-        // ─── Update Status ────────────────────────────────────────────────────
 
         private void UpdateMilestone(List<MilestoneModel> milestones)
         {
@@ -164,8 +159,6 @@ namespace PrmClient.UI.Admin
                 Console.WriteLine($"\n  Error: {ex.Message}");
             }
         }
-
-        // ─── Table printer ────────────────────────────────────────────────────
 
         private static void PrintMilestoneTable(List<MilestoneModel> milestones)
         {

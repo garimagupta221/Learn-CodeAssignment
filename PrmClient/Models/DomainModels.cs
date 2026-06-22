@@ -129,7 +129,7 @@ namespace PrmClient.Models
         public string ProjectName { get; set; } = string.Empty;
         public DateTime WeekStart { get; set; }
         public float HoursLogged { get; set; }
-        public string Status { get; set; } = string.Empty;   // "SUBMITTED" | "MISSED"
+        public string Status { get; set; } = string.Empty;
         public List<TimesheetTagModel> TimesheetTags { get; set; } = new();
     }
 
@@ -178,7 +178,6 @@ namespace PrmClient.Models
     {
         public string Proficiency { get; set; } = string.Empty;
     }
-
 
     public class MissingTimesheetEmployee
     {
@@ -257,13 +256,11 @@ namespace PrmClient.Models
         public string RoleTitle { get; set; } = string.Empty;
         public bool Filled { get; set; }
 
-        // When Filled == true
         public int? EmployeeId { get; set; }
         public string EmployeeName { get; set; } = string.Empty;
         public string MatchedSkills { get; set; } = string.Empty;
         public string Reason { get; set; } = string.Empty;
 
-        // When Filled == false
         /// <summary>"NoSkill" | "Allocated" | "NoAvailableBench"</summary>
         public string GapReason { get; set; } = string.Empty;
         public string GapDetail { get; set; } = string.Empty;

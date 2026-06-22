@@ -32,10 +32,10 @@ namespace PrmClient.UI.Admin
             {
                 case 1:
                     CreateUserAccount();
-                    return;  // CreateUserAccount handles its own keypress pause
-                case 2: ViewAllUsers();          break;
-                case 3: ResetUserPassword();     return;
-                case 4: DeactivateUser();        return;
+                    return;
+                case 2: ViewAllUsers();      break;
+                case 3: ResetUserPassword(); return;
+                case 4: DeactivateUser();    return;
                 case 5:
                     AppState.CurrentScreen = "admin-menu";
                     return;
@@ -44,8 +44,6 @@ namespace PrmClient.UI.Admin
             Console.WriteLine("\n  Press any key to continue...");
             Console.ReadKey(intercept: true);
         }
-
-        // ─── Create User Account (BRD Screen 3.4.1) ──────────────────────────
 
         private void CreateUserAccount()
         {
@@ -143,8 +141,6 @@ namespace PrmClient.UI.Admin
             }
         }
 
-        // ─── View All Users (BRD Screen 3.4.2) ───────────────────────────────
-
         private void ViewAllUsers()
         {
             Console.Clear();
@@ -188,14 +184,11 @@ namespace PrmClient.UI.Admin
             }
         }
 
-        // ─── Reactivate User (inline from View All Users, BRD Screen 3.4.2) ──
-
         private void ReactivateUser(List<UserModel> users)
         {
             Console.WriteLine();
             int id = InputHelper.GetValidIntOption("  Enter User ID to reactivate: ", 1, int.MaxValue);
 
-            // ── Client-side guard: check the already-fetched list before hitting the API ──
             var match = users.FirstOrDefault(u => u.Id == id);
             if (match is not null && match.IsActive)
             {
@@ -235,8 +228,6 @@ namespace PrmClient.UI.Admin
             }
         }
 
-        // ─── Reset User Password (BRD Screen 3.4.3) ──────────────────────────
-
         private void ResetUserPassword()
         {
             Console.Clear();
@@ -252,7 +243,6 @@ namespace PrmClient.UI.Admin
             UserModel? user = null;
             try
             {
-                // Try lookup by username or ID
                 user = _api.GetAsync<UserModel>($"api/users/lookup/{identifier}")
                            .GetAwaiter().GetResult();
             }
@@ -321,8 +311,6 @@ namespace PrmClient.UI.Admin
             }
         }
 
-        // ─── Deactivate User (BRD Screen 3.4.4) ──────────────────────────────
-
         private void DeactivateUser()
         {
             Console.Clear();
@@ -387,8 +375,6 @@ namespace PrmClient.UI.Admin
             }
         }
 
-        // ─── Table printer ────────────────────────────────────────────────────
-
         private static void PrintUserTable(List<UserModel> users)
         {
             Console.WriteLine("ID    Username          Role        Status");
@@ -398,14 +384,12 @@ namespace PrmClient.UI.Admin
             {
                 Console.WriteLine($"{u.Id,-5} {u.Username,-17} {u.Role.ToUpper(),-11} {(u.IsActive ? "Active" : "Inactive")}");
             }
-            
+
             Console.WriteLine("──────────────────────────────────────────────");
 
             int active   = users.Count(u => u.IsActive);
             int inactive = users.Count - active;
             Console.WriteLine($"Total: {users.Count}   |   Active: {active}   |   Inactive: {inactive}");
         }
-
-
     }
 }

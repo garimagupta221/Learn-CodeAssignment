@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using PrmClient.Models;
 using PrmClient.Services;
 
@@ -19,8 +15,8 @@ namespace PrmClient.UI.Admin
         public void Render()
         {
             string filterText = "";
-            
-            while(true)
+
+            while (true)
             {
                 ConsoleHelper.ClearScreen();
                 ConsoleHelper.PrintHeader(AppState.Role);
@@ -38,14 +34,16 @@ namespace PrmClient.UI.Admin
                     var activeAllocations = allocations.Where(a => a.IsActive).ToList();
 
                     var employees = _api.GetAsync<List<EmployeeModel>>("api/employees").GetAwaiter().GetResult() ?? new List<EmployeeModel>();
-                    var projects = _api.GetAsync<List<ProjectModel>>("api/projects").GetAwaiter().GetResult() ?? new List<ProjectModel>();
+                    var projects  = _api.GetAsync<List<ProjectModel>>("api/projects").GetAwaiter().GetResult()  ?? new List<ProjectModel>();
 
-                    var displayRows = activeAllocations.Select(a => {
-                        var emp = employees.FirstOrDefault(e => e.Id == a.EmployeeId);
+                    var displayRows = activeAllocations.Select(a =>
+                    {
+                        var emp  = employees.FirstOrDefault(e => e.Id == a.EmployeeId);
                         var proj = projects.FirstOrDefault(p => p.Id == a.ProjectId);
-                        return new {
-                            Alloc = a,
-                            EmpName = emp?.FullName ?? $"Employee {a.EmployeeId}",
+                        return new
+                        {
+                            Alloc    = a,
+                            EmpName  = emp?.FullName  ?? $"Employee {a.EmployeeId}",
                             ProjName = proj?.Name ?? $"Project {a.ProjectId}"
                         };
                     }).ToList();
@@ -92,7 +90,7 @@ namespace PrmClient.UI.Admin
                     filterText = Console.ReadLine()?.Trim() ?? "";
                 }
             }
-            
+
             AppState.CurrentScreen = "admin-menu";
         }
     }

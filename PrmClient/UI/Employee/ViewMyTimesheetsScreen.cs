@@ -32,15 +32,13 @@ namespace PrmClient.UI.Employee
                 return;
             }
 
-            // Group by week, summing hours across projects per week
             var weekSummaries = timesheets
                 .GroupBy(t => t.WeekStart.Date)
                 .OrderByDescending(g => g.Key)
                 .Select(g => (
                     WeekStart: g.Key,
-                    TotalHrs: g.Sum(t => t.HoursLogged),
-                    // Surface MISSED if any entry for that week is MISSED, else first status
-                    Status: g.Any(t => t.Status == "MISSED") ? "MISSED" : g.First().Status
+                    TotalHrs:  g.Sum(t => t.HoursLogged),
+                    Status:    g.Any(t => t.Status == "MISSED") ? "MISSED" : g.First().Status
                 ))
                 .ToList();
 
@@ -73,8 +71,6 @@ namespace PrmClient.UI.Employee
             Pause();
             AppState.CurrentScreen = "employee-menu";
         }
-
-        // ─── Week detail ───────────────────────────────────────────────────────
 
         private void ViewWeekDetail(List<TimesheetModel> allTimesheets)
         {
@@ -124,8 +120,6 @@ namespace PrmClient.UI.Employee
             Console.WriteLine($"  {new string('─', 44)}");
             Console.WriteLine($"  Total: {weekSheets.Sum(t => t.HoursLogged):F0} hrs");
         }
-
-        // ─── Helpers ──────────────────────────────────────────────────────────
 
         private static void Pause()
         {
