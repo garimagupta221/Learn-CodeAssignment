@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Project Resource Management Tool - ER Diagram (Updated)</title>
+  <style>
+    :root {
+      --bg: #f8f7f2;
+      --bg2: #ffffff;
+      --text: #2c2c2a;
+      --text2: #5f5e5a;
+      --border: rgba(44, 44, 42, 0.15);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1e1e1c;
+        --bg2: #2a2a28;
+        --text: #d4d2c8;
+        --text2: #9c9a92;
+        --border: rgba(212, 210, 200, 0.15);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 32px 24px 48px;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--text2);
+      margin-bottom: 24px;
+    }
+
+    .changes {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+      color: #856404;
+    }
+
+    .changes h2 {
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .changes ul {
+      margin-left: 20px;
+      font-size: 12px;
+    }
+
+    .changes li {
+      margin-bottom: 4px;
+    }
+
+    #erd {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    #erd svg {
+      min-width: 900px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Project Resource Management Tool - ER Diagram</h1>
+  <p class="subtitle">Updated schema — roles: Admin, Manager, Engineer</p>
+
+  <div id="erd"></div>
+
+  <script type="module">
+    import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+    const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+    await document.fonts.ready;
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      fontFamily: 'system-ui, -apple-system, sans-serif',
+      themeVariables: {
+        darkMode: dark,
+        fontSize: '13px',
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        lineColor: dark ? '#9c9a92' : '#73726c',
+        textColor: dark ? '#c2c0b6' : '#3d3d3a',
+      },
+    });
+
+    const diagram = `erDiagram
+  Users {
+    int id PK
+    string username "unique, not null"
+    string email "unique, not null, valid format"
+    string password_hash "bcrypt, not null"
+    bool force_pwd_change "true on creation"
+    string full_name "not null"
+    string department
+    string designation
+    int manager_id FK "nullable; self-ref to Users.id"
+    bool is_active "default true"
+    datetime created_at
+    datetime updated_at
+  }
+
+  Roles {
+    int id PK
+    string role "ADMIN|MANAGER|ENGINEER; unique, not null"
+  }
+
+  UserRoles {
+    int id PK
+    int user_id FK
+    int role_id FK
+  }
+
+  UserStatus {
+    int id PK
+    int user_id FK "unique"
+    string status "BENCH|ALLOCATED"
+    datetime updated_at
+  }
+
+  Skills {
+    int id PK
+    string name "unique, not null"
+    string category "BACKEND|FRONTEND|DEVOPS|QA|OTHER"
+    datetime created_at
+  }
+
+  UserSkills {
+    int id PK
+    int user_id FK
+    int skill_id FK
+    string proficiency "BEGINNER|INTERMEDIATE|ADVANCED"
+    datetime assigned_at
+  }
+
+  Projects {
+    int id PK
+    string name "not null"
+    string description
+    date start_date "not null"
+    date end_date "not null"
+    string status "PLANNED|ACTIVE|ON_HOLD|COMPLETED"
+    string health "GREEN|AMBER|RED"
+    int manager_user_id FK "FK to Users"
+    int total_story_points "default 0"
+    datetime created_at
+    datetime updated_at
+  }
+
+  Milestones {
+    int id PK
+    int project_id FK
+    string title "not null"
+    date due_date "not null"
+    int story_points "default 0"
+    string status "NOT_STARTED|IN_PROGRESS|DONE"
+    datetime completed_at "null until DONE"
+    datetime updated_at
+  }
+
+  Allocations {
+    int id PK
+    int user_id FK
+    int project_id FK
+    int allocated_by FK "FK to Users (who created allocation)"
+    int utilization_pct "1-100; sum across active le 100"
+    date start_date "not null"
+    date end_date "not null"
+    bool is_active "false when ended"
+    datetime created_at
+    datetime updated_at
+  }
+
+  Timesheets {
+    int id PK
+    int user_id FK
+    int project_id FK
+    int approved_by FK "FK to Users (manager who reviewed)"
+    date week_start "Monday of that week"
+    float hours_logged "0.5 increments"
+    string status "SUBMITTED|APPROVED|REJECTED|MISSED"
+    string rejection_reason "null unless REJECTED"
+    datetime submitted_at
+    datetime reviewed_at
+  }
+
+  ActivityTags {
+    int id PK
+    string tag_name "unique, not null"
+    string category "nullable"
+    bool is_active "default true"
+    datetime created_at
+  }
+
+  TimesheetTags {
+    int id PK
+    int timesheet_id FK
+    int activity_tag_id FK
+  }
+
+  Notifications {
+    int id PK
+    int user_id FK
+    string message "not null"
+    string type "TIMESHEET_SUBMITTED|APPROVED|REJECTED|MISSED|ALLOCATION_CREATED|PASSWORD_RESET"
+    bool is_read "default false"
+    datetime created_at
+  }
+
+  Users ||--o{ UserRoles : "has roles"
+  Roles ||--o{ UserRoles : "assigned via"
+  Users ||--o| UserStatus : "has status"
+  Users ||--o{ UserSkills : "has skills"
+  Skills ||--o{ UserSkills : "assigned via"
+  Users ||--o{ Projects : "manages"
+  Projects ||--o{ Milestones : "broken into"
+  Users ||--o{ Allocations : "allocated in"
+  Projects ||--o{ Allocations : "contains"
+  Users ||--o{ Allocations : "created allocation"
+  Users ||--o{ Timesheets : "submits"
+  Projects ||--o{ Timesheets : "logged against"
+  Users ||--o{ Timesheets : "approved timesheet"
+  Timesheets ||--o{ TimesheetTags : "tagged with"
+  ActivityTags ||--o{ TimesheetTags : "used in"
+  Users ||--o{ Notifications : "receives"
+`;
+
+    const { svg } = await mermaid.render('erd-svg', diagram);
+    document.getElementById('erd').innerHTML = svg;
+
+    document.querySelectorAll('#erd svg .node').forEach(node => {
+      const firstPath = node.querySelector('path[d]');
+      if (!firstPath) return;
+      const d = firstPath.getAttribute('d');
+      const nums = d.match(/-?[\d.]+/g)?.map(Number);
+      if (!nums || nums.length < 8) return;
+      const xs = [nums[0], nums[2], nums[4], nums[6]];
+      const ys = [nums[1], nums[3], nums[5], nums[7]];
+      const x = Math.min(...xs), y = Math.min(...ys);
+      const w = Math.max(...xs) - x, h = Math.max(...ys) - y;
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', x); rect.setAttribute('y', y);
+      rect.setAttribute('width', w); rect.setAttribute('height', h);
+      rect.setAttribute('rx', '8');
+      for (const a of ['fill', 'stroke', 'stroke-width', 'class', 'style']) {
+        if (firstPath.hasAttribute(a)) rect.setAttribute(a, firstPath.getAttribute(a));
+      }
+      firstPath.replaceWith(rect);
+    });
+    document.querySelectorAll('#erd svg .row-rect-odd path, #erd svg .row-rect-even path').forEach(p => {
+      p.setAttribute('stroke', 'none');
+    });
+  </script>
+</body>
+
+</html>

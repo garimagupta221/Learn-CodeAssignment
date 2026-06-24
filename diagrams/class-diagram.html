@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Project Resource Management Tool - Class Diagram</title>
+  <style>
+    :root {
+      --bg: #f8f7f2;
+      --bg2: #ffffff;
+      --text: #2c2c2a;
+      --text2: #5f5e5a;
+      --border: rgba(44, 44, 42, 0.15);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1e1e1c;
+        --bg2: #2a2a28;
+        --text: #d4d2c8;
+        --text2: #9c9a92;
+        --border: rgba(212, 210, 200, 0.15);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 32px 24px 48px;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--text2);
+      margin-bottom: 24px;
+    }
+
+    .changes {
+      background: #d4edda;
+      border: 1px solid #28a745;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+      color: #155724;
+    }
+
+    .changes h2 {
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .changes ul {
+      margin-left: 20px;
+      font-size: 12px;
+    }
+
+    .changes li {
+      margin-bottom: 4px;
+    }
+
+    #cd {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    #cd svg {
+      min-width: 900px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Project Resource Management Tool - Class Diagram</h1>
+
+
+  <div id="cd"></div>
+
+  <script type="module">
+    import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+    const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+    await document.fonts.ready;
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      fontFamily: 'system-ui, -apple-system, sans-serif',
+      themeVariables: {
+        darkMode: dark,
+        fontSize: '13px', fontFamily: 'system-ui, -apple-system, sans-serif',
+        lineColor: dark ? '#9c9a92' : '#73726c',
+        textColor: dark ? '#c2c0b6' : '#3d3d3a',
+      },
+    });
+
+    const diagram = `classDiagram
+  class User {
+    +int Id
+    +string Username
+    +string Email
+    +string PasswordHash
+    +UserRole Role
+    +bool IsActive
+    +bool ForcePasswordChange
+  }
+  class Employee {
+    +int Id
+    +int UserId
+    +int? ManagerUserId
+    +string FullName
+    +string Email
+    +string Department
+    +string Designation
+    +EmployeeStatus Status
+    +bool IsActive
+  }
+  class Project {
+    +int Id
+    +string Name
+    +string Description
+    +DateTime StartDate
+    +DateTime EndDate
+    +ProjectStatus Status
+    +HealthFlag Health
+    +int ManagerId
+    +int TotalStoryPoints
+  }
+  class Milestone {
+    +int Id
+    +int ProjectId
+    +string Title
+    +DateTime DueDate
+    +int StoryPoints
+    +MilestoneStatus Status
+    +DateTime CompletedAt
+  }
+  class Allocation {
+    +int Id
+    +int EmployeeId
+    +int ProjectId
+    +int AllocatedBy
+    +int UtilizationPct
+    +DateTime StartDate
+    +DateTime EndDate
+    +bool IsActive
+  }
+  class Timesheet {
+    +int Id
+    +int EmployeeId
+    +int ProjectId
+    +int ApprovedBy
+    +DateTime WeekStart
+    +float HoursLogged
+    +TimesheetStatus Status
+    +string RejectionReason
+  }
+  class Skill {
+    +int Id
+    +string Name
+    +string Category
+  }
+  class EmployeeSkill {
+    +int EmployeeId
+    +int SkillId
+    +ProficiencyLevel Proficiency
+  }
+  class ActivityTag {
+    +int Id
+    +string TagName
+    +string Category
+    +bool IsActive
+  }
+  class TimesheetTag {
+    +int Id
+    +int TimesheetId
+    +int ActivityTagId
+  }
+  class Notification {
+    +int Id
+    +int UserId
+    +string Message
+    +NotificationType Type
+    +bool IsRead
+  }
+
+  class IUserRepository {
+    <<interface>>
+    +GetById(id) User
+    +GetByUsername(username) User
+    +Create(user) User
+    +Update(user) User
+  }
+  class IEmployeeRepository {
+    <<interface>>
+    +GetAll() List~Employee~
+    +GetById(id) Employee
+    +GetByUserId(userId) Employee
+    +GetByManagerUserId(mgrUserId) List~Employee~
+    +Create(employee) Employee
+    +Update(employee) Employee
+  }
+  class IProjectRepository {
+    <<interface>>
+    +GetAll() List~Project~
+    +GetById(id) Project
+    +GetByManager(managerId) List~Project~
+    +Create(project) Project
+    +Update(project) Project
+  }
+  class IAllocationRepository {
+    <<interface>>
+    +GetAll() List~Allocation~
+    +GetByEmployee(employeeId) List~Allocation~
+    +GetByProject(projectId) List~Allocation~
+    +GetActive(employeeId) List~Allocation~
+    +Create(allocation) Allocation
+    +Update(allocation) Allocation
+    +EndAll(employeeId, endDate) void
+  }
+  class ITimesheetRepository {
+    <<interface>>
+    +GetAll() List~Timesheet~
+    +GetById(id) Timesheet
+    +GetByEmployee(employeeId) List~Timesheet~
+    +GetByProject(projectId) List~Timesheet~
+    +Create(timesheet) Timesheet
+    +Update(timesheet) Timesheet
+  }
+  class INotificationRepository {
+    <<interface>>
+    +GetUnread(userId) List~Notification~
+    +Create(notification) Notification
+    +MarkRead(notificationId) void
+  }
+  class IAuthService {
+    <<interface>>
+    +Login(username, password) string
+    +SignUp(signUpDto) User
+    +Logout(token) void
+    +ChangePassword(userId, newPwd) void
+    +ValidateToken(token) bool
+  }
+  class IEmployeeService {
+    <<interface>>
+    +GetAll() List~Employee~
+    +GetById(id) Employee
+    +GetAvailable(utilizationThreshold) List~Employee~
+    +GetByManagerUserId(mgrUserId) List~Employee~
+    +GetUtilization(employeeId) float
+    +Create(dto) Employee
+    +Update(id, dto) Employee
+    +Deactivate(id) void
+    +Reactivate(id) void
+    +AssignManager(dto) void
+    +AssignSkill(employeeId, skillDto) void
+    +UpdateSkill(employeeId, skillId, proficiency) void
+    +RemoveSkill(employeeId, skillId) void
+  }
+  class IProjectService {
+    <<interface>>
+    +GetAll() List~Project~
+    +GetById(id) Project
+    +GetByManager(managerId) List~Project~
+    +Create(dto) Project
+    +Update(id, dto) Project
+    +GetHealth(id) HealthFlag
+    +AddMilestone(projectId, dto) Milestone
+    +UpdateMilestone(milestoneId, dto) Milestone
+    +GetMilestones(projectId) List~Milestone~
+    +GetCompletedStoryPoints(projectId) int
+  }
+  class IAllocationService {
+    <<interface>>
+    +GetAll() List~Allocation~
+    +GetByEmployee(employeeId) List~Allocation~
+    +GetByProject(projectId) List~Allocation~
+    +Allocate(dto) Allocation
+    +CheckOverAllocation(employeeId, pct, dates) bool
+    +EndAllocation(id) void
+    +RecomputeUtilization() void
+  }
+  class ITimesheetService {
+    <<interface>>
+    +GetAll() List~Timesheet~
+    +GetById(id) Timesheet
+    +GetByEmployee(employeeId) List~Timesheet~
+    +GetByProject(projectId) List~Timesheet~
+    +Submit(dto) Timesheet
+    +Update(id, dto) Timesheet
+    +Approve(id, approverId) void
+    +Reject(id, reason, approverId) void
+    +GetMissed() List~Timesheet~
+    +MarkMissed(employeeId, weekStart) void
+  }
+  class INotificationService {
+    <<interface>>
+    +Create(userId, message, type) Notification
+    +GetUnread(userId) List~Notification~
+    +MarkAsRead(notificationId) void
+    +MarkAllAsRead(userId) void
+  }
+  class ISystemConfigService {
+    <<interface>>
+    +Get(key) string
+    +Set(key, value) void
+    +GetAll() Dictionary~string,string~
+  }
+  class ILLMService {
+    <<interface>>
+    +FindBestMatch(requirement) List~MatchResult~
+    +GetRiskSummary(projectId) string
+  }
+  class GeminiAdapter {
+    +FindBestMatch(requirement) List~MatchResult~
+    +GetRiskSummary(projectId) string
+  }
+  class GroqAdapter {
+    +FindBestMatch(requirement) List~MatchResult~
+    +GetRiskSummary(projectId) string
+  }
+  class BackgroundScheduler {
+    +int IntervalHours
+    +Run() void
+    -RecomputeUtilization() void
+    -EvaluateProjectHealth() void
+    -MarkMissedTimesheets() void
+  }
+  class AuthController {
+    +Post_Login(dto) IActionResult
+    +Post_SignUp(dto) IActionResult
+    +Post_Logout(token) IActionResult
+    +Post_ChangePassword(dto) IActionResult
+  }
+  class EmployeeController {
+    +Get_All() IActionResult
+    +Get_ById(id) IActionResult
+    +Get_Available() IActionResult
+    +Get_ByManager(managerUserId) IActionResult
+    +Post_Create(dto) IActionResult
+    +Put_Update(id, dto) IActionResult
+    +Put_AssignManager(dto) IActionResult
+    +Delete_Deactivate(id) IActionResult
+    +Post_AssignSkill(employeeId, dto) IActionResult
+    +Put_UpdateSkill(id, skillId, dto) IActionResult
+    +Delete_RemoveSkill(id, skillId) IActionResult
+  }
+  class ProjectController {
+    +Get_All() IActionResult
+    +Get_ById(id) IActionResult
+    +Get_ByManager(id) IActionResult
+    +Post_Create(dto) IActionResult
+    +Put_Update(id, dto) IActionResult
+    +Get_Health(id) IActionResult
+    +Post_AddMilestone(projectId, dto) IActionResult
+    +Get_MilestonesByProject(projectId) IActionResult
+    +Put_UpdateMilestone(milestoneId, dto) IActionResult
+  }
+  class AllocationController {
+    +Get_ByEmployee(employeeId) IActionResult
+    +Get_ByProject(projectId) IActionResult
+    +Post_Allocate(dto) IActionResult
+    +Put_End(id) IActionResult
+  }
+  class TimesheetController {
+    +Get_ByEmployee(employeeId) IActionResult
+    +Post_Submit(dto) IActionResult
+    +Put_Update(id, dto) IActionResult
+    +Put_Approve(id) IActionResult
+    +Put_Reject(id, reason) IActionResult
+  }
+  class SystemConfigController {
+    +Get_All() IActionResult
+    +Put_Set(key, value) IActionResult
+  }
+  class AiController {
+    +Post_SkillMatch(dto) IActionResult
+    +Get_RiskSummary(projectId) IActionResult
+  }
+
+  ILLMService <|.. GeminiAdapter : implements
+  ILLMService <|.. GroqAdapter : implements
+  IAuthService <.. AuthController : uses
+  IEmployeeService <.. EmployeeController : uses
+  IProjectService <.. ProjectController : uses
+  IAllocationService <.. AllocationController : uses
+  ITimesheetService <.. TimesheetController : uses
+  ISystemConfigService <.. SystemConfigController : uses
+  ILLMService <.. AiController : uses
+  IEmployeeService <.. AiController : uses
+  INotificationService <.. TimesheetController : uses
+  INotificationService <.. AllocationController : uses
+  User "1" --> "0..1" Employee : has profile
+  User "1" --> "0..*" Employee : manages team
+  Employee "1" --> "0..*" EmployeeSkill : has
+  Skill "1" --> "0..*" EmployeeSkill : used in
+  Employee "1" --> "0..*" Allocation : allocated via
+  Project "1" --> "0..*" Allocation : includes
+  Project "1" --> "0..*" Milestone : has
+  Employee "1" --> "0..*" Timesheet : submits
+  Project "1" --> "0..*" Timesheet : logged for
+  Timesheet "1" --> "0..*" TimesheetTag : tagged with
+  ActivityTag "1" --> "0..*" TimesheetTag : used in
+  BackgroundScheduler ..> ITimesheetService : triggers
+  BackgroundScheduler ..> IProjectService : updates health
+  BackgroundScheduler ..> IAllocationService : recomputes utilization
+  IAuthService ..> IUserRepository : uses
+  IEmployeeService ..> IEmployeeRepository : uses
+  IProjectService ..> IProjectRepository : uses
+  IAllocationService ..> IAllocationRepository : uses
+  ITimesheetService ..> ITimesheetRepository : uses
+  INotificationService ..> INotificationRepository : uses
+  IEmployeeService ..> IAllocationService : deactivation cascade
+`;
+
+    const { svg } = await mermaid.render('cd-svg', diagram);
+    document.getElementById('cd').innerHTML = svg;
+    document.querySelectorAll('#cd svg .node').forEach(node => {
+      const firstPath = node.querySelector('path[d]');
+      if (!firstPath) return;
+      const d = firstPath.getAttribute('d');
+      const nums = d.match(/-?[\d.]+/g)?.map(Number);
+      if (!nums || nums.length < 8) return;
+      const xs = [nums[0], nums[2], nums[4], nums[6]];
+      const ys = [nums[1], nums[3], nums[5], nums[7]];
+      const x = Math.min(...xs), y = Math.min(...ys);
+      const w = Math.max(...xs) - x, h = Math.max(...ys) - y;
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', x); rect.setAttribute('y', y);
+      rect.setAttribute('width', w); rect.setAttribute('height', h);
+      rect.setAttribute('rx', '8');
+      for (const a of ['fill', 'stroke', 'stroke-width', 'class', 'style']) {
+        if (firstPath.hasAttribute(a)) rect.setAttribute(a, firstPath.getAttribute(a));
+      }
+      firstPath.replaceWith(rect);
+    });
+  </script>
+</body>
+
+</html>

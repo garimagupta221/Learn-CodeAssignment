@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Project Resource Management Tool - Flow Diagram</title>
+<style>
+  :root {
+    --bg: #f8f7f2; --bg2: #ffffff; --text: #2c2c2a; --text2: #5f5e5a;
+    --border: rgba(44,44,42,0.15);
+    --purple-fill:#EEEDFE; --purple-stroke:#534AB7; --purple-text:#3C3489;
+    --teal-fill:#E1F5EE;   --teal-stroke:#0F6E56;   --teal-text:#085041;
+    --coral-fill:#FAECE7;  --coral-stroke:#993C1D;  --coral-text:#712B13;
+    --amber-fill:#FAEEDA;  --amber-stroke:#854F0B;  --amber-text:#633806;
+    --gray-fill:#F1EFE8;   --gray-stroke:#5F5E5A;   --gray-text:#444441;
+    --blue-fill:#E6F1FB;   --blue-stroke:#185FA5;   --blue-text:#0C447C;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#1e1e1c; --bg2:#2a2a28; --text:#d4d2c8; --text2:#9c9a92;
+      --border:rgba(212,210,200,0.15);
+      --purple-fill:#26215C; --purple-stroke:#AFA9EC; --purple-text:#CECBF6;
+      --teal-fill:#04342C;   --teal-stroke:#5DCAA5;   --teal-text:#9FE1CB;
+      --coral-fill:#4A1B0C;  --coral-stroke:#F0997B;  --coral-text:#F5C4B3;
+      --amber-fill:#412402;  --amber-stroke:#EF9F27;  --amber-text:#FAC775;
+      --gray-fill:#2C2C2A;   --gray-stroke:#B4B2A9;   --gray-text:#D3D1C7;
+      --blue-fill:#042C53;   --blue-stroke:#85B7EB;   --blue-text:#B5D4F4;
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);padding:32px 24px 64px;}
+  h1{font-size:20px;font-weight:500;margin-bottom:4px;}
+  .subtitle{font-size:13px;color:var(--text2);margin-bottom:12px;}
+  .changes { 
+    background: #e7f3ff; 
+    border: 1px solid #0066cc; 
+    border-radius: 8px; 
+    padding: 16px; 
+    margin-bottom: 24px;
+    color: #004080;
+  }
+  .changes h2 { font-size: 14px; margin-bottom: 8px; }
+  .changes ul { margin-left: 20px; font-size: 12px; }
+  .changes li { margin-bottom: 4px; }
+  .legend{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:28px;padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);}
+  .leg{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);}
+  .dot{width:12px;height:12px;border-radius:3px;border:1.5px solid;}
+  .flow{display:flex;flex-direction:column;align-items:center;gap:0;width:100%;max-width:1060px;margin:0 auto;}
+  .node{border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;text-align:center;border-width:1px;border-style:solid;min-width:160px;}
+  .node.pill{border-radius:24px;}
+  .node sub{display:block;font-size:11px;font-weight:400;margin-top:3px;opacity:.85;}
+  .node.gray  {background:var(--gray-fill);  border-color:var(--gray-stroke);  color:var(--gray-text);}
+  .node.purple{background:var(--purple-fill);border-color:var(--purple-stroke);color:var(--purple-text);}
+  .node.teal  {background:var(--teal-fill);  border-color:var(--teal-stroke);  color:var(--teal-text);}
+  .node.coral {background:var(--coral-fill); border-color:var(--coral-stroke); color:var(--coral-text);}
+  .node.amber {background:var(--amber-fill); border-color:var(--amber-stroke); color:var(--amber-text);}
+  .node.blue  {background:var(--blue-fill);  border-color:var(--blue-stroke);  color:var(--blue-text);}
+  .arrow{width:2px;height:24px;background:var(--text2);margin:0 auto;position:relative;flex-shrink:0;}
+  .arrow::after{content:'';position:absolute;bottom:-5px;left:-4px;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--text2);}
+  .arrow.short{height:14px;}
+  .decision{font-size:12px;font-weight:500;color:var(--purple-text);text-align:center;margin:4px 0 2px;}
+  .branch3{display:flex;width:100%;max-width:1060px;gap:0;align-items:flex-start;justify-content:center;}
+  .branch2{display:flex;width:100%;max-width:700px;gap:0;align-items:flex-start;justify-content:center;}
+  .lane{display:flex;flex-direction:column;align-items:center;flex:1;gap:0;}
+  .lane-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);margin-bottom:8px;text-align:center;}
+  .step{border-radius:7px;padding:9px 12px;font-size:12px;font-weight:500;text-align:center;border-width:1px;border-style:solid;width:100%;}
+  .step sub{display:block;font-size:10px;font-weight:400;margin-top:2px;opacity:.8;}
+  .step.gray  {background:var(--gray-fill);  border-color:var(--gray-stroke);  color:var(--gray-text);}
+  .step.purple{background:var(--purple-fill);border-color:var(--purple-stroke);color:var(--purple-text);}
+  .step.teal  {background:var(--teal-fill);  border-color:var(--teal-stroke);  color:var(--teal-text);}
+  .step.coral {background:var(--coral-fill); border-color:var(--coral-stroke); color:var(--coral-text);}
+  .step.amber {background:var(--amber-fill); border-color:var(--amber-stroke); color:var(--amber-text);}
+  .step.blue  {background:var(--blue-fill);  border-color:var(--blue-stroke);  color:var(--blue-text);}
+  .mini-arrow{width:1px;height:14px;background:var(--text2);margin:0 auto;position:relative;}
+  .mini-arrow::after{content:'';position:absolute;bottom:-4px;left:-3px;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--text2);}
+  .sec{font-size:11px;color:var(--text2);text-align:center;padding:3px 8px;border-radius:4px;background:var(--bg);border:1px dashed var(--border);margin:8px 0 4px;width:100%;}
+  .col-box{border-radius:12px;border:1px solid var(--border);padding:14px 12px;background:var(--bg2);width:100%;display:flex;flex-direction:column;align-items:center;gap:0;}
+  .sched-box{border:1.5px dashed var(--gray-stroke);border-radius:12px;padding:16px;background:var(--bg2);width:100%;max-width:960px;}
+  .sched-title{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);text-align:center;margin-bottom:12px;}
+  .sched-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .phase{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--text2);margin:14px auto 4px;text-align:center;}
+  .ai-row{display:flex;gap:12px;width:100%;max-width:780px;}
+  .ai-row .step{flex:1;}
+  .connector{width:100%;overflow:visible;display:block;}
+  .or-label{font-size:11px;color:var(--text2);text-align:center;margin:2px 0;}
+  .note{font-size:11px;color:var(--text2);text-align:center;margin:6px 0;}
+  .blabel{font-size:11px;color:var(--text2);text-align:center;}
+  .divider{width:100%;max-width:1060px;height:1px;background:var(--border);margin:12px auto;}
+</style>
+</head>
+<body>
+
+<h1>Project Resource Management Tool - Flow Diagram</h1>
+
+
+<div class="flow">
+
+  <div class="node gray pill" style="width:200px">
+    User starts client
+    <sub>Console application</sub>
+  </div>
+  <div class="arrow"></div>
+
+  <div class="node purple" style="width:320px">
+    Main screen
+    <sub>1. Login &nbsp;&nbsp; 2. Exit</sub>
+  </div>
+  <div class="arrow"></div>
+
+  <svg class="connector" style="height:32px;max-width:1060px" viewBox="0 0 1060 32" preserveAspectRatio="xMidYMid meet">
+    <line x1="530" y1="0" x2="530" y2="12" stroke="var(--text2)" stroke-width="1.5"/>
+    <line x1="200" y1="12" x2="860" y2="12" stroke="var(--text2)" stroke-width="1.5"/>
+    <line x1="200" y1="12" x2="200" y2="32" stroke="var(--text2)" stroke-width="1.5" marker-end="url(#arr)"/>
+    <line x1="860" y1="12" x2="860" y2="32" stroke="var(--text2)" stroke-width="1.5" marker-end="url(#arr)"/>
+    <text x="200" y="10" text-anchor="middle" font-size="11" fill="var(--text2)">2. Exit</text>
+    <text x="860" y="10" text-anchor="middle" font-size="11" fill="var(--text2)">1. Login</text>
+    <defs>
+      <marker id="arr" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+        <path d="M2 2L8 5L2 8" fill="none" stroke="var(--text2)" stroke-width="1.5" stroke-linecap="round"/>
+      </marker>
+    </defs>
+  </svg>
+
+  <div class="branch3" style="gap:12px;align-items:flex-start;">
+
+    <!-- ── EXIT lane ── -->
+    <div class="lane" style="max-width:220px;">
+      <div class="node gray pill" style="width:180px">
+        Exit gracefully
+        <sub>Application terminates</sub>
+      </div>
+    </div>
+
+<!-- ── LOGIN lane ── -->
+<div class="lane" style="max-width:420px;">
+  <svg viewBox="0 0 420 660" width="420" height="660" xmlns="http://www.w3.org/2000/svg" style="overflow:visible;display:block;">
+    <defs>
+      <marker id="arr-login" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M2 1L8 5L2 9" fill="none" stroke="var(--text2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </marker>
+    </defs>
+
+    <!-- Enter username + password -->
+    <rect x="60" y="0" width="300" height="58" rx="8" fill="var(--purple-fill)" stroke="var(--purple-stroke)" stroke-width="1"/>
+    <text x="210" y="22" text-anchor="middle" font-size="13" font-weight="600" fill="var(--purple-text)" font-family="system-ui,sans-serif">Enter username + password</text>
+    <text x="210" y="42" text-anchor="middle" font-size="11" fill="var(--purple-text)" font-family="system-ui,sans-serif" opacity=".85">Credentials are sent to the server for validation</text>
+
+    <!-- Arrow down -->
+    <line x1="210" y1="58" x2="210" y2="82" stroke="var(--text2)" stroke-width="1.5" marker-end="url(#arr-login)"/>
+
+    <!-- Credentials valid? -->
+    <text x="210" y="97" text-anchor="middle" font-size="12" font-weight="600" fill="var(--purple-text)" font-family="system-ui,sans-serif">Credentials valid?</text>
+
+    <!-- Split line -->
+    <line x1="210" y1="104" x2="210" y2="116" stroke="var(--text2)" stroke-width="1.5"/>
+    <line x1="90"  y1="116" x2="330" y2="116" stroke="var(--text2)" stroke-width="1.5"/>
+    <line x1="90"  y1="116" x2="90"  y2="140" stroke="var(--text2)" stroke-width="1.5" marker-end="url(#arr-login)"/>
+    <line x1="330" y1="116" x2="330" y2="140" stroke="var(--text2)" stroke-width="1.5" marker-end="url(#arr-login)"/>
+    <text x="68"  y="130" text-anchor="middle" font-size="11" fill="var(--text2)" font-family="system-ui,sans-serif">No</text>
+    <text x="352" y="130" text-anchor="middle" font-size="11" fill="var(--text2)" font-family="system-ui,sans-serif">Yes</text>
+
+    <!-- Login failed -->
+    <rect x="10" y="144" width="160" height="64" rx="8" fill="var(--coral-fill)" stroke="var(--coral-stroke)" stroke-width="1"/>
+    <text x="90" y="167" text-anchor="middle" font-size="13" font-weight="700" fill="var(--coral-text)" font-family="system-ui,sans-serif">Login failed</text>
+    <text x="90" y="184" text-anchor="middle" font-size="11" fill="var(--coral-text)" font-family="system-ui,sans-serif" opacity=".85">Show error and return to</text>
+    <text x="90" y="198" text-anchor="middle" font-size="11" fill="var(--coral-text)" font-family="system-ui,sans-serif" opacity=".85">this screen</text>
+
+    <!-- Check first login -->
+    <rect x="250" y="144" width="160" height="64" rx="8" fill="var(--purple-fill)" stroke="var(--purple-stroke)" stroke-width="1"/>
+    <text x="330" y="164" text-anchor="middle" font-size="13" font-weight="600" fill="var(--purple-text)" font-family="system-ui,sans-serif">Check first login</text>
+    <text x="330" y="181" text-anchor="middle" font-size="11" fill="var(--purple-text)" font-family="system-ui,sans-serif" opacity=".85">force_password_change</text>
+    <text x="330" y="196" text-anchor="middle" font-size="11" fill="var(--purple-text)" font-family="system-ui,sans-serif" opacity=".85">= true?</text>
+
+    <!-- Arrow from Check first login down, merge to center -->
+    <line x1="330" y1="208" x2="330" y2="234" stroke="var(--text2)" stroke-width="1.5"/>
+    <line x1="210" y1="234" x2="330" y2="234" stroke="var(--text2)" stroke-width="1.5"/>
+    <line x1="210" y1="234" x2="210" y2="254" stroke="var(--text2)" stroke-width="1.5" marker-end="url(#arr-login)"/>
+
+    <!-- First login? -->
+    <text x="210" y="269" text-anchor="middle" font-size="12" font-weight="600" fill="var(--purple-text)" font-family="system-ui,sans-serif">First login?</text>
+
+    <!-- Split line -->
+    <line x1="210" y1="276" x2="210" y2="288" stroke="var(--text2)" stroke-width="1.5"/>
+    <line x1="90"  y1="288" x2="330" y2="288" stroke="var(--text2)" stroke-width="1.5"/>
+    <line x1="90"  y1="288" x2="90"  y2="312" stroke="var(--text2)" stroke-width="1.5" marker-end="url(#arr-login)"/>
+    <line x1="330" y1="288" x2="330" y2="312" stroke="var(--text2)" stroke-width="1.5" marker-end="url(#arr-login)"/>
+    <text x="68"  y="302" text-anchor="middle" font-size="11" fill="var(--text2)" font-family="system-ui,sans-serif">Yes</text>
+    <text x="352" y="302" text-anchor="middle" font-size="11" fill="var(--text2)" font-family="system-ui,sans-serif">No</text>
+
+    <!-- Change Password screen -->
+    <rect x="10" y="316" width="160" height="58" rx="8" fill="var(--purple-fill)" stroke="var(--purple-stroke)" stroke-width="1"/>
+    <text x="90" y="337" text-anchor="middle" font-size="13" font-weight="600" fill="var(--purple-text)" font-family="system-ui,sans-serif">Change Password</text>
+    <text x="90" y="353" text-anchor="middle" font-size="13" font-weight="600" fill="var(--purple-text)" font-family="system-ui,sans-serif">screen</text>
+    <text x="90" y="366" text-anchor="middle" font-size="11" fill="var(--purple-text)" font-family="system-ui,sans-serif" opacity=".85">Cannot be skipped</text>
+
+    <!-- Arrow down to Save new password -->
+    <line x1="90" y1="374" x2="90" y2="398" stroke="var(--text2)" stroke-width="1.5" marker-end="url(#arr-login)"/>
+
+    <!-- Save new password -->
+    <rect x="10" y="402" width="160" height="62" rx="8" fill="var(--purple-fill)" stroke="var(--purple-stroke)" stroke-width="1"/>
+    <text x="90" y="422" text-anchor="middle" font-size="13" font-weight="600" fill="var(--purple-text)" font-family="system-ui,sans-serif">Save new password</text>
+    <text x="90" y="439" text-anchor="middle" font-size="11" fill="var(--purple-text)" font-family="system-ui,sans-serif" opacity=".85">force_password_change</text>
+    <text x="90" y="453" text-anchor="middle" font-size="11" fill="var(--purple-text)" font-family="system-ui,sans-serif" opacity=".85">= false</text>
+
+    <!-- Yes branch: down then right to merge -->
+    <line x1="90"  y1="464" x2="90"  y2="500" stroke="var(--text2)" stroke-width="1.5"/>
+    <line x1="90"  y1="500" x2="210" y2="500" stroke="var(--text2)" stroke-width="1.5"/>
+
+    <!-- No branch: straight down to merge -->
+    <line x1="330" y1="316" x2="330" y2="500" stroke="var(--text2)" stroke-width="1.5"/>
+    <line x1="210" y1="500" x2="330" y2="500" stroke="var(--text2)" stroke-width="1.5"/>
+
+    <!-- Merged arrow down -->
+    <line x1="210" y1="500" x2="210" y2="524" stroke="var(--text2)" stroke-width="1.5" marker-end="url(#arr-login)"/>
+
+    <!-- Fetch unread notifications -->
+    <rect x="60" y="528" width="300" height="58" rx="8" fill="var(--purple-fill)" stroke="var(--purple-stroke)" stroke-width="1"/>
+    <text x="210" y="550" text-anchor="middle" font-size="13" font-weight="600" fill="var(--purple-text)" font-family="system-ui,sans-serif">Fetch unread notifications</text>
+    <text x="210" y="568" text-anchor="middle" font-size="11" fill="var(--purple-text)" font-family="system-ui,sans-serif" opacity=".85">Displayed at menu load (pull model)</text>
+
+    <!-- Arrow down -->
+    <line x1="210" y1="586" x2="210" y2="610" stroke="var(--text2)" stroke-width="1.5" marker-end="url(#arr-login)"/>
+
+    <!-- Route by role -->
+    <text x="210" y="628" text-anchor="middle" font-size="13" font-weight="700" fill="var(--purple-text)" font-family="system-ui,sans-serif">Route by role →</text>
+  </svg>
+</div>
+
+    </div><!-- end branch3 -->
+
+  <div class="divider"></div>
+
+  <div style="font-size:12px;font-weight:500;co lor:var(--text2);text-align:center;margin-bottom:10px;">Role menus (after successful login)</div>
+
+  <div class="branch3" style="gap:16px;align-items:flex-start;">
+
+    <!-- ── ADMIN ── -->
+    <div class="lane">
+      <div class="lane-label" style="color:var(--coral-text)">Admin</div>
+      <div class="col-box">
+
+        <div class="sec">User &amp; account management</div>
+        <div class="step coral">Create user accounts<sub>Admin / Manager / Employee roles</sub></div>
+        <div class="mini-arrow"></div>
+        <div class="step coral">Reset passwords<sub>User must change password on next login</sub></div>
+        <div class="mini-arrow"></div>
+        <div class="step coral">Deactivate / reactivate accounts<sub>Login blocked; data preserved</sub></div>
+
+        <div class="sec">Employee management</div>
+        <div class="step coral">Add employee and link to existing user account</div>
+        <div class="mini-arrow"></div>
+        <div class="step coral">Update employee details<sub>Full name, email, department, designation</sub></div>
+        <div class="mini-arrow"></div>
+        <div class="step coral">Assign manager to employee<sub>links ManagerUserId; scopes manager dashboard + AI search</sub></div>
+        <div class="mini-arrow"></div>
+        <div class="step coral">Deactivate employee<sub>Ends active allocations today and blocks login</sub></div>
+
+        <div class="sec">Skill management</div>
+        <div class="step coral">Add skill to employee<sub>Choose category and proficiency level</sub></div>
+        <div class="mini-arrow"></div>
+        <div class="step coral">Update proficiency or remove skill</div>
+
+        <div class="sec">Project management</div>
+        <div class="step coral">Create project<sub>Name, description, dates, status, assign manager, total story points</sub></div>
+        <div class="mini-arrow"></div>
+        <div class="step coral">Update project details<sub>all fields editable incl. story points; COMPLETED is a valid status</sub></div>
+        <div class="mini-arrow"></div>
+        <div class="step coral">Manage milestones<sub>Add milestone (with story points) or update milestone status (NOT_STARTED / IN_PROGRESS / DONE)</sub></div>
+        <div class="mini-arrow"></div>
+        <div class="step coral">View all allocations<sub>Filter by employee or project</sub></div>
+
+        <div class="sec">System configuration</div>
+        <div class="step coral">Update LLM API key and provider<sub>Gemini or Groq</sub></div>
+        <div class="mini-arrow"></div>
+        <div class="step coral">Update scheduler interval</div>
+        <div class="mini-arrow"></div>
+        <div class="step coral">Update max weekly hours<sub>Screen example shows 40 hours</sub></div>
+      </div>
+    </div>
+
+    <!-- ── MANAGER ── -->
+    <div class="lane">
+      <div class="lane-label" style="color:var(--teal-text)">Manager</div>
+      <div class="col-box">
+
+        <div class="sec">Resource dashboard</div>
+        <div class="step teal">View own team resource dashboard<sub>scoped to employees WHERE ManagerUserId = this manager</sub></div>
+        <div class="mini-arrow"></div>
+        <div class="step teal">Drill into employee<sub>Department, profile skills, active allocations, recent activity tags</sub></div>
+
+        <div class="sec">AI-assisted allocation</div>
+        <div class="step amber">Enter natural language requirement<sub>Example: Java + microservices for 3 months</sub></div>
+        <div class="mini-arrow"></div>
+        <div class="step amber">Server queries own team DB + builds prompt<sub>only this manager's employees considered</sub></div>
+        <div class="mini-arrow"></div>
+        <div class="step amber">LLM returns ranked suggestions<sub>Shown with AI-generated disclaimer</sub></div>
+
+        <div class="sec">Resource allocation</div>
+        <div class="step teal">Allocate employee to project<sub>Utilisation % + date range</sub></div>
+        <div class="mini-arrow"></div>
+        <div class="step teal">Check over-allocation<sub>Total across overlapping dates ≤ 100%</sub></div>
+        <div class="mini-arrow"></div>
+        <div class="step coral">Over-allocated? → Block with error</div>
+        <div class="mini-arrow"></div>
+        <div class="step teal">End an existing allocation<sub>Set to_date to today; scheduler recomputes employee status</sub></div>
+
+        <div class="sec">My Projects</div>
+        <div class="step teal">View assigned projects and health status<sub>table shows SP Done / Total (story points)</sub></div>
+        <div class="mini-arrow"></div>
+        <div class="step teal">Open project detail<sub>Risk flags, milestones with story points, allocated resources</sub></div>
+        <div class="mini-arrow"></div>
+        <div class="step amber">AI risk summary<sub>Plain-English from LLM based on milestones + timesheets</sub></div>
+
+        <div class="sec">Timesheet review (read-only)</div>
+        <div class="step teal">View team timesheets<sub>own team only; filter by week; MISSED ⚠ rows highlighted</sub></div>
+        <div class="mini-arrow"></div>
+        <div class="step teal">View employee week detail<sub>Employee / Project / Hrs / Status per row</sub></div>
+      </div>
+    </div>
+
+    <!-- ── EMPLOYEE ── -->
+    <div class="lane">
+      <div class="lane-label" style="color:var(--blue-text)">Employee</div>
+      <div class="col-box">
+
+        <div class="sec">Menu reminder</div>
+        <div class="step blue">Show missing-timesheet banner<sub>Checks last completed week; shown if no entry exists for that Monday</sub></div>
+
+        <div class="sec">Timesheet submission</div>
+        <div class="step blue">Select week<sub>Enter date or press Enter for last Monday</sub></div>
+        <div class="mini-arrow"></div>
+        <div class="step blue">Check active allocations for that week</div>
+        <div class="mini-arrow"></div>
+        <div class="step blue">Log hours per allocated project<sub>Within allocation % × max weekly hours</sub></div>
+        <div class="mini-arrow"></div>
+        <div class="step blue">Select activity tags<sub>From the provided tag list</sub></div>
+        <div class="mini-arrow"></div>
+        <div class="step blue">Validate weekly submission<sub>No future week, no duplicate, total ≤ configured max hours</sub></div>
+        <div class="mini-arrow"></div>
+        <div class="step blue">Submit timesheet<sub>Status: SUBMITTED</sub></div>
+
+        <div class="sec">History &amp; allocations</div>
+        <div class="step blue">View my timesheets<sub>Week-summarised history; MISSED ⚠ shown if scheduler marked a week</sub></div>
+        <div class="mini-arrow"></div>
+        <div class="step blue">View week detail<sub>Hours and activity tags by project</sub></div>
+        <div class="mini-arrow"></div>
+        <div class="step blue">View my allocations<sub>Project, %, from, to, status</sub></div>
+      </div>
+    </div>
+
+  </div><!-- end role columns -->
+
+  <div class="arrow" style="margin-top:12px"></div>
+
+  <div class="phase">Background scheduler (server thread)</div>
+  <div class="sched-box" style="max-width:1060px;">
+    <div class="sched-title">Runs every 4 hours by default (configurable via config file) — independent of any user action</div>
+    <div class="sched-grid">
+      <div class="step gray">Recompute utilisation<sub>Sum overlapping alloc% per employee; update employee status</sub></div>
+      <div class="step gray">Update employee status<sub>Bench if 0%, Allocated if &gt;0%</sub></div>
+      <div class="step amber">Evaluate project health<sub>Overdue milestones, low hours, deadline proximity</sub></div>
+      <div class="step amber">Set health flag<sub>Green → Amber → Red by flag count</sub></div>
+    </div>
+    <div style="height:10px"></div>
+    <div class="step gray" style="max-width:460px;margin:0 auto">
+      Mark missed timesheets
+      <sub>Past week with no submission → status = Missed; manager notification created</sub>
+    </div>
+  </div>
+
+  <div class="arrow" style="margin-top:12px"></div>
+
+  <div class="phase">AI service layer (on-demand, server-side)</div>
+  <div class="ai-row" style="max-width:900px;">
+    <div class="step amber" style="flex:1">
+      Skill match
+      <sub>Natural language → DB query → LLM prompt → ranked employees with disclaimer</sub>
+    </div>
+    <div class="step amber" style="flex:1">
+      Risk summary
+      <sub>Milestone + timesheet data → LLM prompt → plain-English risk assessment</sub>
+    </div>
+  </div>
+  <div class="note" style="margin:8px 0">LLM unavailable → graceful fallback message; app never crashes</div>
+
+  <div class="arrow"></div>
+
+  <div class="node gray pill" style="width:200px">
+    Logout
+    <sub>JWT invalidated on server</sub>
+  </div>
+
+</div><!-- end flow -->
+</body>
+</html>
